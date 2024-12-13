@@ -1,0 +1,257 @@
+.footer-container {
+  background-color: #f9f9f9;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  color: #00274d;
+}
+
+.footer-top {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  margin-bottom: 30px;
+  border-color: rgb(236, 235, 235);
+  border-radius: 2px;
+}
+
+.feature-item {
+  text-align: center;
+  flex: 1;
+}
+
+.circle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 50px;
+  height: 50px;
+  border: 2px solid #00274d;
+  border-radius: 50%;
+  font-size: 18px;
+  font-weight: bold;
+  color: #00274d;
+  margin: 0 auto 10px;
+}
+
+.facebook{
+  width: 30px;
+  height: 30px;
+  color: blue;
+}
+
+.twitter{
+  width: 30px;
+  height: 30px;
+  border-radius: 2px;
+  color: black;
+}
+
+.instagram{
+  width: 30px;
+  height: 30px;
+}
+
+.footer-middle {
+  display: flex;
+  justify-content: space-evenly;
+  text-align: left;
+  border-color: rgb(236, 235, 235);
+  border-radius: 2px;
+  width: auto;
+}
+
+.company-info {
+  flex: 3;
+  width: 150px;
+}
+
+.blog-links, .app-links, .social-links{
+  flex: 1;
+  margin: 0 20px;
+}
+
+h6 {
+  font-size: 18px;
+  margin-bottom: 15px;
+  text-align: left;
+  font-family: 'Maven Pro', sans-serif;
+  box-sizing: border-box;
+  margin-top: 0;
+  margin-bottom: .5rem;
+  font-weight: 600;
+  line-height: 1.2;
+  font-size: 1rem;
+  color: #133365;
+}
+
+.blog-links {
+  display: flex;
+  justify-content: space-between; 
+  gap: 0px;
+}
+
+.blog-links .col-1,
+.blog-links .col-2 {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+}
+
+.blog-links .col-1 ,
+.blog-links .col-2  {
+  list-style: none;
+}
+
+.blog-links h6 {
+  font-size: 16px;
+  font-weight: bold;
+  color: #00274d;
+  white-space: nowrap;  
+  /* overflow:; */
+  text-overflow: ellipsis;
+}
+
+.blog-links p {
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  color: #555;
+  margin: 5px 0;
+}
+
+.blog-links hr {
+  border: none;
+  border-top: 1px solid #ddd;
+  margin: 10px 0;
+}
+
+.blog-links a {
+  text-decoration: none;
+  color: #133365; 
+  transition: color 0.3s ease;
+}
+
+.blog-links a:hover {
+  color: black;
+}
+
+.app-links img {
+  width: 120px;
+  margin: 10px 0;
+}
+
+.social-icons {
+  display: flex;
+  gap: 10px;
+}
+
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  color: #555;
+  background-color: rgb(236, 235, 235);
+  border-color: rgb(236, 235, 235);
+  border-radius: 2px;
+  margin-top: 20px;
+  height: 50px;
+}
+
+.footer-bottom .title {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.footer-bottom a {
+  color: #0a7ff3;
+  text-decoration: none;
+  margin: 0 5px;
+}
+
+.footer-bottom .links {
+  display: flex;
+  gap: 5px;
+}
+
+.footer-bottom img {
+  height: 30px;
+  object-fit: contain;
+}
+
+
+.company-logo {
+  width: 180px;
+  height: auto;
+}
+
+.company-info a {
+  text-align: left;
+  font-family: 'Maven Pro', sans-serif;
+  font-size: 13px;
+  line-height: 22px;
+  box-sizing: border-box;
+  background-color: transparent;
+  color: #343a40;
+  text-decoration: none;
+}
+
+.company-info a:hover {
+  color: black;
+}
+
+
+a:active {
+  color: #00376d;
+}
+
+.app-links-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+  padding: 20px;
+}
+
+.app-links h3,
+.social-links h3 {
+  font-size: 18px;
+  color: #00274d;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+.app-icons {
+  display: flex;
+  gap: 15px;
+}
+
+.app-links img {
+  width: 140px;
+  height: auto;
+  transition: transform 0.3s ease;
+}
+
+.app-links img:hover {
+  transform: scale(1.05);
+}
+
+.social-icons {
+  display: flex;
+  gap: 20px;
+}
+
+.social-icon {
+  font-size: 30px;
+  color: #00274d;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.social-icon:hover {
+  color: #ff4500;
+  transform: scale(1.);
+}
+
