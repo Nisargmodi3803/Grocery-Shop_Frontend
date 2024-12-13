@@ -101,8 +101,8 @@ export const Header = () => {
                 </ul>
             </div>
             {showModal && <LoginSignUpModal closeModal={closeModal} />}
-            {/* <button onClick={addToCart}>Add Item to Cart</button> */}
-            {/* <button onClick={removeFromCart}>Remove Item from Cart</button> */}
+            <button onClick={addToCart}>Add Item to Cart</button>
+            <button onClick={removeFromCart}>Remove Item from Cart</button>
         </div>
     );
 };

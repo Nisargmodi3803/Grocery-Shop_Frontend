@@ -63,7 +63,6 @@
     width: 35px;
     border-radius: 5px;
     background-color: rgba(255, 255, 255, 0.6);
-    border: 2px solid rgba(0, 0, 0, 0.2);
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.3s ease;
 }
@@ -153,15 +152,13 @@
 .card {
     flex: 1 1 300px;
     max-width: 345px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
     overflow: hidden;
     transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
 .card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    transform: scale(1.1);
 }
 
 .card img {
@@ -233,6 +230,7 @@
     border-radius: 10px;
     margin: 30px auto;
     max-width: auto;
+    margin-top: 0px;
 }
 
 .shop-by-category .top-section {
@@ -292,18 +290,3 @@
     color: #133365;
     margin: 0;
 }
-
-text-align: left;
-font-family: 'Maven Pro', sans-serif;
-font-weight: 500;
-box-sizing: border-box;
-text-decoration: none !important;
-transition-duration: 0.4s;
-float: right!important;
-font-size: 15px;
-line-height: 22px;
-box-shadow: 0 2px 4px 0 rgb(0 0 0 / 20%);
-padding: 3px 10px;
-background: #fe0000;
-background-color: #e1e8ef !important;
-color: #133365 !important;
