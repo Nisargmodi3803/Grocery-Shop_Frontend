@@ -1,0 +1,123 @@
+.card-container {
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.card-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.card-section-header h5 {
+    font-size: 1.5rem;
+    color: #333;
+}
+
+.card-section-header button {
+    background-color: #f0f0f0;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.card-section-lower {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+}
+
+.product {
+    width: 200px;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    text-align: center;
+    background: #fff;
+}
+
+.product-header {
+    position: relative;
+}
+
+.product-discount {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    background: #4caf50;
+    color: #fff;
+    font-size: 0.8rem;
+    padding: 3px 6px;
+    border-radius: 5px;
+}
+
+.product-image {
+    width: 100%;
+    height: auto;
+    margin-bottom: 10px;
+}
+
+.product-text {
+    font-size: 1rem;
+    color: #333;
+    margin: 5px 0;
+}
+
+.product-rating-main {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    align-items: center;
+}
+
+.rating {
+    font-size: 1rem;
+    color: #ff9800;
+}
+
+.product-rating-total {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.no-rating {
+    font-size: 0.8rem;
+    color: #999;
+}
+
+.product-footer {
+    margin-top: 10px;
+}
+
+.product-regular-price {
+    text-decoration: line-through;
+    color: #999;
+    font-size: 0.9rem;
+}
+
+.product-discount-price {
+    color: #e53935;
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.add-to-cart,
+.out-of-stock {
+    background-color: #2196f3;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    margin-top: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 0.9rem;
+}
+
+.out-of-stock {
+    background-color: #ccc;
+    cursor: not-allowed;
+}

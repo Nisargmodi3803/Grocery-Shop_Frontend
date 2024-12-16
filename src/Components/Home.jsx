@@ -4,6 +4,7 @@ import Slides from './Slides';
 import { BsArrowLeftCircleFill, BsArrowRightCircleFill } from "react-icons/bs";
 import CardSlider from './CardSlider';
 import { Link, useNavigate } from 'react-router-dom';
+import { ProductCard } from './ProductCard';
 
 export const Home = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -105,6 +106,9 @@ export const Home = () => {
           ))}
 
         </div>
+      </section>
+      <section>
+        <ProductCard/>
       </section>
     </>
 
