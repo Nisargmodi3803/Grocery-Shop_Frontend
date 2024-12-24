@@ -12,7 +12,6 @@ import { FaRegCalendarAlt } from "react-icons/fa";
 const Footer = () => {
     return (
         <>
-
             <div className="footer-top">
                 <div className="feature-item">
                     <span className="circle">1</span>

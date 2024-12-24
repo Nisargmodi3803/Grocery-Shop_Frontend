@@ -88,7 +88,7 @@ export const Home = () => {
       <div className='card-slider-container'>
         <CardSlider />
       </div>
-      <section className='shop-by-category'>
+      <section className='shop-by-category-home'>
         <div className='top-section'>
           <h5>Shop By Category</h5>
           <button onClick={() => { navigate('/ecommerce/shopbycategory') }}>View All</button>

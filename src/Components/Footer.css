@@ -1,6 +1,6 @@
 .footer-container {
   background-color: #f9f9f9;
-  padding: 20px;
+  padding: 52px;
   font-family: Arial, sans-serif;
   color: #00274d;
 }
@@ -12,6 +12,7 @@
   margin-bottom: 30px;
   border-color: rgb(236, 235, 235);
   border-radius: 2px;
+  padding-top: 25px;
 }
 
 .feature-item {

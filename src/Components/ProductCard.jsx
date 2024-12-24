@@ -1,181 +1,15 @@
 import React, { useState, useRef } from 'react';
 import './ProductCard.css';
-// import { products } from './Products';
+import  products  from './Products';
 import { MdOutlineStarPurple500 } from "react-icons/md";
 import { MdOutlineShoppingCart } from "react-icons/md";
 import { MdRemoveShoppingCart } from "react-icons/md";
 import { FaRegHeart, FaHeart } from "react-icons/fa";
 import { BsArrowLeftCircleFill, BsArrowRightCircleFill } from 'react-icons/bs';
-import { CiCircleMinus } from "react-icons/ci";
-import { CiCirclePlus } from "react-icons/ci";
-
-const products = [
-  {
-    "Vegetables & Fruits": {
-      "Fruits": {
-        "Apple": {
-          "image": "https://bitsinfotech.in/ecommerce/fmcg_upload/product/030822054008APPLE.jpg",
-          "category": {
-            "1kg": {
-              "brand": "Fruits",
-              "discount": 10,
-              "rating": 3.5,
-              "total raters": 6,
-              "price": 500,
-              "available": 3,
-              "new": false,
-              "liked": false,
-            },
-            "5kg": {
-              "brand": "Fruits",
-              "discount": 4,
-              "rating": 4.5,
-              "total raters": 4,
-              "price": 325,
-              "available": 3,
-              "new": false,
-              "liked": false,
-            },
-            "500gm": {
-              "brand": "Fruits",
-              "discount": 8,
-              "rating": 0,
-              "total raters": 0,
-              "price": 500,
-              "available": 0,
-              "new": true,
-              "liked": false,
-            },
-          },
-          "Highlights": "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
-          "Quick OverView": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type",
-        },
-      },
-      "Vegetables": {
-        "mango": {
-          "image": "https://bitsinfotech.in/ecommerce/fmcg_upload/product/030822054008APPLE.jpg",
-          "category": {
-            "1kg": {
-              "brand": "Fruits",
-              "discount": 10,
-              "rating": 3.5,
-              "total raters": 6,
-              "price": 5000,
-              "available": 3,
-              "new": false,
-              "liked": false,
-            },
-            "5kg": {
-              "brand": "Fruits",
-              "discount": 4,
-              "rating": 4.5,
-              "total raters": 4,
-              "price": 3250,
-              "available": 3,
-              "new": false,
-              "liked": false,
-            },
-            "500gm": {
-              "brand": "Fruits",
-              "discount": 8,
-              "rating": 0,
-              "total raters": 0,
-              "price": 504,
-              "available": 0,
-              "new": true,
-              "liked": false,
-            }
-          },
-          "Highlights": "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
-          "Quick OverView": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's",
-        },
-      },
-      "Drink": {
-        "coke": {
-          "image": "https://bitsinfotech.in/ecommerce/fmcg_upload/product/030822054008APPLE.jpg",
-          "category": {
-            "1kg": {
-              "brand": "Fruits",
-              "discount": 10,
-              "rating": 3.5,
-              "total raters": 6,
-              "price": 1000,
-              "available": 3,
-              "new": false,
-              "liked": false,
-            },
-            "5kg": {
-              "brand": "Fruits",
-              "discount": 4,
-              "rating": 4.5,
-              "total raters": 4,
-              "price": 32,
-              "available": 3,
-              "new": false,
-              "liked": false,
-            },
-            "500gm": {
-              "brand": "Fruits",
-              "discount": 8,
-              "rating": 0,
-              "total raters": 0,
-              "price": 50,
-              "available": 0,
-              "new": true,
-              "liked": false,
-            }
-          },
-          "Highlights": "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
-          "Quick OverView": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's",
-        },
-      },
-      "Drink": {
-        "abc": {
-          "image": "https://bitsinfotech.in/ecommerce/fmcg_upload/product/030822054008APPLE.jpg",
-          "category": {
-            "1kg": {
-              "brand": "Fruits",
-              "discount": 10,
-              "rating": 3.5,
-              "total raters": 6,
-              "price": 1000,
-              "available": 3,
-              "new": false,
-              "liked": false,
-            },
-            "5kg": {
-              "brand": "Fruits",
-              "discount": 4,
-              "rating": 4.5,
-              "total raters": 4,
-              "price": 32,
-              "available": 3,
-              "new": false,
-              "liked": false,
-            },
-            "500gm": {
-              "brand": "Fruits",
-              "discount": 8,
-              "rating": 0,
-              "total raters": 0,
-              "price": 50,
-              "available": 0,
-              "new": true,
-              "liked": false,
-            }
-          },
-          "Highlights": "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
-          "Quick OverView": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's",
-        },
-      }
-
-
-
-    }
-  }
-];
+import { useNavigate } from 'react-router-dom';
 
 export const ProductCard = () => {
+  const navigate = useNavigate();
   const direction = useRef("normal");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [likedProducts, setLikedProducts] = useState({});
@@ -229,6 +63,11 @@ export const ProductCard = () => {
     });
   };
 
+  const navigateToProductPage = (productId) => () => {
+    // alert(`Navigating to product page with id: ${productId}`);
+    navigate(`/ecommerce/product/${productId}`);
+  }
+
   const vegetableAndFruits = products[0]["Vegetables & Fruits"];
 
   const productList = [];
@@ -237,6 +76,7 @@ export const ProductCard = () => {
       const product = vegetableAndFruits[category][item];
       for (const size in product.category) {
         productList.push({
+          id: product.category[size].id,
           name: `${item} - ${size}`,
           image: product.image,
           discount: product.category[size].discount,
@@ -287,6 +127,7 @@ export const ProductCard = () => {
                       className='product-image'
                       src={product.image}
                       alt={product.name}
+                      onClick={navigateToProductPage(product.id)}
                     />
                   </a>
                 </div>

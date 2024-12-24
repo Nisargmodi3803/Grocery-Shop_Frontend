@@ -11,6 +11,7 @@ import { Demo } from './demo';
 import { ShippingReturnPolicy } from './ShippingReturnPolicy';
 import { PrivacyPolicy } from './PrivacyPolicy';
 import { TermsConditions } from './TermsConditions';
+import Product from './Product';
 
 export const NavRouters = () => {
   return (
@@ -29,6 +30,7 @@ export const NavRouters = () => {
         <Route path="/ecommerce/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/ecommerce/terms-conditions" element={<TermsConditions />} />
         <Route path="/ecommerce/demo" element={<Demo />} />
+        <Route path="/ecommerce/product/:productId" element={<Product/>}/>
       </Routes>
       <Footer />
     </BrowserRouter>

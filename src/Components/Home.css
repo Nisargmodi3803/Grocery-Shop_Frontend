@@ -1,3 +1,7 @@
+.Home{
+    padding-top: 140px;
+}
+
 .slider-container {
     position: relative;
     display: flex;
@@ -225,7 +229,7 @@
     background: #555;
 }
 
-.shop-by-category {
+.shop-by-category-home {
     padding: 20px;
     border-radius: 10px;
     margin: 30px auto;
@@ -233,7 +237,7 @@
     margin-top: 0px;
 }
 
-.shop-by-category .top-section {
+.shop-by-category-home .top-section {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -241,14 +245,14 @@
     padding: 0 10px;
 }
 
-.shop-by-category .top-section h5 {
+.shop-by-category-home .top-section h5 {
     font-size: 1.5rem;
     font-weight: 600;
     color: #133365;
     margin: 0;
 }
 
-.shop-by-category .top-section button {
+.shop-by-category-home .top-section button {
     background-color: #e1e8ef;
     color: #133365;
     border: none;
@@ -261,7 +265,7 @@
     box-shadow: black;
 }
 
-.shop-by-category .bottom-section {
+.shop-by-category-home .bottom-section {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 20px;
