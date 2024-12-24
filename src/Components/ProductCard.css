@@ -2,38 +2,51 @@
     width: 100%;
     padding: 20px;
     box-sizing: border-box;
+    /* box-shadow: 0 5px 10px rgba(13, 12, 12, 0.1); */
+    border: 1px solid #e0e0e0;
+    position: relative;
+    overflow: hidden;
+    padding-left: 50px;
 }
 
 .card-section-header {
+    padding-top: 0px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-top: 0px;
 }
 
 .card-section-header h5 {
     font-size: 1.5rem;
-    color: #333;
+    color: #133365;
+    font-weight: 600;
 }
 
 .card-section-header button {
-    background-color: #f0f0f0;
+    background-color: #e1e8ef;
+    color: #133365;
     border: none;
-    padding: 8px 12px;
-    cursor: pointer;
     border-radius: 5px;
+    padding: 8px 16px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-family: 'Maven Pro', sans-serif;
+    box-shadow: black;
 }
 
 .card-section-lower {
     display: flex;
-    gap: 20px;
+    /* gap: 20px; */
     overflow-x: auto;
+    padding-bottom: 20px;
 }
 
 .product {
     width: 200px;
-    border: 1px solid #e0e0e0;
-    border-radius: 10px;
+    /* border: 1px solid #e0e0e0; */
+    /* border-radius: 10px; */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     padding: 10px;
     text-align: center;
@@ -56,37 +69,53 @@
 }
 
 .product-image {
+    margin-top: 35px;
     width: 100%;
-    height: auto;
+    height: 200px;
     margin-bottom: 10px;
 }
 
 .product-text {
     font-size: 1rem;
-    color: #333;
+    color: #133365;
     margin: 5px 0;
 }
 
 .product-rating-main {
     display: flex;
-    justify-content: center;
+    margin-left: 15spx;
     gap: 5px;
     align-items: center;
 }
 
+.product-rating-avg {
+    justify-content: last baseline;
+    border-radius: 0 75px 75px 0;
+    width: 50px;
+    height: 25px;
+    background-color: #133365;
+}
+
 .rating {
-    font-size: 1rem;
-    color: #ff9800;
+    font-size: 0.85rem;
+    color: #ffffff;
+    align-items: center;
 }
 
 .product-rating-total {
     font-size: 0.8rem;
     color: #666;
+    margin-left: 10px;
 }
 
 .no-rating {
     font-size: 0.8rem;
     color: #999;
+    border-radius: 0 55px 55px 0;
+    border: 1px solid #e4e4e4;
+    width: 100px;
+    height: 20px;
+    margin-left: 30px;
 }
 
 .product-footer {
@@ -100,24 +129,119 @@
 }
 
 .product-discount-price {
-    color: #e53935;
+    color: #133365;
     font-weight: bold;
     font-size: 1rem;
+    margin-left: 5px;
 }
 
 .add-to-cart,
 .out-of-stock {
-    background-color: #2196f3;
+    background-color: #133365;
     color: #fff;
     border: none;
     padding: 5px 10px;
-    margin-top: 10px;
+    margin-top: 20px;
     cursor: pointer;
-    border-radius: 5px;
-    font-size: 0.9rem;
+    border-radius: 75px;
+    font-size: 0.8rem;
 }
 
 .out-of-stock {
-    background-color: #ccc;
+    background-color: #8091ab;
     cursor: not-allowed;
+}
+
+.like-icon {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.like-icon:hover {
+    transform: scale(1.2);
+}
+
+.product-slider-arrow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
+    z-index: 10;
+    pointer-events: none;
+}
+
+.arrow2 {
+    font-size: 2.5rem;
+    color: grey;
+    cursor: pointer;
+    transition: color 0.3s ease, transform 0.3s ease;
+    pointer-events: auto;
+    width: 2.5rem;
+    height: 2.5rem;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    background-color: black;
+
+}
+
+.arrow2:hover {
+    background-color: black;
+    color: rgba(255, 255, 255, 0.8);
+    transform: scale(1.1);
+}
+
+.arrow-left {
+    position: absolute;
+    left: 20px;
+    /* Adjust to align within the container */
+}
+
+.arrow-right {
+    position: absolute;
+    right: 20px;
+    /* Adjust to align within the container */
+}
+
+.add-to-cart-quantity {
+    background-color: #c9d7e3;
+    color: #133365;
+    border: none;
+    border-radius: 75px;
+    padding: 5px 10px;
+    font-size: 0.8rem;
+    font-family: 'Maven Pro', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;  
+    width: 95px;
+    height: 26px;
+    cursor: pointer;
+    margin-left: 30px;
+    margin-top: 12px;
+}
+
+.add-to-cart-quantity button {
+    background-color: #ffffff;
+    color: #133365;
+    border: none;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }

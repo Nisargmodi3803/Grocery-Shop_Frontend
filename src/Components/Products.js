@@ -34,6 +34,36 @@ export const products = [
                             "available": 0,
                             "new":true,
                             "liked":false,
+                        },
+                        "1kg":{
+                            "brand":"Fruits",
+                            "discount": 10,
+                            "rating": 3.5,
+                            "total raters": 6,
+                            "price": 500,
+                            "available": 3,
+                            "new":false,
+                            "liked":false,
+                        },
+                        "5kg":{
+                            "brand":"Fruits",
+                            "discount": 4,
+                            "rating": 4.5,
+                            "total raters": 4,
+                            "price": 325,
+                            "available": 3,
+                            "new":false,
+                            "liked":false,
+                        },
+                        "500gm":{
+                            "brand":"Fruits",
+                            "discount": 8,
+                            "rating": 0,
+                            "total raters": 0,
+                            "price": 500,
+                            "available": 0,
+                            "new":true,
+                            "liked":false,
                         }
                     },
                     "Highlights": "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
@@ -84,4 +114,5 @@ export const products = [
 
         }
     }
-]
+];
+

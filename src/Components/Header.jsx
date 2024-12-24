@@ -72,8 +72,8 @@ export const Header = () => {
                     </div>
                     <div className="icon-container cart-icon-container" onClick={handleCart}>
                         <ShoppingCartRoundedIcon />
-                        <span>My Cart</span>
                         {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
+                        <span>My Cart</span>
                     </div>
                 </div>
             </div>
