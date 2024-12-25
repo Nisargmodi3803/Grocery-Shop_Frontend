@@ -1,14 +1,14 @@
-import { React, useState, useEffect } from 'react'
-import './Product.css'
-import products from './Products'
-import { useParams } from 'react-router-dom'
+import { React, useState, useEffect } from 'react';
+import './Product.css';
+import products from './Products';
+import { useParams } from 'react-router-dom';
 import { IoMdHome } from "react-icons/io";
-import { FaGreaterThan } from "react-icons/fa6";
 import { useNavigate } from 'react-router-dom';
 import { FaHeart } from "react-icons/fa";
 import { MdOutlineStarPurple500 } from "react-icons/md";
 import { MdOutlineShoppingCart } from "react-icons/md";
 import { MdRemoveShoppingCart } from "react-icons/md";
+import { BsTag } from "react-icons/bs";
 
 export default function Product() {
     const { productId } = useParams();
@@ -26,7 +26,8 @@ export default function Product() {
             for (const size in product.category) {
                 productList.push({
                     id: product.category[size].id,
-                    name: `${item} - ${size}`,
+                    name: `${item}`,
+                    size: size,
                     image: product.image,
                     discount: product.category[size].discount,
                     rating: product.category[size].rating,
@@ -46,9 +47,10 @@ export default function Product() {
         const id = parseInt(productId, 10);
         const foundProduct = productList.find((product) => product.id === id);
         if (!foundProduct) {
-            console.error('Product not found');
+            navigate('/ecommerce/404');
+        } else {
+            setProduct(foundProduct);
         }
-        setProduct(foundProduct);
     }, []);
 
     if (!product) {
@@ -56,7 +58,7 @@ export default function Product() {
             <div className='product-page'>
                 <section className='product-navigate-section'>
                     <span className='navigate'>
-                        <a onClick={() => { navigate('/ecommerce/') }}>
+                        <a onClick={() => navigate('/ecommerce/')}>
                             <b><IoMdHome /> Home</b>
                         </a>
                         <span>Loading...</span>
@@ -67,45 +69,50 @@ export default function Product() {
         );
     }
 
+    const greater = '>';
     return (
         <div className='product-page'>
             <section className='product-navigate-section'>
                 <span className='navigate'>
-                    <a href='' onClick={() => { navigate('/ecommerce/') }}>
+                    <a onClick={() => navigate('/ecommerce/')}>
                         <b><IoMdHome /> Home</b>
                     </a>
-                    <FaGreaterThan />
-                    <a href=''>{product.parentCategory}</a>
+                    {greater}
+                    <a>{product.parentCategory}</a>
                 </span>
             </section>
             <section className='product-content-section'>
                 <div className='product-content-image-section'>
-                    <img src={product.image} alt={product.name} />
-                    <span className='product-content-likebtn' onClick={() => setLikedProducts(!likedProducts)}>
-                        {likedProducts ? <FaHeart color='red' /> : <FaHeart color='grey' />}
-                    </span>
+                    <div className='product-content-image-section'>
+                        <img src={product.image} alt={product.name} />
+                        <span className='product-content-likebtn' onClick={() => setLikedProducts(!likedProducts)}>
+                            {likedProducts ? <FaHeart color='red' /> : <FaHeart color='grey' />}
+                        </span>
+                    </div>
                 </div>
                 <div className='product-content-details-section'>
-                    <div className='product-content-discount'>
-                        {product.discount > 0 && (
-                            <span className='product-content-discount'>{product.discount}% OFF</span>
-                        )}
-                    </div>
-                    <div className='product-content-rating'>
-                        {product.rating > 0 ? (
-                            <>
-                                <div className='product-content-rating-avg'>
-                                    <span className='product-content-rating'>
-                                        {product.rating} <MdOutlineStarPurple500 color='gold' />
-                                    </span>
-                                </div>
-                                <div className='product-content-rating-total'>
-                                    <p>{product.totalRaters} Rating</p>
-                                </div>
-                            </>
-                        ) : (
-                            <p className='product-content-no-rating'>No Rating Yet</p>
-                        )}
+                    <div className='product-content-details-header'>
+                        <div className='product-content-discount'>
+                            {product.discount > 0 && (
+                                <span>{product.discount}% OFF</span>
+                            )}
+                        </div>
+                        <div className='product-content-rating'>
+                            {product.rating > 0 ? (
+                                <>
+                                    <div className='product-content-rating-avg'>
+                                        <span className='product-content-rating'>
+                                            {product.rating} <MdOutlineStarPurple500 color='gold' />
+                                        </span>
+                                    </div>
+                                    <div className='product-content-rating-total'>
+                                        <p>{product.totalRaters} Rating</p>
+                                    </div>
+                                </>
+                            ) : (
+                                <p className='product-content-no-rating'>No Rating Yet</p>
+                            )}
+                        </div>
                     </div>
                     <div className='product-content-name'>
                         <h5>{product.name}</h5>
@@ -113,11 +120,11 @@ export default function Product() {
                     <div className='product-content-price'>
                         {product.discount > 0 && (
                             <span className='product-regular-price'>
-                                ₹{product.price}
+                                <BsTag /> Price : ₹{product.price}
                             </span>
                         )}
                         <span className='product-content-discount-price'>
-                            ₹
+                            <p>Discount Price : </p> ₹
                             {(
                                 product.price -
                                 (product.price * product.discount) / 100
@@ -162,7 +169,6 @@ export default function Product() {
                             )}
                         </>
                     )}
-
                     <div className='product-content-highlights'>
                         <h1>Highlights</h1>
                         <p>{product.highlights}</p>

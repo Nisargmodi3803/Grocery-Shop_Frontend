@@ -61,11 +61,11 @@
     position: absolute;
     top: 5px;
     left: 5px;
-    background: #4caf50;
-    color: #fff;
+    background: #F2FEF2;
+    color: #51AA1B;
     font-size: 0.8rem;
     padding: 3px 6px;
-    border-radius: 5px;
+    border: #51AA1B solid 1px;
 }
 
 .product-image {
@@ -83,7 +83,7 @@
 
 .product-rating-main {
     display: flex;
-    margin-left: 15spx;
+    margin-left: 15px;
     gap: 5px;
     align-items: center;
 }
@@ -245,3 +245,4 @@
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
+
