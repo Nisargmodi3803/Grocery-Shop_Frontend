@@ -13,11 +13,18 @@
   border-color: rgb(236, 235, 235);
   border-radius: 2px;
   padding-top: 25px;
+  margin-left: 100px;
 }
 
 .feature-item {
   text-align: center;
   flex: 1;
+  display: flex;
+  gap: 0px;
+}
+
+.feature-item p{
+  color: #133365;
 }
 
 .circle {
@@ -31,7 +38,7 @@
   font-size: 18px;
   font-weight: bold;
   color: #00274d;
-  margin: 0 auto 10px;
+  margin: 0 10px;
 }
 
 .facebook{

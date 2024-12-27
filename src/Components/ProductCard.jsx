@@ -128,6 +128,7 @@ export const ProductCard = () => {
                       src={product.image}
                       alt={product.name}
                       onClick={navigateToProductPage(product.id)}
+                      loading='lazy'
                     />
                   </a>
                 </div>

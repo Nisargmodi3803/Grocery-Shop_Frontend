@@ -49,6 +49,7 @@ export const Header = () => {
                                 alt="Company Logo"
                                 title="Bits Infotech"
                                 className="company-logo"
+                                loading='lazy'
                             />
                         </div>
                     </div>

@@ -91,7 +91,7 @@ export default function Product() {
             <section className='product-content-section'>
                 <div className='product-content-image-section'>
                     <div className='product-content-image-section'>
-                        <img src={product.image} alt={product.name} />
+                        <img src={product.image} alt={product.name} loading='lazy' />
                         <span className='product-content-likebtn' onClick={() => setLikedProducts(!likedProducts)}>
                             {likedProducts ? <FaHeart color='red' /> : <FaHeart color='grey' />}
                         </span>
@@ -175,6 +175,9 @@ export default function Product() {
                                         {category.size}
                                     </label>
                                     <label htmlFor={`category-${category.id}`} className="category-price">
+                                        <span className='category-regular-price'>
+                                            <p>₹{category.price.toFixed(2)}</p>
+                                        </span>
                                         <span className='category-discount-price'>
                                             <p>
                                                 ₹{(
@@ -182,9 +185,6 @@ export default function Product() {
                                                     (category.price * category.discount) / 100
                                                 ).toFixed(2)}
                                             </p>
-                                        </span>
-                                        <span className='category-regular-price'>
-                                            <p>₹{category.price.toFixed(2)}</p>
                                         </span>
                                     </label>
                                 </div>

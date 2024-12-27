@@ -34,13 +34,14 @@ const Footer = () => {
                             alt="Company Logo"
                             title="Bits Infotech"
                             className="company-logo"
+                            loading='lazy'
                         />
                         <br />
                         <MdPhone /><a href='https://bitsinfotech.in/ecommerce/tel:+91%207016248207'>+91 7016248207</a>
                         <br />
                         <FaMobileScreenButton /><a href='https://bitsinfotech.in/ecommerce/tel:+91%208320099260'>+91 8320099260</a>
                         <br />
-                        <a href='https://www.google.com/maps?q=1200Bits+Infotech,+Block-A,+SIDDHI+VINAYAK+TOWER,+Kataria+Automobiles+Road,+Makarba,+Ahmedabad,+Gujarat'><strong>Address:</strong> Bits Infotech, Block-A, SIDDHI VINAYAK TOWER, Kataria Automobiles Road, Makarba, Ahmedabad, Gujarat</a>
+                        <a href='https://www.google.com/maps/place/Bits+Infotech/@22.9945958,72.4964289,17z/data=!3m1!4b1!4m6!3m5!1s0x395e9ac2f80829ab:0x7be5571ea6defb37!8m2!3d22.9945958!4d72.4990038!16s%2Fg%2F11c30q4vby!5m1!1e1?entry=ttu&g_ep=EgoyMDI0MTIxMS4wIKXMDSoASAFQAw%3D%3D'><strong>Address:</strong> Bits Infotech, Block-A, SIDDHI VINAYAK TOWER, Kataria Automobiles Road, Makarba, Ahmedabad, Gujarat</a>
                         <br />
                         <a href='mailto:sales@bitsinfotech.in'><MdMail /> sales@bitsinfotech.in</a>
                         <br />
@@ -73,7 +74,12 @@ const Footer = () => {
                         <h3>Get in Touch</h3>
                         <a href="https://www.facebook.com/Bitsinfotech1716/" className="social-icon"><FaFacebook className='facebook' /></a>
                         <a href="https://twitter.com/BitsInfotech" className="social-icon"><FaSquareXTwitter className='twitter' /></a>
-                        <a href="https://www.instagram.com/bits_infotech/" className="social-icon">{/*<FaInstagramSquare className='instagram'/>*/}<img className='instagram' src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Instagram_icon.png/900px-Instagram_icon.png?20200512141346' /></a>
+                        <a href="https://www.instagram.com/bits_infotech/" className="social-icon">
+                            <img
+                                className='instagram'
+                                src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Instagram_icon.png/900px-Instagram_icon.png?20200512141346'
+                                loading='lazy' />
+                        </a>
                     </div>
                 </div>
             </div>
@@ -84,7 +90,9 @@ const Footer = () => {
                     <a href="/ecommerce/privacy-policy">Privacy Policy</a> |
                     <a href="/ecommerce/terms-conditions">Terms and Conditions</a>
                 </p>
-                <img src='https://bitsinfotech.in/ecommerce/img/payment_methods.png' />
+                <img
+                    src='https://bitsinfotech.in/ecommerce/img/payment_methods.png'
+                    loading='lazy' />
             </div>
         </>
     );

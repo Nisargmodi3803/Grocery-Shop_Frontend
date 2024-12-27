@@ -68,7 +68,7 @@ const CardSlider = () => {
                 {cardData.slice(currentIndex, currentIndex + 8).map((d) => (
                     <div className='card' key={d.id}>
                         <div className='card-image-container'>
-                            <img src={d.img} alt={d.title} />
+                            <img src={d.img} alt={d.title} loading='lazy'/>
                         </div>
                         <div className='card-content'>
                             <p>{d.title}</p>

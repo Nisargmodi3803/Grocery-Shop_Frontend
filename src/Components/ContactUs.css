@@ -1,3 +1,33 @@
 .contact-us{
     padding-top: 140px;
 }
+
+.contact-us-main{
+    display: flex;
+    background-color: #f8f6f6;
+    padding: 50px;
+}
+
+.contact-us-main a{
+    text-decoration: none;
+}
+
+.get-in-touch{
+    flex: 1;
+}
+
+.google-map{
+    flex: 2.5;
+}
+
+.contact-form{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background-color: #efefef;
+}
+
+.mobile-email-group{
+    display: flex;
+    gap: 20px;
+}

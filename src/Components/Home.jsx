@@ -65,6 +65,7 @@ export const Home = () => {
               src={Slides[currentSlide].src}
               alt={Slides[currentSlide].alt}
               className='slider-image'
+              loading='lazy'
 
             />
           </Link>
@@ -97,7 +98,10 @@ export const Home = () => {
           {categories.map((category, index) => (
             <div key={index} className='category-card'>
               <a href=''>
-                <img src={category.img} alt={category.name} />
+                <img
+                  src={category.img}
+                  alt={category.name}
+                  loading='lazy' />
               </a>
               <a href=''>
                 <h6>{category.name}</h6>
@@ -108,7 +112,7 @@ export const Home = () => {
         </div>
       </section>
       <section>
-        <ProductCard/>
+        <ProductCard />
       </section>
     </>
 
