@@ -9,6 +9,7 @@ import { MdOutlineStarPurple500 } from "react-icons/md";
 import { MdOutlineShoppingCart } from "react-icons/md";
 import { MdRemoveShoppingCart } from "react-icons/md";
 import { BsTag } from "react-icons/bs";
+import { MdVerified } from "react-icons/md";
 
 export default function Product() {
     const { productId } = useParams();
@@ -17,6 +18,7 @@ export default function Product() {
     const [likedProducts, setLikedProducts] = useState(false);
     const [cartCount, setCartCount] = useState(0);
     const [cartBtnClicked, setCartBtnClicked] = useState(false);
+    const [relatedCategories, setRelatedCategories] = useState([]);
 
     const vegetableAndFruits = products[0]["Vegetables & Fruits"];
     const productList = [];
@@ -26,7 +28,7 @@ export default function Product() {
             for (const size in product.category) {
                 productList.push({
                     id: product.category[size].id,
-                    name: `${item}`,
+                    name: item,
                     size: size,
                     image: product.image,
                     discount: product.category[size].discount,
@@ -51,6 +53,11 @@ export default function Product() {
         } else {
             setProduct(foundProduct);
         }
+
+        const related = productList.filter(
+            (item) => item.name === foundProduct.name && item.parentCategory === foundProduct.parentCategory
+        );
+        setRelatedCategories(related);
     }, []);
 
     if (!product) {
@@ -78,7 +85,7 @@ export default function Product() {
                         <b><IoMdHome /> Home</b>
                     </a>
                     {greater}
-                    <a>{product.parentCategory}</a>
+                    <a href=''>{product.parentCategory}</a>
                 </span>
             </section>
             <section className='product-content-section'>
@@ -110,27 +117,86 @@ export default function Product() {
                                     </div>
                                 </>
                             ) : (
-                                <p className='product-content-no-rating'>No Rating Yet</p>
+                                <div className='product-content-no-rating'>
+                                    <p>No Rating Yet</p>
+                                </div>
                             )}
                         </div>
                     </div>
                     <div className='product-content-name'>
-                        <h5>{product.name}</h5>
+                        <p>{product.name}</p>
+                    </div>
+                    <div className='product-content-category'>
+                        <span>
+                            <strong>
+                                <MdVerified />{product.parentCategory}
+                            </strong>
+                        </span>
                     </div>
                     <div className='product-content-price'>
                         {product.discount > 0 && (
-                            <span className='product-regular-price'>
-                                <BsTag /> Price : ₹{product.price}
+                            <span className='product-content-regular-price'>
+                                <BsTag /> Price  :  ₹ {product.price.toFixed(2)}
                             </span>
                         )}
-                        <span className='product-content-discount-price'>
-                            <p>Discount Price : </p> ₹
-                            {(
-                                product.price -
-                                (product.price * product.discount) / 100
-                            ).toFixed(2)}
-                        </span>
+                        <div className='product-content-discount-price'>
+                            <span className='discount'>Discount Price : </span>
+                            <p>
+                                <strong className='price'>
+                                    ₹
+                                    {(
+                                        product.price -
+                                        (product.price * product.discount) / 100
+                                    ).toFixed(2)}
+                                </strong>
+                            </p>
+                        </div>
                     </div>
+                    <div className="product-content-category-options">
+                        {relatedCategories.map((category) => (
+                            <div
+                                key={category.id}
+                                className={
+                                    category.id === product.id
+                                        ? "selected-category-option-container"
+                                        : "category-option-container"
+                                }
+                                onClick={() => setProduct(category)}
+                            >
+                                <div className="radio-button-section">
+                                    <input
+                                        type="radio"
+                                        name="category-option"
+                                        id={`category-${category.id}`}
+                                        checked={category.id === product.id}
+                                        onChange={() => setProduct(category)}
+                                    />
+                                    <label htmlFor={`category-${category.id}`} className="category-size">
+                                        {category.size}
+                                    </label>
+                                    <label htmlFor={`category-${category.id}`} className="category-price">
+                                        <span className='category-discount-price'>
+                                            <p>
+                                                ₹{(
+                                                    category.price -
+                                                    (category.price * category.discount) / 100
+                                                ).toFixed(2)}
+                                            </p>
+                                        </span>
+                                        <span className='category-regular-price'>
+                                            <p>₹{category.price.toFixed(2)}</p>
+                                        </span>
+                                    </label>
+                                </div>
+                                {category.id === product.id && category.discount > 0 && (
+                                    <div className="discount-section-main">
+                                        <span>{category.discount}% OFF</span>
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+
                     {cartBtnClicked ? (
                         <div className='product-content-add-to-cart-quantity'>
                             <button
@@ -160,18 +226,18 @@ export default function Product() {
                                         setCartBtnClicked(true);
                                     }}
                                 >
-                                    <MdOutlineShoppingCart /> Add To Cart
+                                    <MdOutlineShoppingCart /> ADD TO CART
                                 </button>
                             ) : (
                                 <button className='product-content-out-of-stock'>
-                                    <MdRemoveShoppingCart /> Out Of Stock
+                                    <MdRemoveShoppingCart /> OUT OF STOCK
                                 </button>
                             )}
                         </>
                     )}
                     <div className='product-content-highlights'>
-                        <h1>Highlights</h1>
-                        <p>{product.highlights}</p>
+                        <h1 className='highlights-title'>Highlights</h1>
+                        <p className='highlights-text'>{product.highlights}</p>
                     </div>
                 </div>
             </section>
