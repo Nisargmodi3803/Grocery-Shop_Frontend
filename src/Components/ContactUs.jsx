@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import './ContactUs.css'
 import { IoLocationSharp } from "react-icons/io5";
 import { MdLocalPhone } from "react-icons/md";
@@ -9,6 +9,84 @@ import { FaFacebook } from "react-icons/fa6";
 import { FaSquareXTwitter } from "react-icons/fa6";
 
 export const ContactUs = () => {
+  const [formData, setFormData] = useState({
+    fullName: '',
+    mobile: '',
+    email: '',
+    message: '',
+    captcha: ''
+  });
+
+  const [errors, setErrors] = useState({});
+  const mobileRegex = /^[6-9]\d{9}$/;
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+
+    validateField(name, value);
+  };
+
+  const validateField = (name, value) => {
+    const validationErrors = { ...errors };
+
+    if (name === "fullName") {
+      if (value.trim() === "") validationErrors.fullName = "Full Name is required";
+      else delete validationErrors.fullName;
+    }
+
+    if (name === "mobile") {
+      if (value.trim() === "") {
+        validationErrors.mobile = "Mobile Number is required";
+      } else if (!mobileRegex.test(value)) {
+        validationErrors.mobile = "Too short: Minimum of '10' characters";
+      } else {
+        delete validationErrors.mobile;
+      }
+    }
+
+    if (name === "email") {
+      if (value.trim() === "") {
+        validationErrors.email = "Email is required";
+      } else if (!emailRegex.test(value)) {
+        validationErrors.email = "Invalid Email Address";
+      } else {
+        delete validationErrors.email;
+      }
+    }
+
+    if (name === "message") {
+      if (value.trim() === "") {
+        validationErrors.message = "Message is required";
+      } else if (value.length > 250) {
+        validationErrors.message = "Message cannot exceed 250 characters";
+      } else {
+        delete validationErrors.message;
+      }
+    }
+
+    if (name === "captcha") {
+      if (value.trim() === "") validationErrors.captcha = "Captcha is required";
+      else delete validationErrors.captcha;
+    }
+
+    setErrors(validationErrors);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (Object.keys(errors).length === 0) {
+      alert('Message sent successfully');
+    } else {
+      alert('Please fix the errors');
+    }
+  };
+
   return (
     <>
       <div className='contact-us'>
@@ -19,7 +97,6 @@ export const ContactUs = () => {
           <div className='get-in-touch'>
             <h1>Get In Touch</h1>
             <div className='get-in-touch-details'>
-
               <span>
                 <IoLocationSharp /> Address :
               </span>
@@ -75,65 +152,80 @@ export const ContactUs = () => {
         </section>
         <section className='contact-form'>
           <h1>Contact Us</h1>
-          <form>
+          <form onSubmit={handleSubmit}>
             <div className='full-name'>
-              <label htmlFor='full-name'>Full Name</label>
+              <label htmlFor='full-name'>Full Name <span className="required">*</span></label>
               <input
                 type='text'
                 id='full-name'
-                name='full-name'
+                name='fullName'
                 placeholder='Full Name'
+                value={formData.fullName}
+                onChange={handleInputChange}
                 required />
             </div>
+            {errors.fullName && <div className="error">{errors.fullName}</div>}
 
             <div className='mobile-email-group'>
               <div className='mobile'>
-                <label htmlFor='mobile'>Mobile Number</label>
+                <label htmlFor='mobile'>Mobile Number <span className="required">*</span></label>
                 <input
                   type='text'
                   id='mobile'
                   name='mobile'
                   placeholder='Mobile Number'
+                  value={formData.mobile}
+                  onChange={handleInputChange}
                   required />
               </div>
+              {errors.mobile && <div className="error">{errors.mobile}</div>}
+
               <div className='email'>
-                <label htmlFor='email'>Email</label>
+                <label htmlFor='email'>Email <span className="required">*</span></label>
                 <input
                   type='email'
                   id='email'
                   name='email'
                   placeholder='Email'
+                  value={formData.email}
+                  onChange={handleInputChange}
                   required />
               </div>
+              {errors.email && <div className="error">{errors.email}</div>}
             </div>
 
             <div className='message'>
-              <label htmlFor='message'>Message</label>
+              <label htmlFor='message'>Message <span className="required">*</span></label>
               <textarea
                 id='message'
                 name='message'
                 placeholder='Message'
                 maxLength={250}
+                value={formData.message}
+                onChange={handleInputChange}
                 required />
             </div>
+            {errors.message && <div className="error">{errors.message}</div>}
 
             <div className='captcha'>
-              <label htmlFor='captcha'>Captcha</label>
+              <label htmlFor='captcha'>Captcha <span className="required">*</span></label>
               <input
                 type='text'
                 id='captcha'
                 name='captcha'
                 placeholder='Captcha'
+                value={formData.captcha}
+                onChange={handleInputChange}
                 required />
             </div>
-
+            {errors.captcha && <div className="error">{errors.captcha}</div>}
             <div className='send-message'>
               <label htmlFor='send-message'></label>
-              <button type='submit'>Send Message</button>
+              <button type='submit' disabled={Object.keys(errors).length > 0}>Send Message</button>
             </div>
           </form>
         </section>
       </div>
     </>
-  )
-}
+  );
+};

@@ -1,19 +1,31 @@
 .contact-us{
     padding-top: 140px;
+    overflow: hidden;
 }
 
 .contact-us-main{
     display: flex;
     background-color: #f8f6f6;
     padding: 50px;
+    align-items: flex-start;
+    text-align: left;
 }
 
 .contact-us-main a{
     text-decoration: none;
+    color: #888888;
+    font-size: 0.9rem;
+}
+
+.contact-us-main h1{
+    color: #133365;
+    font-weight: 500;
+    font-size: 2rem;
 }
 
 .get-in-touch{
-    flex: 1;
+    flex: 1.5;
+    padding-right: 30px;
 }
 
 .google-map{
@@ -31,3 +43,149 @@
     display: flex;
     gap: 20px;
 }
+
+/*
+.contact-us {
+    padding-top: 140px;
+    overflow: hidden;
+}
+
+.contact-us-main {
+    display: flex;
+    background-color: #f8f6f6;
+    padding: 50px;
+    gap: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.contact-us-main a {
+    text-decoration: none;
+    color: #333;
+    transition: color 0.3s ease;
+}
+
+.contact-us-main a:hover {
+    color: #1a73e8;
+}
+
+.contact-us-main h1 {
+    color: #133365;
+    font-weight: 600;
+    font-size: 2.2rem;
+    margin-bottom: 20px;
+}
+
+.get-in-touch {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.get-in-touch span {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #444;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 5px;
+}
+
+.get-in-touch p {
+    margin: 5px 0 15px;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.social-icon {
+    font-size: 1.5rem;
+    margin-right: 10px;
+    color: #555;
+    transition: color 0.3s ease;
+}
+
+.social-icon:hover {
+    color: #1a73e8;
+}
+
+.google-map iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 8px;
+}
+
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.contact-form h1 {
+    font-size: 2rem;
+    color: #133365;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.contact-form label {
+    font-size: 0.9rem;
+    color: #333;
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+.contact-form input,
+.contact-form textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    color: #333;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+    border-color: #1a73e8;
+}
+
+.contact-form textarea {
+    height: 100px;
+    resize: none;
+}
+
+.mobile-email-group {
+    display: flex;
+    gap: 20px;
+}
+
+.send-message button {
+    background-color: #1a73e8;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.send-message button:hover {
+    background-color: #0f5aba;
+}
+
+*/

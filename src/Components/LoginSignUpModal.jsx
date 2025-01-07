@@ -18,6 +18,7 @@ export const LoginSignUpModal = ({ closeModal }) => {
     const [isButtonEnabled, setIsButtonEnabled] = useState(false);
     const [otpSent, setOtpSent] = useState(false);
     const [isAgree, setIsAgree] = useState(false);
+    const mobileRegex = /^[6-9]\d{9}$/;
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -31,35 +32,66 @@ export const LoginSignUpModal = ({ closeModal }) => {
         //     setErrors(validationErrors);
         // }
 
-        if (
-            formData.name &&
-            formData.mobileNumber &&
-            formData.password &&
-            formData.confirmPassword
-        ) {
-            setIsButtonEnabled(true);
-        } else {
-            setIsButtonEnabled(false);
-        }
+        // if (
+        //     formData.name &&
+        //     formData.mobileNumber &&
+        //     formData.password &&
+        //     formData.confirmPassword
+        // ) {
+        //     setIsButtonEnabled(true);
+        // } else {
+        //     setIsButtonEnabled(false);
+        // }
+
+        validateField(name, value);
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
-        if (!formData.name) validationErrors.name = "Name is required";
-        if (!formData.mobileNumber) validationErrors.mobileNumber = "Mobile Number is required";
-        if (!formData.password) validationErrors.password = "Password is required";
-        if (formData.password && (formData.password.length < 4 || formData.password.length > 15)) {
-            validationErrors.password = "Password must be between 4 to 15 characters";
-        }
-
-        if (Object.keys(validationErrors).length > 0) {
-            setErrors(validationErrors);
-        } else {
-            setErrors({});
-            // alert("Form submitted successfully!");
-        }
     };
+
+    const validateField = (name, value) => {
+        const validationErrors = { ...errors };
+      
+        if (name === "name") {
+          if (value.trim() === "") validationErrors.name = "Name is required";
+          else delete validationErrors.name;
+        }
+      
+        if (name === "mobileNumber") {
+          if (value.trim() === "") {
+            validationErrors.mobileNumber = "Mobile Number is required";
+          } else if (!mobileRegex.test(value)) {
+            validationErrors.mobileNumber = "Invalid Mobile Number";
+          } else {
+            delete validationErrors.mobileNumber;
+          }
+        }
+      
+        if (name === "password") {
+          if (value.length < 4 || value.length > 15) {
+            validationErrors.password = "Password must be between 4 to 15 characters";
+          } else {
+            delete validationErrors.password;
+          }
+          if (formData.confirmPassword && value !== formData.confirmPassword) {
+            validationErrors.confirmPassword = "Passwords do not match";
+          } else {
+            delete validationErrors.confirmPassword;
+          }
+        }
+      
+        if (name === "confirmPassword") {
+          if (value !== formData.password) {
+            validationErrors.confirmPassword = "Passwords do not match";
+          } else {
+            delete validationErrors.confirmPassword;
+          }
+        }
+      
+        setErrors(validationErrors);
+      };
+      
 
     return (
         <div className="modal-overlay">

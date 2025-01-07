@@ -162,6 +162,7 @@ form .btn-secondary:hover {
 .required {
     color: red;
     font-size: 10px;
+    font-weight: 500;
 }
 
 .error {

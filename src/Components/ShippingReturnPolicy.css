@@ -1,0 +1,33 @@
+.shipping-return-policy{
+    padding-top: 140px;
+}
+
+.footer-policys {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    border-radius: 8px;
+    background: #f4f4f4;
+    margin-top: 0px;
+    padding: 20px 30px;
+    align-items: flex-start;
+    text-align: left;
+}
+
+.footer-policys h3 {
+    color: #888888;
+    font-size: 22px;
+    font-family: sans-serif, "maven pro";
+    margin-bottom: -5px; 
+    text-align: left;
+    font-weight: 400;
+}
+
+.footer-policys p {
+    color: #000000;
+    font-size: 16px;
+    font-family: sans-serif, "maven pro";
+    text-align: left; 
+    line-height: 1.5;
+    margin-bottom: 20px; 
+}
