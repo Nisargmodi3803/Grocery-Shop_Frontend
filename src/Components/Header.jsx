@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { RiFileSearchFill } from "react-icons/ri";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
@@ -7,10 +7,48 @@ import SearchIcon from '@mui/icons-material/Search';
 import HomeIcon from '@mui/icons-material/Home';
 import "./Header.css";
 import { LoginSignUpModal } from './LoginSignUpModal';
+import Cookies from 'js-cookie';
+import { jwtDecode } from 'jwt-decode';
+import axios from 'axios';
 
 export const Header = () => {
     const [showModal, setShowModal] = useState(false);
     const [cartCount, setCartCount] = useState(0);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [customerDetails,setCustomerDetails] = useState(null);
+
+    useEffect(() => {
+        const fetchCustomerDetails = async () => {
+            const authToken = Cookies.get('authToken');
+
+            if (authToken) {
+                setIsAuthenticated(true);
+                try {
+                    // Decode JWT to extract customerId & email
+                    const decodedToken = jwtDecode(authToken);
+                    const customerId = decodedToken.customerId;
+                    const customerEmail = decodedToken.sub; // "sub" contains the email
+
+                    console.log("Customer ID:", customerId);
+                    console.log("Customer Email:", customerEmail);
+
+                    // Fetch additional customer details from backend
+                    const response = await axios.get(`http://localhost:9000/customer/${customerId}`);
+                    setCustomerDetails(response.data);
+                } catch (error) {
+                    console.error("Error fetching customer details:", error);
+                    setIsAuthenticated(false);
+                    setCustomerDetails(null);
+                }
+            } else {
+                setIsAuthenticated(false);
+                setCustomerDetails(null);
+            }
+        };
+
+        fetchCustomerDetails();
+    }, [Cookies.get('authToken')]); // Run every time authToken changes
+
 
     const handleSearchClick = () => {
         alert("Search Button Clicked");
@@ -68,10 +106,17 @@ export const Header = () => {
                     </div>
 
                     <div className="navbar-right">
-                        <div className="icon-container" onClick={handleLoginSignUp}>
+                        {!isAuthenticated ? (
+                            <div className="icon-container" onClick={handleLoginSignUp}>
                             <AccountCircleIcon />
                             <span>Login/Sign Up</span>
                         </div>
+                        ) : (
+                            <div className='icon-container'>
+                            <AccountCircleIcon />
+                            <span><b>Hi</b> ${customerDetails.customerName}</span>
+                            </div>
+                        )}
                         <div className="icon-container cart-icon-container" onClick={handleCart}>
                             <ShoppingCartRoundedIcon />
                             {cartCount > 0 && <span className="cart-count">{cartCount}</span>}

@@ -4,16 +4,19 @@ import { MdLock } from "react-icons/md";
 import { BiSolidPencil } from "react-icons/bi";
 import { FaArrowRight } from "react-icons/fa6";
 import axios from 'axios';
+import Cookies from 'js-cookie';
+import { useNavigate } from 'react-router-dom';
 import "./LoginSignUpModal.css";
 
 export const LoginSignUpModal = ({ closeModal }) => {
+    const navigate = useNavigate();
     const [isLogin, setIsLogin] = useState(true);
     const [OTP, setOTP] = useState('');
-    const [response,setResponse] = useState('');
+    const [response, setResponse] = useState('');
     const [formData, setFormData] = useState({
         name: '',
         mobileNumber: '',
-        email : '',
+        email: '',
         password: '',
         confirmPassword: '',
         referralCode: '', // Optional
@@ -21,7 +24,7 @@ export const LoginSignUpModal = ({ closeModal }) => {
     const [errors, setErrors] = useState({});
     const [isButtonEnabled, setIsButtonEnabled] = useState(false);
     const [otpSent, setOtpSent] = useState(false);
-    const [verify,setVerify] = useState(false);
+    const [verified, setVerified] = useState(false);
     // const [confirmationResult, setConfirmationResult] = useState(null); // Store the confirmationResult
 
     const mobileRegex = /^[6-9]\d{9}$/;
@@ -37,18 +40,36 @@ export const LoginSignUpModal = ({ closeModal }) => {
         validateField(name, value);
     };
 
-    
+
     const handleSubmit = (e) => {
         e.preventDefault();
         if (isLogin) {
             handleLogin();
         } else {
+            if (!verified) {
+                alert("Please verify OTP before registration.");
+                return;
+            }
             handleRegistration();
         }
     };
 
     const handleLogin = () => {
-        alert("Login logic goes here!");
+        axios.post('http://localhost:9000/login', {
+            email: formData.email,
+            password: formData.password,
+        }, { withCredentials: true }) // Ensure cookies are sent & received
+            .then(response => {
+                console.log(response.data);
+                alert('Login Successful');
+
+                // Redirect to home page after successful login
+                navigate('/ecommerce');
+            })
+            .catch(error => {
+                console.error(error);
+                alert('Login Failed');
+            });
     };
 
     const handleRegistration = () => {
@@ -56,49 +77,74 @@ export const LoginSignUpModal = ({ closeModal }) => {
             customerName: formData.name,
             customerMobile: formData.mobileNumber,
             customerPassword: formData.password,
-            // customerOtp: OTP,
+            otp: OTP,
             referralCode: formData.referralCode, // Optional
-        })
+        }, { withCredentials: true }) // Ensure cookies are sent & received
             .then(response => {
-                console.log(response.data); 
+                console.log(response.data);
+                setVerified(false);
                 alert('Registration Successful');
+
+                // Read authToken from the cookie (auto-login)
+                const authToken = Cookies.get('authToken');
+                console.log("Auth Token:", authToken);
+                if (authToken) {
+                    // Redirect to home page after successful registration & login
+                    navigate('/ecommerce');
+                }
             })
             .catch(error => {
-                console.error(error); 
+                console.error(error);
                 alert('Registration Failed');
             });
     };
 
     const handleOTP = () => {
-        if(isLogin){ // Login with OTP
+        if (isLogin) { // Login with OTP
             axios.post('http://localhost:9000/send-otp-login', {
                 email: formData.email
             })
-            .then(response => {
-                console.log(response.data);
-                setOtpSent(true);
-                setResponse(response.data);
-            })
-            .catch(error => {
-                console.error(error);
-                alert('OTP sending failed');
-            });
+                .then(response => {
+                    console.log(response.data);
+                    setOtpSent(true);
+                    setResponse(response.data);
+                })
+                .catch(error => {
+                    console.error(error);
+                    alert('OTP sending failed');
+                });
         }
-        else{ // Registration with OTP
-            axios.post('http://localhost:9000/send-email-login',{
-                email: formData.email
+        else { // Registration with OTP
+            axios.post('http://localhost:9000/send-email-registration', {
+                email: formData.email,
+                name: formData.name
             })
-            .then(response => {
-                console.log(response.data);
-                setOtpSent(true);
-                setResponse(response.data);
-            })
-            .catch(error => {
-                console.error(error);
-                alert('OTP sending failed');
-            });
+                .then(response => {
+                    console.log(response.data);
+                    setOtpSent(true);
+                    setResponse(response.data);
+                })
+                .catch(error => {
+                    console.error(error);
+                    alert('OTP sending failed');
+                });
         }
     };
+
+    const handleVerify = () => {
+        axios.post('http://localhost:9000/verify-otp', {
+            email: formData.email,
+            otp: OTP
+        })
+            .then(response => {
+                console.log(response.data);
+                setVerified(true);
+            })
+            .catch(error => {
+                console.error(error);
+                alert('OTP verification failed');
+            });
+    }
 
     const validateField = (name, value) => {
         const validationErrors = { ...errors };
@@ -123,10 +169,10 @@ export const LoginSignUpModal = ({ closeModal }) => {
                 validationErrors.email = "Email is required";
             } else if (!emailRegex.test(value)) {
                 validationErrors.email = "Invalid Email";
-            } else { 
-                delete validationErrors.email; 
+            } else {
+                delete validationErrors.email;
             }
-        } 
+        }
 
         if (name === "password") {
             if (value.length < 4 || value.length > 15) {
@@ -277,7 +323,7 @@ export const LoginSignUpModal = ({ closeModal }) => {
                             <label className="password-info">Please enter the referral code shared by your friend if available.</label>
                             {errors.confirmPassword && <div className="error">{errors.confirmPassword}</div>}
 
-                            {Object.keys(errors).length === 0 && formData.name && formData.mobileNumber && formData.password && formData.confirmPassword && (
+                            {Object.keys(errors).length === 0 && formData.name && formData.mobileNumber && formData.password && formData.confirmPassword && formData.email && (
                                 <>
                                     <button
                                         type="button"
@@ -285,12 +331,25 @@ export const LoginSignUpModal = ({ closeModal }) => {
                                         onClick={handleOTP}>
                                         Send OTP <FaArrowRight />
                                     </button>
-                                    <input placeholder='OTP' className='label-otp' onChange={(e) => setOTP(e.target.value)} />
-                                    <div id="recaptcha-container" />
-                                    {otpSent && <span className="otp-success-message">${response}</span>}
+                                    <input
+                                        placeholder='Enter OTP'
+                                        className='label-otp'
+                                        value={OTP}
+                                        onChange={(e) => setOTP(e.target.value)}
+                                    />
+                                    {otpSent && <span className="otp-success-message">✅ OTP Send Successfully!</span>}
+                                    {otpSent && (
+                                        <button
+                                            type="button"
+                                            className="btn-otp"
+                                            onClick={handleVerify}>
+                                            Verify OTP
+                                        </button>
+                                    )}
+                                    {verified && <span className="otp-success-message">✅ OTP Verified!</span>}
                                 </>
                             )}
-                            {otpSent ? (
+                            {verified ? (
                                 <div className="text-center">
                                     <button type="submit" className="btn btn-primary">
                                         Register

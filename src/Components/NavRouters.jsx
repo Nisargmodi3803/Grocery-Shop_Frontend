@@ -14,6 +14,8 @@ import { TermsConditions } from './TermsConditions';
 import Product from './Product';
 
 export const NavRouters = () => {
+
+  
   return (
     <BrowserRouter>
       <Header />
