@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Header } from './Header';
 import { Home } from './Home';
@@ -14,11 +14,14 @@ import { TermsConditions } from './TermsConditions';
 import Product from './Product';
 
 export const NavRouters = () => {
+  // useEffect(() => {
+  //   <Header />;
+  // }, []);
 
-  
   return (
     <BrowserRouter>
       <Header />
+      {/* <Home /> */}
       <Routes>
         <Route path="/ecommerce" element={<Home />} />
         <Route path="/ecommerce/shopByCategory" element={<ShopByCategory />} />

@@ -1,78 +1,66 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { FaCalendarDay } from "react-icons/fa";
 import './BlogCard.css'
+import axios from 'axios';
 
 export default function BlogCard() {
+    const [blogs, setBlogs] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchBlogs = async () => {
+            try {
+                const response = await axios.get('http://localhost:9000/blogs');
+                setBlogs(response.data);
+                console.log('Blogs:', response.data);
+            }
+            catch (error) {
+                console.error('Error fetching blogs:', error);
+                setError('Failed to load blogs. Please try again later.');
+            }
+            finally {
+                setLoading(false);
+            }
+        }
+        fetchBlogs();
+    }, []);
+
+    if (loading) return <p className="loading">Loading blogs...</p>;
+    if (error) return <p className="error">{error}</p>;
+
     return (
         <div className='blog-container'>
-            <div className='blog-card'>
-                <div className='blog-image'>
-                    <img
-                        src='https://bitsinfotech.in/ecommerce/fmcg_upload/blog/040822102959.jpg'
-                        loading='lazy'
-                    />
-                </div>
-                <div className='blog-content'>
-                    <div className='blog-title'>
-                        <h3>Easy Homemade Flatbread Crackers</h3>
-                    </div>
-                    <div className='blog-date'>
-                        <span><FaCalendarDay /> July 18, 2022</span>
-                    </div>
-                    <div className='blog-description'>
-                        <p>I love how simple this recipe was, and super easy to make double! I paired it with a baked brie for a holiday party!</p>
-                    </div>
-                    <div className='blog-readmore'>
-                        <span>READ MORE {'>'}</span>
-                    </div>
-                </div>
-            </div>
+            {
+                blogs.length > 0 ? (
+                    blogs.map((blog) => (
+                        <div className='blog-card' key={blog.id}>
+                            <div className='blog-image'>
+                                <img
+                                    src={blog.image_url}                              
+                                    loading='lazy'
+                                />
+                            </div>
+                            <div className='blog-content'>
+                                <div className='blog-title'>
+                                    <h3>{blog.title}</h3>
+                                </div>
+                                <div className='blog-date'>
+                                    <span><FaCalendarDay /> {blog.date}</span>
+                                </div>
+                                <div className='blog-description'>
+                                    <p>{blog.description}</p>
+                                </div>
+                                <div className='blog-readmore'>
+                                    <span>READ MORE {'>'}</span>
+                                </div>
+                            </div>
+                        </div>
+                    ))
+                    ) : (
+                    <p className="no-blogs">No blogs available</p>
+                )}
 
-            <div className='blog-card'>
-                <div className='blog-image'>
-                    <img
-                        src='https://bitsinfotech.in/ecommerce/fmcg_upload/blog/040822102959.jpg'
-                        loading='lazy'
-                    />
-                </div>
-                <div className='blog-content'>
-                    <div className='blog-title'>
-                        <h3>Easy Homemade Flatbread Crackers</h3>
-                    </div>
-                    <div className='blog-date'>
-                        <span><FaCalendarDay /> July 18, 2022</span>
-                    </div>
-                    <div className='blog-description'>
-                        <p>I love how simple this recipe was, and super easy to make double! I paired it with a baked brie for a holiday party!</p>
-                    </div>
-                    <div className='blog-readmore'>
-                        <span>READ MORE {'>'}</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div className='blog-card'>
-                <div className='blog-image'>
-                    <img
-                        src='https://bitsinfotech.in/ecommerce/fmcg_upload/blog/040822102959.jpg'
-                        loading='lazy'
-                    />
-                </div>
-                <div className='blog-content'>
-                    <div className='blog-title'>
-                        <h3>Easy Homemade Flatbread Crackers</h3>
-                    </div>
-                    <div className='blog-date'>
-                        <span><FaCalendarDay /> July 18, 2022</span>
-                    </div>
-                    <div className='blog-description'>
-                        <p>I love how simple this recipe was, and super easy to make double! I paired it with a baked brie for a holiday party!</p>
-                    </div>
-                    <div className='blog-readmore'>
-                        <span>READ MORE {'>'}</span>
-                    </div>
-                </div>
-            </div>
         </div>
     )
 }

@@ -5,6 +5,7 @@ import { BsArrowLeftCircleFill, BsArrowRightCircleFill } from "react-icons/bs";
 import CardSlider from './CardSlider';
 import { Link, useNavigate } from 'react-router-dom';
 import { ProductCard } from './ProductCard';
+import axios from 'axios';
 
 export const Home = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -12,7 +13,7 @@ export const Home = () => {
   const [isPaused, setIsPaused] = useState(false);
   const navigate = useNavigate()
 
-  const categories = [
+  const categories1 = [
     { name: 'Vegetables & Fruits', img: 'https://bitsinfotech.in/ecommerce/fmcg_upload/category/040822105930.png' },
     { name: 'Dairy, Bread & Eggs', img: 'https://bitsinfotech.in/ecommerce/fmcg_upload/category/030822024035.png' },
     { name: 'Cold Drinks & Juices', img: 'https://bitsinfotech.in/ecommerce/fmcg_upload/category/030822022302.png' },
@@ -20,6 +21,22 @@ export const Home = () => {
     { name: 'Atta, Rice & Dal', img: 'https://bitsinfotech.in/ecommerce/fmcg_upload/category/030822020431.png' },
     { name: 'Sweet Tooth', img: 'https://bitsinfotech.in/ecommerce/fmcg_upload/category/030822040938.png' },
   ];
+
+  const [categories, setCategories] = useState([]);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get('http://localhost:9000/categories');
+      setCategories(response.data);
+    }
+    catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  }
+
+  useEffect(() => {
+    fetchCategories();
+  },[])
 
   const handleLeft = () => {
     setTransitionDirection('backward');
@@ -96,10 +113,10 @@ export const Home = () => {
         </div>
         <div className='bottom-section'>
           {categories.map((category, index) => (
-            <div key={index} className='category-card'>
+            <div key={category.id} className='category-card'>
               <a href=''>
                 <img
-                  src={category.img}
+                  src={category.image_url}
                   alt={category.name}
                   loading='lazy' />
               </a>

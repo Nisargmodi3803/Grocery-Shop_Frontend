@@ -195,7 +195,7 @@ form button {
 }
 
 .btn-otp {
-    background-color: #28a745;
+    background-color: #133365;
     color: white;
     padding: 10px 20px;
     font-size: 14px;
@@ -207,12 +207,40 @@ form button {
     align-items: center;
     gap: 8px;
     justify-content: center;
-    transition: background-color 0.3s ease-in-out;
+    transition: background-color 0.3s ease-in-out, transform 0.1s ease-in-out;
 }
 
+/* Hover Effect */
 .btn-otp:hover {
-    background-color: #218838;
+    background-color: #0d244a;
 }
+
+/* Click Effect */
+.btn-otp:active {
+    transform: scale(0.95);
+    background-color: #091b33;
+}
+
+/* Ripple Effect on Click */
+.btn-otp.clicked::after {
+    content: "";
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    transform: scale(0);
+    animation: ripple 0.4s ease-out;
+}
+
+/* Ripple Animation */
+@keyframes ripple {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
 
 .label-otp {
     margin-top: 10px;
@@ -225,6 +253,13 @@ form button {
 
 .otp-success-message {
     color: #28a745;
+    font-size: 12px;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+.otp-error-message {
+    color: red;
     font-size: 12px;
     font-weight: bold;
     margin-top: 5px;

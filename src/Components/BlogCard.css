@@ -1,5 +1,7 @@
 .blog-container{
-    display: flex;
+    /* display: flex; */
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 40px;
     flex: 3;
     margin-left: 50px;

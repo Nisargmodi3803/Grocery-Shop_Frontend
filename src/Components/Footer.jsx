@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './Footer.css';
 import { MdPhone } from "react-icons/md";
 import { FaMobileScreenButton } from "react-icons/fa6";
@@ -8,8 +8,24 @@ import { FaFacebook } from "react-icons/fa6";
 import { FaInstagramSquare } from "react-icons/fa";
 import { FaSquareXTwitter } from "react-icons/fa6";
 import { FaRegCalendarAlt } from "react-icons/fa";
+import axios from 'axios';
 
 const Footer = () => {
+    const [blogs, setBlogs] = useState([]);
+
+    const fetchBlogs = async () => {
+        try {
+            const response = await axios.get('http://localhost:9000/blogs');
+            setBlogs(response.data);
+        } catch (error) {
+            console.error("Error fetching blogs:", error);
+        }
+    }
+
+    useEffect(() => {
+        fetchBlogs();
+    }, [])
+
     return (
         <>
             <div className="footer-top">
@@ -48,8 +64,17 @@ const Footer = () => {
                         <a href="https://bitsinfotech.in" target="_blank" rel="noopener noreferrer"><TbWorld /> bitsinfotech.in</a>
                     </div>
                     <div className="blog-links">
+                        {/* <h6>LATEST BLOG</h6>
+                        {blogs.map((blog, index) => (
+                            <div className='blog-links' key={index}>
+                                <a href="">
+                                    <h6>{blog.title}</h6>
+                                </a>
+                                <p><FaRegCalendarAlt /> {blog.date}</p>
+                                <hr />
+                            </div>
+                        ))} */}
                         <div className='blog-links col-1'>
-                            <h6>LATEST BLOG</h6>
                             <a href='https://bitsinfotech.in/ecommerce/easy-homemade-flatbread-crackers'><h6>Easy Homemade Flatbread Crackers...</h6></a><p><FaRegCalendarAlt /> July 18,2022</p>
                             <hr />
                             <a href='https://bitsinfotech.in/ecommerce/cucumber-agua-fresca'><h6>Cucumber Agua Fresca</h6></a><p><FaRegCalendarAlt /> July 22,2022</p>

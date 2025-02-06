@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState,useEffect } from 'react';
 import './ShopByCategory.css';
+import axios from 'axios';
 
 export const ShopByCategory = () => {
-  const categories = [
+  const categories1 = [
     { name: 'Vegetables & Fruits', img: 'https://bitsinfotech.in/ecommerce/fmcg_upload/category/040822105930.png' },
     { name: 'Dairy, Bread & Eggs', img: 'https://bitsinfotech.in/ecommerce/fmcg_upload/category/030822024035.png' },
     { name: 'Cold Drinks & Juices', img: 'https://bitsinfotech.in/ecommerce/fmcg_upload/category/030822022302.png' },
@@ -10,6 +11,23 @@ export const ShopByCategory = () => {
     { name: 'Atta, Rice & Dal', img: 'https://bitsinfotech.in/ecommerce/fmcg_upload/category/030822020431.png' },
     { name: 'Sweet Tooth', img: 'https://bitsinfotech.in/ecommerce/fmcg_upload/category/030822040938.png' },
   ];
+
+  const [categories, setCategories] = useState([]);
+
+  const fetchCategories = async () => {
+    try{
+      const response = await axios.get('http://localhost:9000/categories');
+      setCategories(response.data);
+    }
+    catch(error)
+    {
+      console.error("Error fetching categories:", error);
+    }
+  }
+
+  useEffect(() => {
+    fetchCategories();
+  },[])
 
   return (
     <>
@@ -20,9 +38,9 @@ export const ShopByCategory = () => {
         <section className='categories-container'>
           <div className='categories-grid'>
             {categories.map((category, index) => (
-              <div key={index} className='category-card'>
+              <div key={category.id} className='category-card'>
                 <a href=''>
-                  <img src={category.img} alt={category.name} />
+                  <img src={category.image_url} alt={category.name} />
                 </a>
                 <a href=''>
                   <h6>{category.name}</h6>

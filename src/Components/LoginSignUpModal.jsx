@@ -3,7 +3,7 @@ import { IoCloseSharp } from "react-icons/io5";
 import { MdLock } from "react-icons/md";
 import { BiSolidPencil } from "react-icons/bi";
 import { FaArrowRight } from "react-icons/fa6";
-import axios from 'axios';
+import axios, { HttpStatusCode } from 'axios';
 import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
 import "./LoginSignUpModal.css";
@@ -12,7 +12,7 @@ export const LoginSignUpModal = ({ closeModal }) => {
     const navigate = useNavigate();
     const [isLogin, setIsLogin] = useState(true);
     const [OTP, setOTP] = useState('');
-    const [response, setResponse] = useState('');
+    const [isAuthenticated, setIsAuthenticated] = useState();
     const [formData, setFormData] = useState({
         name: '',
         mobileNumber: '',
@@ -23,12 +23,19 @@ export const LoginSignUpModal = ({ closeModal }) => {
     });
     const [errors, setErrors] = useState({});
     const [isButtonEnabled, setIsButtonEnabled] = useState(false);
-    const [otpSent, setOtpSent] = useState(false);
-    const [verified, setVerified] = useState(false);
-    // const [confirmationResult, setConfirmationResult] = useState(null); // Store the confirmationResult
+    const [otpSent, setOtpSent] = useState();
+    const [verified, setVerified] = useState();
+    const [otpResponse, setOtpResponse] = useState("");
 
     const mobileRegex = /^[6-9]\d{9}$/;
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    useEffect(() => {
+        const storedAuth = sessionStorage.getItem("isAuthenticated");
+        if (storedAuth === "true") {
+            setIsAuthenticated(true);
+        }
+    }, []);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -54,52 +61,66 @@ export const LoginSignUpModal = ({ closeModal }) => {
         }
     };
 
-    const handleLogin = () => {
-        axios.post('http://localhost:9000/login', {
-            email: formData.email,
-            password: formData.password,
-        }, { withCredentials: true }) // Ensure cookies are sent & received
-            .then(response => {
-                console.log(response.data);
-                alert('Login Successful');
+    const handleLogin = async () => {
+        try {
+            const response = await axios.post('http://localhost:9000/login', {
+                email: formData.email,
+                password: formData.password,
+            });
 
-                // Redirect to home page after successful login
+            if (response.status == 200) {
+                sessionStorage.setItem("isAuthenticated", "true");
+                sessionStorage.setItem("customerEmail", formData.email);
+                setIsAuthenticated(true);
+                closeModal();
                 navigate('/ecommerce');
-            })
-            .catch(error => {
+                window.location.reload();
+            }
+            else {
+                setIsAuthenticated(false);
+            }
+
+        } catch (error) {
+            if (error.response.status === 400) {
+                setIsAuthenticated(false);
+            }
+            else {
                 console.error(error);
                 alert('Login Failed');
-            });
+            }
+        }
     };
 
-    const handleRegistration = () => {
-        axios.post('http://localhost:9000/register', {
-            customerName: formData.name,
-            customerMobile: formData.mobileNumber,
-            customerPassword: formData.password,
-            otp: OTP,
-            referralCode: formData.referralCode, // Optional
-        }, { withCredentials: true }) // Ensure cookies are sent & received
-            .then(response => {
-                console.log(response.data);
-                setVerified(false);
-                alert('Registration Successful');
-
-                // Read authToken from the cookie (auto-login)
-                const authToken = Cookies.get('authToken');
-                console.log("Auth Token:", authToken);
-                if (authToken) {
-                    // Redirect to home page after successful registration & login
-                    navigate('/ecommerce');
-                }
-            })
-            .catch(error => {
-                console.error(error);
-                alert('Registration Failed');
+    const handleRegistration = async () => {
+        try {
+            const response = await axios.post('http://localhost:9000/register', {
+                customerName: formData.name,
+                customerMobile: formData.mobileNumber,
+                customerEmail: formData.email,
+                customerPassword: formData.password,
+                otp: OTP,
+                referralCode: formData.referralCode,
             });
+
+            if (response.status === 200) {
+                sessionStorage.setItem("isAuthenticated", "true");
+                sessionStorage.setItem("customerEmail", formData.email);
+                setIsAuthenticated(true);
+                closeModal();
+                navigate('/ecommerce');
+                window.location.reload();
+            }
+            else {
+                setIsAuthenticated(false);
+            }
+        } catch (error) {
+            console.error(error);
+            alert('Registration Failed');
+        }
     };
 
-    const handleOTP = () => {
+
+    const handleOTP = async () => {
         if (isLogin) { // Login with OTP
             axios.post('http://localhost:9000/send-otp-login', {
                 email: formData.email
@@ -107,7 +128,6 @@ export const LoginSignUpModal = ({ closeModal }) => {
                 .then(response => {
                     console.log(response.data);
                     setOtpSent(true);
-                    setResponse(response.data);
                 })
                 .catch(error => {
                     console.error(error);
@@ -115,35 +135,75 @@ export const LoginSignUpModal = ({ closeModal }) => {
                 });
         }
         else { // Registration with OTP
-            axios.post('http://localhost:9000/send-email-registration', {
-                email: formData.email,
-                name: formData.name
-            })
-                .then(response => {
-                    console.log(response.data);
-                    setOtpSent(true);
-                    setResponse(response.data);
-                })
-                .catch(error => {
-                    console.error(error);
-                    alert('OTP sending failed');
+            try {
+                const response = await axios.post('http://localhost:9000/send-email-registration', {
+                    email: formData.email,
+                    name: formData.name
                 });
+
+                // Check if the response status is 200 (OK)
+                if (response.status === 200) {
+                    setOtpSent(true);
+                    // alert("OTP sent successfully!");
+                } else {
+                    setOtpSent(false);
+                    alert('Something went wrong. Please try again!');
+                }
+            } catch (error) {
+                if (error.response) {
+                    if (error.response.status === 409) {
+                        // alert("Email already registered. Please login or use a different email.");
+                        setOtpSent(false);
+                    } else {
+                        alert(`Error: ${error.response.status}`);
+                    }
+                } else {
+                    console.error(error);
+                    alert('OTP sending failed due to network or server error');
+                }
+            }
+
         }
     };
 
     const handleVerify = () => {
-        axios.post('http://localhost:9000/verify-otp', {
-            email: formData.email,
-            otp: OTP
-        })
-            .then(response => {
-                console.log(response.data);
-                setVerified(true);
+        try {
+            const response = axios.post('http://localhost:9000/verify-otp', {
+                email: formData.email,
+                otp: OTP
             })
-            .catch(error => {
+
+            if (response.status === 200) {
+                setVerified(true);
+                setOtpResponse(response.data.toString());
+            }
+            
+
+        } catch (error) {
+            if(error.response){
+                if (error.response.status === 400) {
+                    setVerified(false);
+                    setOtpResponse(error.response.data.toString());
+                }
+                else if (error.response.status === 404) {
+                    setVerified(false);
+                    setOtpResponse(error.response.data.toString());
+                }
+                else if (error.response.status === 409) {
+                    setVerified(false);
+                    setOtpResponse(error.response.data.toString());
+                }
+                else {
+                    setVerified(false);
+                    setOtpResponse("PLease Enter Valid OTP");
+                }
+            }
+            else {
                 console.error(error);
-                alert('OTP verification failed');
-            });
+                alert('OTP Verification Failed');
+            }
+        }
+
     }
 
     const validateField = (name, value) => {
@@ -254,6 +314,11 @@ export const LoginSignUpModal = ({ closeModal }) => {
                             <a href="#" className="forgot-password">
                                 Forgot Your Password?
                             </a>
+                            {isAuthenticated === true && Object.keys(errors).length === 0 && formData.email && formData.password ? (
+                                <span className="otp-success-message">✅ Login Successful!</span>
+                            ) : isAuthenticated === false ? (
+                                <span className="otp-error-message">❌ Email or Password Incorrect</span>
+                            ) : null}
                         </form>
                     ) : (
                         <form onSubmit={handleSubmit}>
@@ -337,7 +402,8 @@ export const LoginSignUpModal = ({ closeModal }) => {
                                         value={OTP}
                                         onChange={(e) => setOTP(e.target.value)}
                                     />
-                                    {otpSent && <span className="otp-success-message">✅ OTP Send Successfully!</span>}
+                                    {otpSent == true ? <span className="otp-success-message">✅ OTP Send Successfully!</span> : ""}
+                                    {otpSent == false ? <span className="otp-error-message">❌ Email already registered. Please login or use a different email. </span> : ""}
                                     {otpSent && (
                                         <button
                                             type="button"
@@ -346,20 +412,27 @@ export const LoginSignUpModal = ({ closeModal }) => {
                                             Verify OTP
                                         </button>
                                     )}
-                                    {verified && <span className="otp-success-message">✅ OTP Verified!</span>}
+                                    {verified == true ?
+                                        <span className="otp-success-message">✅ {otpResponse}</span>
+                                        : verified == false ? <span className="otp-error-message">❌ {otpResponse}</span> : ""}
                                 </>
                             )}
                             {verified ? (
                                 <div className="text-center">
                                     <button type="submit" className="btn btn-primary">
-                                        Register
+                                        Create Your Account
                                     </button>
+                                    {isAuthenticated === true && Object.keys(errors).length === 0 && formData.email && formData.password && formData.confirmPassword && formData.mobileNumber && OTP ? (
+                                        <span className="otp-success-message">✅ Registration Successful!</span>
+                                    ) : isAuthenticated === false ? (
+                                        <span className="otp-error-message">❌ Email Already Exist!</span>
+                                    ) : null}
                                 </div>
                             ) : ""}
                         </form>
                     )}
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
