@@ -119,14 +119,60 @@ form .btn {
 }
 
 form .btn-primary {
-    background: #133365;
+    background-color: #133365;
     color: white;
-    transition: background-color 0.3s;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+    transition: background-color 0.3s ease-in-out, transform 0.1s ease-in-out;
 }
 
-form .btn-primary:hover {
-    background: #0d244a;
+.text-center .btn-primary {
+    width: 100%;
 }
+
+.text-center {
+    width: 100%;
+}
+
+
+form .btn-primary:hover {
+    background-color: #0d244a;
+}
+
+/* Click Effect */
+form .btn-primary:active {
+    transform: scale(0.95);
+    background-color: #091b33;
+}
+
+/* Ripple Effect on Click */
+form .btn-primary.clicked::after {
+    content: "";
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    transform: scale(0);
+    animation: ripple 0.4s ease-out;
+}
+
+/* Ripple Animation */
+@keyframes ripple {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
 
 form .btn-secondary {
     background: #6c757d;
@@ -176,7 +222,12 @@ form input {
 }
 
 form button:disabled {
-    background: #c7c7c7;
+    background: #d7d3d3;
+    cursor: not-allowed;
+}
+
+form input:disabled {
+    background: #d7d3d3;
     cursor: not-allowed;
 }
 
@@ -274,11 +325,11 @@ form button {
 
 .checkbox-container input[type="checkbox"] {
     appearance: none;
-    width: 18px;
-    height: 18px;
+    width: 0px;
+    height: 0px;
     border: 2px solid #133365;
-    border-radius: 4px;
-    outline: none;
+    /* border-radius: 4px; */
+    /* outline: none; */
     cursor: pointer;
     position: relative;
     transition: background-color 0.3s, border-color 0.3s;
@@ -292,7 +343,7 @@ form button {
 .checkbox-container input[type="checkbox"]:checked::after {
     content: '✔';
     color: white;
-    font-size: 12px;
+    /* font-size: 12px; */
     position: absolute;
     top: 50%;
     left: 50%;
@@ -300,10 +351,20 @@ form button {
 }
 
 .checkbox-container label {
-    font-size: 14px;
+    font-size: 18px;
     color: #555555;
     cursor: pointer;
     transition: color 0.3s;
+    /* padding-bottom: 5px; */
+    margin-bottom: 10px;
+}
+
+.checkbox-container span{
+    font-size: 15px;
+    color: #555555;
+    cursor: pointer;
+    transition: color 0.3s;
+    margin-bottom: 10px;
 }
 
 .checkbox-container label:hover {
