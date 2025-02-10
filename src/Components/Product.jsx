@@ -1,6 +1,5 @@
 import { React, useState, useEffect } from 'react';
 import './Product.css';
-import products from './Products';
 import { useParams } from 'react-router-dom';
 import { IoMdHome } from "react-icons/io";
 import { useNavigate } from 'react-router-dom';
@@ -10,55 +9,66 @@ import { MdOutlineShoppingCart } from "react-icons/md";
 import { MdRemoveShoppingCart } from "react-icons/md";
 import { BsTag } from "react-icons/bs";
 import { MdVerified } from "react-icons/md";
+import axios from 'axios';
+import DOMPurify from 'dompurify';
 
 export default function Product() {
-    const { productId } = useParams();
     const [product, setProduct] = useState(null);
-    const navigate = useNavigate();
-    const [likedProducts, setLikedProducts] = useState(false);
+    const [likedProduct, setLikedProduct] = useState(false);
     const [cartCount, setCartCount] = useState(0);
     const [cartBtnClicked, setCartBtnClicked] = useState(false);
     const [relatedCategories, setRelatedCategories] = useState([]);
+    const { productSlugTitle } = useParams();
+    const navigate = useNavigate();
 
-    const vegetableAndFruits = products[0]["Vegetables & Fruits"];
-    const productList = [];
-    for (const category in vegetableAndFruits) {
-        for (const item in vegetableAndFruits[category]) {
-            const product = vegetableAndFruits[category][item];
-            for (const size in product.category) {
-                productList.push({
-                    id: product.category[size].id,
-                    name: item,
-                    size: size,
-                    image: product.image,
-                    discount: product.category[size].discount,
-                    rating: product.category[size].rating,
-                    totalRaters: product.category[size]["total raters"],
-                    price: product.category[size].price,
-                    available: product.category[size].available,
-                    isNew: product.category[size].new,
-                    highlights: product.Highlights,
-                    quickOverview: product["Quick OverView"],
-                    parentCategory: category,
-                });
-            }
-        }
-    }
+    const importAll = (r) => {
+        let images = {};
+        r.keys().forEach((item) => {
+            images[item.replace("./", "")] = r(item);
+        });
+        return images;
+    };
 
+    const imageMap = importAll(require.context("../assets/Product", false, /\.(png|jpeg|svg|jpg|JPEG)$/));
     useEffect(() => {
-        const id = parseInt(productId, 10);
-        const foundProduct = productList.find((product) => product.id === id);
-        if (!foundProduct) {
-            navigate('/ecommerce/404');
-        } else {
-            setProduct(foundProduct);
-        }
+        const fetchProduct = async () => {
+            try {
+                console.log("Fetching product:", productSlugTitle);
+                const response = await axios.get(`http://localhost:9000/product-title/${productSlugTitle}`);
+                if (response.status === 200) {
+                    setProduct(response.data);
+                }
+            } catch (error) {
+                if (error.response && error.response.status === 404) {
+                    console.log("No Product Found");
+                    alert("No Product Found");
+                } else {
+                    console.error("Error fetching product:", error);
+                    alert("Something went wrong. Please try again!");
+                }
+            }
+        };
+        fetchProduct();
+    }, [productSlugTitle]);
 
-        const related = productList.filter(
-            (item) => item.name === foundProduct.name && item.parentCategory === foundProduct.parentCategory
-        );
-        setRelatedCategories(related);
-    }, []);
+
+    // Fetch Related Variants
+    useEffect(() => {
+        if (!product) return;
+
+        const fetchRelatedCategories = async () => {
+            try {
+                const response = await axios.get(`http://localhost:9000/product-variants?name=${product.name}`);
+                if (response.status === 200) {
+                    const variants = response.data;
+                    setRelatedCategories(variants);
+                }
+            } catch (error) {
+                console.error("Error fetching related categories:", error);
+            }
+        };
+        fetchRelatedCategories();
+    }, [product]);
 
     if (!product) {
         return (
@@ -76,7 +86,19 @@ export default function Product() {
         );
     }
 
-    const greater = '>';
+    // Image Handling
+    const imageSrc = imageMap[product.image_url] || imageMap["default.jpg"];
+
+    // Discount Calculation
+    const calculateDiscountPercentage = (mrp, discountAmt) => {
+        return mrp > 0 ? Math.round(((mrp - discountAmt) * 100) / mrp) : 0;
+    };
+    const discount = calculateDiscountPercentage(product.mrp, product.discount_amt);
+
+    // Rating Handling
+    const rating = product.average_rating ? parseFloat(product.average_rating).toFixed(1) : 0;
+    const noOfRatings = product.no_of_rating || 0;
+
     return (
         <div className='product-page'>
             <section className='product-navigate-section'>
@@ -84,36 +106,32 @@ export default function Product() {
                     <a onClick={() => navigate('/ecommerce/')}>
                         <b><IoMdHome /> Home</b>
                     </a>
-                    {greater}
-                    <a href=''>{product.parentCategory}</a>
+                    <span>  </span>
+                    <a href=''>{product.cat?.name || "Category"}</a>
                 </span>
             </section>
+
             <section className='product-content-section'>
                 <div className='product-content-image-section'>
-                    <div className='product-content-image-section'>
-                        <img src={product.image} alt={product.name} loading='lazy' />
-                        <span className='product-content-likebtn' onClick={() => setLikedProducts(!likedProducts)}>
-                            {likedProducts ? <FaHeart color='red' /> : <FaHeart color='grey' />}
-                        </span>
-                    </div>
+                    <img src={imageSrc} alt={product.name} loading='lazy' />
+                    <span className='product-content-likebtn' onClick={() => setLikedProduct(!likedProduct)}>
+                        {likedProduct ? <FaHeart color='red' /> : <FaHeart color='grey' />}
+                    </span>
                 </div>
+
                 <div className='product-content-details-section'>
                     <div className='product-content-details-header'>
-                        <div className='product-content-discount'>
-                            {product.discount > 0 && (
-                                <span>{product.discount}% OFF</span>
-                            )}
-                        </div>
+                        {discount > 0 && <span className='product-content-discount'>{discount}% OFF</span>}
                         <div className='product-content-rating'>
-                            {product.rating > 0 ? (
+                            {rating > 0 ? (
                                 <>
                                     <div className='product-content-rating-avg'>
                                         <span className='product-content-rating'>
-                                            {product.rating} <MdOutlineStarPurple500 color='gold' />
+                                            {rating} <MdOutlineStarPurple500 color='gold' />
                                         </span>
                                     </div>
                                     <div className='product-content-rating-total'>
-                                        <p>{product.totalRaters} Rating</p>
+                                        <p>{noOfRatings} Ratings</p>
                                     </div>
                                 </>
                             ) : (
@@ -123,79 +141,74 @@ export default function Product() {
                             )}
                         </div>
                     </div>
+
                     <div className='product-content-name'>
                         <p>{product.name}</p>
                     </div>
+
                     <div className='product-content-category'>
                         <span>
                             <strong>
-                                <MdVerified />{product.parentCategory}
+                                <MdVerified /> {product.subcat.name}
                             </strong>
                         </span>
                     </div>
                     <div className='product-content-price'>
-                        {product.discount > 0 && (
+                        {discount > 0 && (
                             <span className='product-content-regular-price'>
-                                <BsTag /> Price  :  ₹ {product.price.toFixed(2)}
+                                <BsTag /> Price: ₹{product.mrp.toFixed(2)}
                             </span>
                         )}
                         <div className='product-content-discount-price'>
-                            <span className='discount'>Discount Price : </span>
+                            <span className='discount'>Discount Price:</span>
                             <p>
-                                <strong className='price'>
-                                    ₹
-                                    {(
-                                        product.price -
-                                        (product.price * product.discount) / 100
-                                    ).toFixed(2)}
-                                </strong>
+                                <strong className='price'>₹{product.discount_amt.toFixed(2)}</strong>
                             </p>
                         </div>
                     </div>
                     <div className="product-content-category-options">
-                        {relatedCategories.map((category) => (
-                            <div
-                                key={category.id}
-                                className={
-                                    category.id === product.id
-                                        ? "selected-category-option-container"
-                                        : "category-option-container"
-                                }
-                                onClick={() => setProduct(category)}
-                            >
-                                <div className="radio-button-section">
-                                    <input
-                                        type="radio"
-                                        name="category-option"
-                                        id={`category-${category.id}`}
-                                        checked={category.id === product.id}
-                                        onChange={() => setProduct(category)}
-                                    />
-                                    <label htmlFor={`category-${category.id}`} className="category-size">
-                                        {category.size}
-                                    </label>
-                                    <label htmlFor={`category-${category.id}`} className="category-price">
-                                        <span className='category-regular-price'>
-                                            <p>₹{category.price.toFixed(2)}</p>
-                                        </span>
-                                        <span className='category-discount-price'>
-                                            <p>
-                                                ₹{(
-                                                    category.price -
-                                                    (category.price * category.discount) / 100
-                                                ).toFixed(2)}
-                                            </p>
-                                        </span>
-                                    </label>
-                                </div>
-                                {category.id === product.id && category.discount > 0 && (
-                                    <div className="discount-section-main">
-                                        <span>{category.discount}% OFF</span>
+                        {relatedCategories.map((category) => {
+                            const isSelected = category.id === product.id;
+                            const discountPercentage = category.mrp > 0 ? Math.round(((category.mrp - category.discount_amt) / category.mrp) * 100) : 0;
+
+                            return (
+                                <div
+                                    key={category.id}
+                                    className={isSelected ? "selected-category-option-container" : "category-option-container"}
+                                    onChange={(e) => {navigate(`/ecommerce/product/${category.slug_title}`);window.location.reload();}}
+                                >
+                                    <div className="radio-button-section">
+                                        <input
+                                            type="radio"
+                                            name="category-option"
+                                            id={`category-${category.id}`}
+                                            checked={isSelected}
+                                            onChange={(e) => {navigate(`/ecommerce/product/${category.slug_title}`);window.location.reload();}}
+                                        />
+                                        <label htmlFor={`category-${category.id}`} className="category-size">
+                                            {category.variantName}
+                                        </label>
+                                        <label htmlFor={`category-${category.id}`} className="category-price">
+                                            <span className='category-regular-price'>
+                                                <p>₹{category.mrp.toFixed(2)}</p>
+                                            </span>
+                                            <span className='category-discount-price'>
+                                                <p>₹{category.discount_amt.toFixed(2)}</p>
+                                            </span>
+                                        </label>
                                     </div>
-                                )}
-                            </div>
-                        ))}
+
+                                    {isSelected && discountPercentage > 0 && (
+                                        <div className="discount-section-main">
+                                            <span>{discountPercentage}% OFF</span>
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })}
                     </div>
+
+
 
                     {cartBtnClicked ? (
                         <div className='product-content-add-to-cart-quantity'>
@@ -237,13 +250,13 @@ export default function Product() {
                     )}
                     <div className='product-content-highlights'>
                         <h1 className='highlights-title'>Highlights</h1>
-                        <p className='highlights-text'>{product.highlights}</p>
+                        <p className='highlights-text'>{product.description}</p>
                     </div>
                 </div>
             </section>
             <section className='product-overview-section'>
                 <h1>Quick Overview</h1>
-                <p>{product.quickOverview}</p>
+                <p dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.long_description) }}></p>
             </section>
         </div>
     );

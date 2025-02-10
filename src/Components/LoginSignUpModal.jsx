@@ -4,7 +4,6 @@ import { MdLock } from "react-icons/md";
 import { BiSolidPencil } from "react-icons/bi";
 import { FaArrowRight } from "react-icons/fa6";
 import axios, { HttpStatusCode } from 'axios';
-import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
 import "./LoginSignUpModal.css";
 

@@ -3,6 +3,18 @@ import { FaCalendarDay } from "react-icons/fa";
 import "./BlogCard.css";
 import axios from "axios";
 
+// Dynamically import all images from the 'assets/Blog' folder
+const importAll = (r) => {
+    let images = {};
+    r.keys().forEach((item) => {
+        images[item.replace("./", "")] = r(item);
+    });
+    return images;
+};
+
+// Load all images from 'src/assets/Blog/'
+const imageMap = importAll(require.context("../assets/Blog", false, /\.(png|jpe?g|svg)$/));
+
 export default function BlogCard() {
     const [blogs, setBlogs] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -13,7 +25,6 @@ export default function BlogCard() {
             try {
                 const response = await axios.get("http://localhost:9000/blogs");
                 setBlogs(response.data);
-                console.log("Blogs:", response.data);
             } catch (error) {
                 console.error("Error fetching blogs:", error);
                 setError("Failed to load blogs. Please try again later.");
@@ -29,21 +40,18 @@ export default function BlogCard() {
 
     return (
         <div className="blog-container">
-            {blogs.length < 0 ? (
+            {blogs.length > 0 ? (
                 blogs.map((blog) => {
-                    // Construct the correct image path
-                    const imagePath = `../assets/Blog/${blog.image}`;
+                    // Get image source from imageMap, fallback to default
+                    const imageSrc = imageMap[blog.image_url] || imageMap["default.png"];
 
                     return (
                         <div className="blog-card" key={blog.id}>
                             <div className="blog-image">
-                                <img
-                                    src={imagePath}
-                                    alt={blog.title}
+                                <img 
+                                    src={imageSrc} 
+                                    alt={blog.title} 
                                     loading="lazy"
-                                    // onError={(e) => {
-                                    //     e.target.src = "/assets/Blog/default.png"; // Fallback image
-                                    // }}
                                 />
                             </div>
                             <div className="blog-content">
@@ -66,11 +74,10 @@ export default function BlogCard() {
                     );
                 })
             ) : (
-                <>
-                <p className="no-blogs">No blogs available</p>
-                <img src="/assets/Blog/040822102959" alt="No blogs available" />
-                </>
-            
+                <div className="no-blogs">
+                    <p>No blogs available</p>
+                    <img src={imageMap["default.png"]} alt="No blogs available" />
+                </div>
             )}
         </div>
     );
