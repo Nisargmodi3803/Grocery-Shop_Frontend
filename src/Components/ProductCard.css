@@ -1,8 +1,8 @@
 .card-container {
     width: 100%;
-    padding: 20px;
+    /* padding: 20px; */
     box-sizing: border-box;
-    border: 1px solid #e0e0e0;
+    /* border: 1px solid #e0e0e0; */
     position: relative;
     overflow: hidden;
     padding-left: 50px;
@@ -43,6 +43,10 @@
 
 .product {
     width: 200px;
+    height: 450px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     padding: 10px;
     text-align: center;
@@ -118,7 +122,11 @@
 }
 
 .product-footer {
-    margin-top: 10px;
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 50px; 
 }
 
 .product-regular-price {
@@ -135,21 +143,56 @@
 }
 
 .add-to-cart,
-.out-of-stock {
+.out-of-stock,
+.coming-soon {
     background-color: #133365;
     color: #fff;
     border: none;
     padding: 5px 10px;
     margin-top: 20px;
+    margin-bottom: 10px;
     cursor: pointer;
     border-radius: 75px;
     font-size: 0.8rem;
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-.out-of-stock {
+.out-of-stock,
+.coming-soon {
     background-color: #8091ab;
     cursor: not-allowed;
 }
+
+.add-to-cart:hover {
+    /* background-color: #0c8db9; */
+    transform: scale(1.05);
+}
+
+.inquiry-now {
+    background-color: #08b4ce;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    border-radius: 75px;
+    font-size: 0.8rem;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.inquiry-now:hover {
+    /* background-color: #0c8db9; */
+    transform: scale(1.05);
+}
+
+/* Optional: Prevent hover effect for disabled buttons */
+.out-of-stock:hover,
+.coming-soon:hover {
+    background-color: #8091ab;
+    transform: none;
+}
+
 
 .like-icon {
     position: absolute;
@@ -183,15 +226,15 @@
     cursor: pointer;
     transition: color 0.3s ease, transform 0.3s ease;
     pointer-events: auto;
-    width: 2.5rem;
-    height: 2.5rem;
+    width: 2rem;
+    height: 2rem;
     color: white;
     display: flex;
     justify-content: center;
     align-items: center;
     border-radius: 50%;
     background-color: black;
-
+    cursor: pointer;
 }
 
 .arrow2:hover {
@@ -226,8 +269,8 @@
     width: 95px;
     height: 26px;
     cursor: pointer;
-    margin-left: 30px;
-    margin-top: 12px;
+    margin-left: 0px;
+    margin-top: auto;
 }
 
 .add-to-cart-quantity button {

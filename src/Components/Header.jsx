@@ -97,6 +97,7 @@ export const Header = () => {
         setIsAuthenticated(false);
         setCustomerEmail("");
         setCartCount(0);
+        window.location.reload();
     };
 
     return (
@@ -155,14 +156,14 @@ export const Header = () => {
                             <HomeIcon />
                             <Link to={"/ecommerce"}><b>Home</b></Link>
                         </li>
-                        <li><Link to={"/ecommerce/shopbycategory"}>Shop By Category</Link></li>
+                        <li><Link to={"/ecommerce/shop-by-category"}>Shop By Category</Link></li>
                         <li><Link to={"/ecommerce/blog"}>Blog</Link></li>
-                        <li><Link to={"/ecommerce/aboutus"}>About Us</Link></li>
-                        <li><Link to={"/ecommerce/contactus"}>Contact Us</Link></li>
+                        <li><Link to={"/ecommerce/about-us"}>About Us</Link></li>
+                        <li><Link to={"/ecommerce/contact-us"}>Contact Us</Link></li>
                     </ul>
                 </div>
 
-                {showModal && <LoginSignUpModal closeModal={closeModal} />}
+                {showModal && <LoginSignUpModal closeModal={closeModal} flag={1}/>}
             </header>
         </>
     );

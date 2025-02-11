@@ -6,8 +6,11 @@ import { FaArrowRight } from "react-icons/fa6";
 import axios, { HttpStatusCode } from 'axios';
 import { useNavigate } from 'react-router-dom';
 import "./LoginSignUpModal.css";
+import { use } from 'react';
 
-export const LoginSignUpModal = ({ closeModal }) => {
+// 1 => navigate to Home page and 2 => navigate to Product page
+
+export const LoginSignUpModal = ({ closeModal, flag, productSlugTitle }) => {
     const navigate = useNavigate();
     const [isLogin, setIsLogin] = useState(true);
     const [OTP, setOTP] = useState('');
@@ -38,7 +41,7 @@ export const LoginSignUpModal = ({ closeModal }) => {
     const [forgotPassword, setForgotPassword] = useState(false);
     const [loginWithOTP, setLoginWithOTP] = useState(false);
     const [SuccessfulForgotPassword, setSuccessfulForgotPassword] = useState();
-
+    const [inquiryProductSlugTitle,setInquiryProductSlugTitle] = useState(productSlugTitle);
     const mobileRegex = /^[6-9]\d{9}$/;
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
@@ -142,10 +145,12 @@ export const LoginSignUpModal = ({ closeModal }) => {
                 sessionStorage.setItem("isAuthenticated", "true");
                 sessionStorage.setItem("customerEmail", formData.email);
                 setIsAuthenticated(true);
-
+                // console.log("Slug title : "+productSlugTitle);
                 const timer = setTimeout(() => {
+                    if(flag===1) navigate('/ecommerce');
+                    else if(flag===2) navigate(`/ecommerce/product/${inquiryProductSlugTitle}`);
+                    else alert("Wrong Navigate Flag");
                     closeModal();
-                    navigate('/ecommerce');
                     window.location.reload();
                 }, 3000);
             }
@@ -181,8 +186,10 @@ export const LoginSignUpModal = ({ closeModal }) => {
                 setIsAuthenticated(true);
 
                 const timer = setTimeout(() => {
+                    if(flag===1) navigate('/ecommerce');
+                    else if(flag===2) navigate(`/ecommerce/product/${inquiryProductSlugTitle}`);
+                    else alert("Wrong Navigate Flag");
                     closeModal();
-                    navigate('/ecommerce');
                     window.location.reload();
                 }, 3000);
             }
@@ -331,8 +338,8 @@ export const LoginSignUpModal = ({ closeModal }) => {
             if (response.status === 200) {
                 setSuccessfulForgotPassword(true);
                 const timer = setTimeout(() => {
-                    // navigate('/ecommerce');
-                    // window.location.reload();
+                    navigate('/ecommerce');
+                    window.location.reload();
                     setIsLogin(true);
                     setForgotPassword(false);
                 }, 3000);
@@ -622,7 +629,7 @@ export const LoginSignUpModal = ({ closeModal }) => {
                                 onChange={handleInputChange}
                                 disabled={otpSent}
                             />
-                            {errors.mobileNumber && <div className="error">{errors.mobileNumber}</div>}
+                            {errors.email && <div className="error">{errors.email}</div>}
 
                             <label>Enter Password <span className="required">*</span></label>
                             <input

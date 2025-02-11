@@ -11,6 +11,10 @@ import { BsTag } from "react-icons/bs";
 import { MdVerified } from "react-icons/md";
 import axios from 'axios';
 import DOMPurify from 'dompurify';
+import { MdAccessTime } from "react-icons/md";
+import { MdOutlineChatBubbleOutline } from "react-icons/md";
+import { LoginSignUpModal } from './LoginSignUpModal';
+import { InquiryNow } from './InquiryNow';
 
 export default function Product() {
     const [product, setProduct] = useState(null);
@@ -20,6 +24,16 @@ export default function Product() {
     const [relatedCategories, setRelatedCategories] = useState([]);
     const { productSlugTitle } = useParams();
     const navigate = useNavigate();
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [showLoginModal, setShowLoginModal] = useState(false);
+    const [showModal, setShowModal] = useState(false);
+    const [inquiryProductId, setInquiryProductId] = useState(null);
+    const [inquiryProductSlugTitle,setInquiryProductSlugTitle] = useState(null);
+
+    useEffect(() => {
+        const authStatus = sessionStorage.getItem("isAuthenticated") === "true";
+        setIsAuthenticated(authStatus);
+    }, []);
 
     const importAll = (r) => {
         let images = {};
@@ -70,6 +84,24 @@ export default function Product() {
         fetchRelatedCategories();
     }, [product]);
 
+    const handleInquiryClick = (productId) => {
+        if (!isAuthenticated) {
+          setShowLoginModal(true);
+          setInquiryProductSlugTitle(productSlugTitle);
+          return;
+        }
+    
+        setInquiryProductId(productId);
+        setShowModal(true); // Open Modal
+    
+      };
+    
+      const closeModal = () => {
+        setShowModal(false);
+        setInquiryProductId(null);
+        setInquiryProductSlugTitle(null);
+      };
+
     if (!product) {
         return (
             <div className='product-page'>
@@ -85,7 +117,7 @@ export default function Product() {
             </div>
         );
     }
-
+    const greater = '>';
     // Image Handling
     const imageSrc = imageMap[product.image_url] || imageMap["default.jpg"];
 
@@ -106,8 +138,10 @@ export default function Product() {
                     <a onClick={() => navigate('/ecommerce/')}>
                         <b><IoMdHome /> Home</b>
                     </a>
-                    <span>  </span>
+                    <span> {greater} </span>
                     <a href=''>{product.cat?.name || "Category"}</a>
+                    <span> {greater} </span>
+                    <a href=''>{product.subcat?.name || "Subcategory"}</a>
                 </span>
             </section>
 
@@ -175,27 +209,29 @@ export default function Product() {
                                 <div
                                     key={category.id}
                                     className={isSelected ? "selected-category-option-container" : "category-option-container"}
-                                    onChange={(e) => {navigate(`/ecommerce/product/${category.slug_title}`);window.location.reload();}}
+                                    onChange={(e) => { navigate(`/ecommerce/product/${category.slug_title}`); window.location.reload(); }}
                                 >
-                                    <div className="radio-button-section">
+                                    <div className="radio-button-section"
+                                        onChange={(e) => { navigate(`/ecommerce/product/${category.slug_title}`); window.location.reload(); }}>
                                         <input
                                             type="radio"
                                             name="category-option"
                                             id={`category-${category.id}`}
                                             checked={isSelected}
-                                            onChange={(e) => {navigate(`/ecommerce/product/${category.slug_title}`);window.location.reload();}}
+                                            onChange={(e) => { navigate(`/ecommerce/product/${category.slug_title}`); window.location.reload(); }}
                                         />
                                         <label htmlFor={`category-${category.id}`} className="category-size">
                                             {category.variantName}
                                         </label>
-                                        <label htmlFor={`category-${category.id}`} className="category-price">
+
+                                        <div htmlFor={`category-${category.id}`} className="category-price">
                                             <span className='category-regular-price'>
                                                 <p>₹{category.mrp.toFixed(2)}</p>
                                             </span>
                                             <span className='category-discount-price'>
                                                 <p>₹{category.discount_amt.toFixed(2)}</p>
                                             </span>
-                                        </label>
+                                        </div>
                                     </div>
 
                                     {isSelected && discountPercentage > 0 && (
@@ -231,21 +267,34 @@ export default function Product() {
                         </div>
                     ) : (
                         <>
-                            {product.available > 0 ? (
+                            {product.productIsActive === 1 ? (
                                 <button
                                     className='product-content-add-to-cart'
                                     onClick={() => {
+                                        if(!isAuthenticated){
+                                            setShowLoginModal(true);
+                                            return;
+                                        }
                                         setCartCount(1);
                                         setCartBtnClicked(true);
                                     }}
                                 >
                                     <MdOutlineShoppingCart /> ADD TO CART
                                 </button>
-                            ) : (
+                            ) : product.productIsActive === 2 ? (
                                 <button className='product-content-out-of-stock'>
                                     <MdRemoveShoppingCart /> OUT OF STOCK
                                 </button>
-                            )}
+                            ) : product.productIsActive === 3 ? (
+                                <button className='product-content-coming-soon'>
+                                    <MdAccessTime /> COMING SOON
+                                </button>
+                            ) : product.productIsActive === 4 ? (
+                                <button className='product-content-inquiry-now'
+                                onClick={()=>handleInquiryClick(product.id)}>
+                                    <MdOutlineChatBubbleOutline /> INQUIRY NOW
+                                </button>
+                            ): null}
                         </>
                     )}
                     <div className='product-content-highlights'>
@@ -258,6 +307,9 @@ export default function Product() {
                 <h1>Quick Overview</h1>
                 <p dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.long_description) }}></p>
             </section>
+            {showLoginModal && <LoginSignUpModal closeModal={() => setShowLoginModal(false)} flag={2} productSlugTitle={inquiryProductSlugTitle}/>}
+            {showModal && <InquiryNow closeModal={closeModal} productId={inquiryProductId} flag={2}/>} 
         </div>
+
     );
 }

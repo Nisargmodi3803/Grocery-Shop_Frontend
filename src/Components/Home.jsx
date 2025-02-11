@@ -6,6 +6,7 @@ import CardSlider from './CardSlider';
 import { Link, useNavigate } from 'react-router-dom';
 import { ProductCard } from './ProductCard';
 import axios from 'axios';
+import { BrandCardSlider } from './BrandCardSlider';
 
 // 🔥 Import all images dynamically from the Category folder
 const importAll = (r) => {
@@ -105,7 +106,7 @@ export const Home = () => {
             <section className='shop-by-category-home'>
                 <div className='top-section'>
                     <h5>Shop By Category</h5>
-                    <button onClick={() => navigate('/ecommerce/shopbycategory')}>View All</button>
+                    <button onClick={() => navigate('/ecommerce/shop-by-category')}>View All</button>
                 </div>
                 <div className='bottom-section'>
                     {categories.map((category) => {
@@ -132,6 +133,9 @@ export const Home = () => {
 
             <section>
                 <ProductCard />
+            </section>
+            <section>
+                <BrandCardSlider/>
             </section>
         </>
     );

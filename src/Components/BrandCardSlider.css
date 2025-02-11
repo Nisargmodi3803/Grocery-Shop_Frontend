@@ -1,0 +1,31 @@
+.brand-card-slider{
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+    /* border: 1px solid #e0e0e0; */
+    position: relative;
+    overflow: hidden;
+    padding-left: 50px;
+}
+
+.brand-image-container{
+    overflow: hidden;
+    position: relative;
+    height: 80%;
+    width: 100%;
+}
+
+.brand-image-container img{
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+    border-radius: 10px;
+    cursor: pointer;
+    /* gap: 2px; */
+    /* border: 1px solid #e0e0e0; */
+}
+
+.brand-image-container img:hover{
+    transform: scale(1);
+}

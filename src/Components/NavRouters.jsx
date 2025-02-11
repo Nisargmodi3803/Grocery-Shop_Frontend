@@ -12,6 +12,7 @@ import { ShippingReturnPolicy } from './ShippingReturnPolicy';
 import { PrivacyPolicy } from './PrivacyPolicy';
 import { TermsConditions } from './TermsConditions';
 import Product from './Product';
+import { ShopByBrand } from './ShopByBrand';
 
 export const NavRouters = () => {
   // useEffect(() => {
@@ -24,10 +25,10 @@ export const NavRouters = () => {
       {/* <Home /> */}
       <Routes>
         <Route path="/ecommerce" element={<Home />} />
-        <Route path="/ecommerce/shopByCategory" element={<ShopByCategory />} />
+        <Route path="/ecommerce/shop-By-Category" element={<ShopByCategory />} />
         <Route path="/ecommerce/blog" element={<Blog />} />
-        <Route path="/ecommerce/aboutus" element={<AboutUs />} />
-        <Route path="/ecommerce/contactus" element={<ContactUs />} />
+        <Route path="/ecommerce/about-us" element={<AboutUs />} />
+        <Route path="/ecommerce/contact-us" element={<ContactUs />} />
         <Route
           path="/ecommerce/shipping-and-return-policy"
           element={<ShippingReturnPolicy />}
@@ -36,6 +37,7 @@ export const NavRouters = () => {
         <Route path="/ecommerce/terms-conditions" element={<TermsConditions />} />
         <Route path="/ecommerce/demo" element={<Demo />} />
         <Route path="/ecommerce/product/:productSlugTitle" element={<Product/>}/>
+        <Route path='/ecommerce/shop-by-brand' element={<ShopByBrand/>}/>
       </Routes>
       <Footer />
     </BrowserRouter>

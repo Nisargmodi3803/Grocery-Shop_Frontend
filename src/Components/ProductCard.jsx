@@ -5,7 +5,11 @@ import { FaRegHeart, FaHeart } from "react-icons/fa";
 import { BsArrowLeftCircleFill, BsArrowRightCircleFill } from 'react-icons/bs';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-
+import { MdAccessTime } from "react-icons/md";
+import { MdOutlineChatBubbleOutline } from "react-icons/md";
+import { InquiryNow } from './InquiryNow';
+import { use } from 'react';
+import { LoginSignUpModal } from './LoginSignUpModal';
 export const ProductCard = () => {
   const navigate = useNavigate();
   const direction = useRef("normal");
@@ -14,6 +18,14 @@ export const ProductCard = () => {
   const [cartState, setCartState] = useState({});
   const [productList, setProductList] = useState([]);
   const [discountMap, setDiscountMap] = useState({});
+  const [showModal, setShowModal] = useState(false);
+  const [inquiryProductId, setInquiryProductId] = useState(null);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    setIsAuthenticated(sessionStorage.getItem("isAuthenticated") === "true");
+  }, []);
 
   const importAll = (r) => {
     let images = {};
@@ -27,21 +39,34 @@ export const ProductCard = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get('http://localhost:9000/products-category-title/vegetables---fruits');
-      if (response.status === 200) {
-        console.log('Products:', response.data);
-        setProductList(Array.isArray(response.data) ? response.data : []);
+      const [vegetablesResponse, fruitsResponse] = await Promise.all([
+        axios.get('http://localhost:9000/products-subcategory-title/vegetables'),
+        axios.get('http://localhost:9000/products-subcategory-title/fruits')
+      ]);
+
+      if (vegetablesResponse.status === 200 || fruitsResponse.status === 200) {
+        const allProducts = [
+          ...(Array.isArray(vegetablesResponse.data) ? vegetablesResponse.data : []),
+          ...(Array.isArray(fruitsResponse.data) ? fruitsResponse.data : [])
+        ];
+
+        console.log('Products:', allProducts);
+        setProductList(allProducts);
+      } else {
+        console.log("No Products Found");
+        setProductList([]);
       }
     } catch (error) {
-      if (error.response.status === 404) {
+      if (error.response?.status === 404) {
         console.log("No Products Found");
-      }
-      else {
+        setProductList([]);
+      } else {
         console.error("Error fetching products:", error);
         alert('Something went wrong. Please try again!');
       }
     }
   };
+
 
   useEffect(() => {
     fetchProducts();
@@ -74,13 +99,23 @@ export const ProductCard = () => {
   };
 
   const toggleLike = (productId) => {
+    if (!isAuthenticated) {
+      setShowLoginModal(true);
+      return;
+    }
+
     setLikedProducts((prev) => ({
       ...prev,
       [productId]: !prev[productId],
     }));
+
   };
 
   const toggleCartState = (productId) => {
+    if (!isAuthenticated) {
+      setShowLoginModal(true);
+      return;
+    }
     setCartState((prev) => ({
       ...prev,
       [productId]: {
@@ -112,6 +147,23 @@ export const ProductCard = () => {
   const navigateToProductPage = (productSlugTitle) => () => {
     navigate(`/ecommerce/product/${productSlugTitle}`);
   };
+
+  const handleInquiryClick = (productId) => {
+    if (!isAuthenticated) {
+      setShowLoginModal(true);
+      return;
+    }
+
+    setInquiryProductId(productId);
+    setShowModal(true); // Open Modal
+
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setInquiryProductId(null); // Reset selected product
+  };
+
 
   return (
     <>
@@ -183,9 +235,20 @@ export const ProductCard = () => {
                           <MdOutlineShoppingCart /> Add To Cart
                         </button>
                       ) : (
-                        <button className='out-of-stock'><MdRemoveShoppingCart /> Out Of Stock</button>
+                        product.productIsActive === 2 ? (
+                          <button className='out-of-stock'><MdRemoveShoppingCart /> Out Of Stock</button>
+                        ) : (
+                          product.productIsActive === 3 ? (
+                            <button className='coming-soon'><MdAccessTime /> Coming Soon</button>
+                          ) : (
+                            product.productIsActive === 4 ? (
+                              <span className='inquiry-now'
+                                onClick={() => handleInquiryClick(product.id)}><MdOutlineChatBubbleOutline /> Inquiry Now</span>
+                            ) : null)
+                        )
                       )
                     )}
+
                   </div>
                 </div>
               );
@@ -195,6 +258,8 @@ export const ProductCard = () => {
           <BsArrowRightCircleFill className="arrow2 arrow-right" onClick={handleNext} />
         </div>
       </section>
+      {showModal && <InquiryNow closeModal={closeModal} productId={inquiryProductId} flag={1} />}
+      {showLoginModal && <LoginSignUpModal closeModal={() => setShowLoginModal(false)} />}
     </>
   );
 };
