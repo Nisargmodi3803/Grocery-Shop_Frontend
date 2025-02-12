@@ -3,7 +3,7 @@ import "./InquiryNow.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-export const InquiryNow = ({ closeModal, productId, flag, productSlugTitle }) => {
+export const InquiryNow = ({ closeModal, productId, flag, productSlugTitle, brandSlugTitle }) => {
     const navigate = useNavigate();
     const [quantity, setQuantity] = useState("");
     const [message, setMessage] = useState("");
@@ -68,9 +68,10 @@ export const InquiryNow = ({ closeModal, productId, flag, productSlugTitle }) =>
                 setSuccessMessage("✅ Inquiry submitted successfully");
                 setTimeout(() => {
                     closeModal();
-                    if (flag === 1) navigate("/ecommerce");
-                    else if (flag === 2) navigate(`/ecommerce/product/${productSlugTitle}`);
-                    else alert("Invalid Navigate Flag");
+                    if(flag===1) navigate('/ecommerce');
+                    else if(flag===2) navigate(`/ecommerce/product/${productSlugTitle}`);
+                    else if(flag===3) navigate(`/ecommerce/brand/${brandSlugTitle}`);
+                    else alert("Wrong Navigate Flag");
                     window.location.reload();
                 }, 3000);
             }

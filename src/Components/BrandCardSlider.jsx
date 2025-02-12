@@ -19,7 +19,6 @@ export const BrandCardSlider = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isPaused, setIsPaused] = useState(false);
     const [brand, setBrand] = useState([]);
-    const [brandSlugTitle,setBrandSlugTitle] = useState(null);
     const navigate = useNavigate();
 
     const handleNext = () => {
@@ -82,13 +81,21 @@ export const BrandCardSlider = () => {
                     <h5>Shop by Brand</h5>
                     <button onClick={() => navigate("/ecommerce/shop-by-brand")}>View All</button>
                 </div>
-                <div className="card-slider-wrapper">
+                <div 
+                    className="card-slider-wrapper"
+                    style={{ 
+                        animation: direction.current === "normal" 
+                            ? "slideIn 0.5s ease-in-out" 
+                            : "slideInReverse 0.5s ease-in-out"
+                    }}
+                >
                     {brand.slice(currentIndex, currentIndex + 12).map((d) => {
-                        // 🔥 Get image from imageMap, fallback to a default image
                         const imageSrc = imageMap[d.image_url] || imageMap["default.jpg"];
 
                         return (
-                            <div className='card' key={d.id}>
+                            <div className='card'
+                             key={d.id}
+                             onClick={() => navigate(`/ecommerce/brand/${d.slug_title}`)}>
                                 <div className='brand-image-container'>
                                     <img src={imageSrc} alt={d.name} loading='lazy' />
                                 </div>

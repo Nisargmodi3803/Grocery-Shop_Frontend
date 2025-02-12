@@ -6,6 +6,7 @@
     flex: 3;
     margin-left: 50px;
     justify-items: center;
+    
 }
 
 .blog-card {
@@ -33,6 +34,7 @@
     padding-left: 122px;
     padding-bottom: 20px;
     padding-top: 5px;
+    object-fit: contain;
 }
 
 .blog-content{

@@ -28,7 +28,8 @@ export default function Product() {
     const [showLoginModal, setShowLoginModal] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [inquiryProductId, setInquiryProductId] = useState(null);
-    const [inquiryProductSlugTitle,setInquiryProductSlugTitle] = useState(null);
+    const [inquiryProductSlugTitle, setInquiryProductSlugTitle] = useState(null);
+    const greater = '>';
 
     useEffect(() => {
         const authStatus = sessionStorage.getItem("isAuthenticated") === "true";
@@ -86,38 +87,40 @@ export default function Product() {
 
     const handleInquiryClick = (productId) => {
         if (!isAuthenticated) {
-          setShowLoginModal(true);
-          setInquiryProductSlugTitle(productSlugTitle);
-          return;
+            setShowLoginModal(true);
+            setInquiryProductSlugTitle(productSlugTitle);
+            return;
         }
-    
+
         setInquiryProductId(productId);
         setShowModal(true); // Open Modal
-    
-      };
-    
-      const closeModal = () => {
+
+    };
+
+    const closeModal = () => {
         setShowModal(false);
         setInquiryProductId(null);
         setInquiryProductSlugTitle(null);
-      };
+    };
 
     if (!product) {
         return (
             <div className='product-page'>
                 <section className='product-navigate-section'>
-                    <span className='navigate'>
-                        <a onClick={() => navigate('/ecommerce/')}>
-                            <b><IoMdHome /> Home</b>
-                        </a>
-                        <span>Loading...</span>
-                    </span>
-                </section>
-                <p>Loading product details...</p>
+                <span className='navigate'>
+                    <a onClick={() => navigate('/ecommerce/')}>
+                        <b><IoMdHome /> Home</b>
+                    </a>
+                    <span> {greater} </span>
+                    <a href=''>Loading...</a>
+                    <span> {greater} </span>
+                    <a href=''>Loading...</a>
+                </span>
+            </section>
+                <h1 style={{ color: "#133365" }}>No Products Found...</h1>
             </div>
         );
     }
-    const greater = '>';
     // Image Handling
     const imageSrc = imageMap[product.image_url] || imageMap["default.jpg"];
 
@@ -271,7 +274,7 @@ export default function Product() {
                                 <button
                                     className='product-content-add-to-cart'
                                     onClick={() => {
-                                        if(!isAuthenticated){
+                                        if (!isAuthenticated) {
                                             setShowLoginModal(true);
                                             return;
                                         }
@@ -291,10 +294,10 @@ export default function Product() {
                                 </button>
                             ) : product.productIsActive === 4 ? (
                                 <button className='product-content-inquiry-now'
-                                onClick={()=>handleInquiryClick(product.id)}>
+                                    onClick={() => handleInquiryClick(product.id)}>
                                     <MdOutlineChatBubbleOutline /> INQUIRY NOW
                                 </button>
-                            ): null}
+                            ) : null}
                         </>
                     )}
                     <div className='product-content-highlights'>
@@ -307,8 +310,8 @@ export default function Product() {
                 <h1>Quick Overview</h1>
                 <p dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.long_description) }}></p>
             </section>
-            {showLoginModal && <LoginSignUpModal closeModal={() => setShowLoginModal(false)} flag={2} productSlugTitle={inquiryProductSlugTitle}/>}
-            {showModal && <InquiryNow closeModal={closeModal} productId={inquiryProductId} flag={2}/>} 
+            {showLoginModal && <LoginSignUpModal closeModal={() => setShowLoginModal(false)} flag={2} productSlugTitle={inquiryProductSlugTitle} />}
+            {showModal && <InquiryNow closeModal={closeModal} productId={inquiryProductId} flag={2} />}
         </div>
 
     );

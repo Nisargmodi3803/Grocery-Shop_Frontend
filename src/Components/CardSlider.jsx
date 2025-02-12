@@ -79,9 +79,15 @@ const CardSlider = () => {
                     onClick={handlePrev}
                 />
             </div>
-            <div className="card-slider-wrapper">
+            <div 
+                className="card-slider-wrapper"
+                style={{ 
+                    animation: direction.current === "normal" 
+                        ? "slideIn 0.5s ease-in-out" 
+                        : "slideInReverse 0.5s ease-in-out"
+                }}
+            >
                 {cardData.slice(currentIndex, currentIndex + 8).map((d) => {
-                    // 🔥 Get image from imageMap, fallback to a default image
                     const imageSrc = imageMap[d.image_url] || imageMap["default.jpg"];
 
                     return (

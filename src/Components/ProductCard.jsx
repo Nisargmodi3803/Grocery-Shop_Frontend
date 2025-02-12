@@ -8,7 +8,6 @@ import axios from 'axios';
 import { MdAccessTime } from "react-icons/md";
 import { MdOutlineChatBubbleOutline } from "react-icons/md";
 import { InquiryNow } from './InquiryNow';
-import { use } from 'react';
 import { LoginSignUpModal } from './LoginSignUpModal';
 export const ProductCard = () => {
   const navigate = useNavigate();
@@ -259,7 +258,7 @@ export const ProductCard = () => {
         </div>
       </section>
       {showModal && <InquiryNow closeModal={closeModal} productId={inquiryProductId} flag={1} />}
-      {showLoginModal && <LoginSignUpModal closeModal={() => setShowLoginModal(false)} />}
+      {showLoginModal && <LoginSignUpModal closeModal={() => setShowLoginModal(false)} flag={1}/>}
     </>
   );
 };

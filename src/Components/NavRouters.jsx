@@ -13,6 +13,7 @@ import { PrivacyPolicy } from './PrivacyPolicy';
 import { TermsConditions } from './TermsConditions';
 import Product from './Product';
 import { ShopByBrand } from './ShopByBrand';
+import { Brand } from './Brand';
 
 export const NavRouters = () => {
   // useEffect(() => {
@@ -38,6 +39,8 @@ export const NavRouters = () => {
         <Route path="/ecommerce/demo" element={<Demo />} />
         <Route path="/ecommerce/product/:productSlugTitle" element={<Product/>}/>
         <Route path='/ecommerce/shop-by-brand' element={<ShopByBrand/>}/>
+        <Route path='/ecommerce/brand/:brandSlugTitle' element={<Brand/>}/>
+        <Route path='/ecommerce/category/:categorySlugTitle'/>
       </Routes>
       <Footer />
     </BrowserRouter>

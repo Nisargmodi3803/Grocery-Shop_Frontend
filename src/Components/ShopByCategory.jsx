@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './ShopByCategory.css';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
-// 🔥 Import all images dynamically from the Category folder
 const importAll = (r) => {
     let images = {};
     r.keys().forEach((item) => {
@@ -11,11 +11,11 @@ const importAll = (r) => {
     return images;
 };
 
-// Load images from 'src/assets/Category/'
-const imageMap = importAll(require.context("../assets/Category", false, /\.(png|jpe?g|svg)$/));
+const imageMap = importAll(require.context("../assets/Category", false, /\.(png|jpeg|svg|jpg|JPEG)$/));
 
 export const ShopByCategory = () => {
     const [categories, setCategories] = useState([]);
+    const navigate = useNavigate();
 
     const fetchCategories = async () => {
         try {
@@ -40,17 +40,15 @@ export const ShopByCategory = () => {
             <section className='categories-container'>
                 <div className='categories-grid'>
                     {categories.map((category) => {
-                        // 🔥 Get image from imageMap, fallback to 'default.png' if missing
                         const imageSrc = imageMap[category.image_url] || imageMap["default.png"];
 
                         return (
-                            <div key={category.id} className='category-card'>
-                                <a href='#'>
-                                    <img src={imageSrc} alt={category.name} loading="lazy" />
-                                </a>
-                                <a href='#'>
-                                    <h6>{category.name}</h6>
-                                </a>
+                            <div 
+                                key={category.id} 
+                                className='category-card'
+                                onClick={()=>navigate(`/ecommerce/category/${category.slug_title}`)}>
+                                <img src={imageSrc} alt={category.name} loading="lazy" />
+                                <h6>{category.name}</h6>
                             </div>
                         );
                     })}
