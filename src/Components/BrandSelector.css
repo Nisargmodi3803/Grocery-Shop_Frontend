@@ -1,0 +1,26 @@
+.brand-selector-container {
+    width: 100%;
+    padding: 10px;
+}
+
+.brand-scroll {
+    display: flex;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 10px 0;
+}
+
+.brand-item {
+    min-width: 100px;
+    height: 80px;
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.brand-item img {
+    object-fit: contain;
+}
+

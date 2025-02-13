@@ -42,7 +42,6 @@ export const BrandCardSlider = () => {
         } catch (error) {
             if (error.response?.status === 404) {
                 console.log("No Brands Found");
-                alert("No Brands Found");
             } else {
                 console.error(error);
                 alert("Something went wrong. Please try again!");
@@ -79,13 +78,16 @@ export const BrandCardSlider = () => {
             >
                 <div className='card-section-header'>
                     <h5>Shop by Brand</h5>
-                    <button onClick={() => navigate("/ecommerce/shop-by-brand")}>View All</button>
+                    <button onClick={() => {
+                        navigate("/ecommerce/shop-by-brand");
+                        window.location.reload();
+                    }}>View All</button>
                 </div>
-                <div 
-                    className="card-slider-wrapper"
-                    style={{ 
-                        animation: direction.current === "normal" 
-                            ? "slideIn 0.5s ease-in-out" 
+                <div
+                    className="brand-slider-wrapper"
+                    style={{
+                        animation: direction.current === "normal"
+                            ? "slideIn 0.5s ease-in-out"
                             : "slideInReverse 0.5s ease-in-out"
                     }}
                 >
@@ -94,8 +96,11 @@ export const BrandCardSlider = () => {
 
                         return (
                             <div className='card'
-                             key={d.id}
-                             onClick={() => navigate(`/ecommerce/brand/${d.slug_title}`)}>
+                                key={d.id}
+                                onClick={() => {
+                                    navigate(`/ecommerce/brand/${d.slug_title}`);
+                                    window.location.reload();
+                                }}>
                                 <div className='brand-image-container'>
                                     <img src={imageSrc} alt={d.name} loading='lazy' />
                                 </div>

@@ -46,6 +46,7 @@
     flex-direction: column;
     overflow: hidden;
     position: relative;
+    gap: 10px;
 }
 
 .card-image-container {

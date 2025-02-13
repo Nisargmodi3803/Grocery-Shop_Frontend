@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './Brand.css';
 import { IoMdHome } from "react-icons/io";
 import { useNavigate, useParams } from 'react-router-dom';
@@ -8,6 +8,7 @@ import axios from 'axios';
 import { MdAccessTime, MdOutlineChatBubbleOutline } from "react-icons/md";
 import { InquiryNow } from './InquiryNow';
 import { LoginSignUpModal } from './LoginSignUpModal';
+import BrandSelector from './BrandSelector';
 
 const importAll = (r) => {
     let images = {};
@@ -18,6 +19,7 @@ const importAll = (r) => {
 };
 
 const imageMap = importAll(require.context("../assets/Product", false, /\.(png|jpeg|svg|jpg|JPEG)$/));
+const imageMap1 = importAll(require.context("../assets/Brand", false, /\.(png|jpeg|svg|jpg|JPEG)$/));
 
 export const Brand = () => {
     const greater = '>';
@@ -31,14 +33,41 @@ export const Brand = () => {
     const [inquiryProductId, setInquiryProductId] = useState(null);
     const [showLoginModal, setShowLoginModal] = useState(false);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [brandName, setBrandName] = useState('');
+    const [brands, setBrands] = useState([]);
+    const [sortOption, setSortOption] = useState("");
+    
+    const handleSortChange = (event) => {
+        setSortOption(event.target.value);
+    };
 
     useEffect(() => {
         setIsAuthenticated(sessionStorage.getItem("isAuthenticated") === "true");
     }, []);
 
+    // useEffect(() => {
+    //     const handleBackButton = (event) => {
+    //         event.preventDefault();
+
+    //         if (window.history.length > 2) {
+    //             window.history.back(); // Go to the previous page normally
+    //         } else {
+    //             navigate("/ecommerce/shop-by-brand", { replace: true }); // Redirect to the main brand page
+    //         }
+    //     };
+
+    //     window.onpopstate = handleBackButton;
+
+    //     return () => {
+    //         window.onpopstate = null; // Cleanup to prevent issues
+    //     };
+    // }, [navigate]);
+    
+
     const fetchProductsByBrand = async () => {
         try {
             const response = await axios.get(`http://localhost:9000/products-brand-title/${brandSlugTitle}`);
+
             if (response.status === 200) {
                 const productData = response.data;
                 setProducts(productData);
@@ -63,9 +92,115 @@ export const Brand = () => {
         }
     };
 
+    const fetchBrandName = async () => {
+        try {
+            const response = await axios.get(`http://localhost:9000/brand-slug/${brandSlugTitle}`);
+            if (response.status === 200) {
+                setBrandName(response.data.name);
+                // window.location.reload();
+            }
+        } catch (error) {
+            if (error.response?.status === 404) {
+                console.log("No Brand Found");
+            } else {
+                console.error("Error fetching product:", error);
+                alert("Something went wrong. Please try again!");
+            }
+        }
+    };
+
+    const fetchBrands = async () => {
+        try {
+            const response = await axios.get('http://localhost:9000/brand');
+            if (response.status === 200) {
+                setBrands(response.data);
+            }
+        } catch (error) {
+            if (error.response?.status === 404) {
+                console.log("No Brands Found");
+            } else {
+                console.error(error);
+                alert("Something went wrong. Please try again!");
+            }
+        }
+    };
+
+    const fetchSortedProducts = async () => {
+        let api = "";
+    
+        switch(sortOption){
+            case "Sort by: Recommended":
+                api = `http://localhost:9000/products-brand-title/${brandSlugTitle}`;
+                break;
+            case "Sort by: Price (Low to High)":
+                api = `http://localhost:9000/product-ascending-brand-mrp/${brandSlugTitle}`;
+                break;
+            case "Sort by: Price (High to Low)":
+                api = `http://localhost:9000/product-descending-brand-mrp/${brandSlugTitle}`;
+                break;
+            case "Sort by: Discount (High to Low)":
+                api = `http://localhost:9000/product-descending-brand-discount/${brandSlugTitle}`;
+                break;
+            case "Sort by: Discount (Low to High)":
+                api = `http://localhost:9000/product-ascending-brand-discount/${brandSlugTitle}`;
+                break;
+            case "Sort by: Name (A to Z)":
+                api = `http://localhost:9000/product-ascending-brand-name/${brandSlugTitle}`;
+                break;
+            case "Sort by: Name (Z to A)":
+                api = `http://localhost:9000/product-descending-brand-name/${brandSlugTitle}`;
+                break;
+            default:
+                api = `http://localhost:9000/products-brand-title/${brandSlugTitle}`;
+                break;
+        }
+    
+        try {
+            const response = await axios.get(api);
+            if (response.status === 200) {
+                setProducts(response.data);
+                // window.location.reload();
+            }
+        } catch (error) {
+            if (error.response?.status === 404) {
+                console.log("No Product Found");
+            } else {
+                console.error("Error fetching product:", error);
+                alert("Something went wrong. Please try again!");
+            }
+        }
+    };
+    
+
+    const brandScrollRef = useRef(null);
+
+    const scrollToSelectedBrand = () => {
+        if (brandScrollRef.current) {
+            const selectedBrand = brandScrollRef.current.querySelector(".selected");
+            if (selectedBrand) {
+                selectedBrand.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+            }
+        }
+    };
+
     useEffect(() => {
-        fetchProductsByBrand();
+        // fetchProductsByBrand();
+        fetchBrandName();
+        fetchBrands();
+        setTimeout(scrollToSelectedBrand, 300);
+        // if (sortOption) {
+        //     fetchSortedProducts();
+        // }
     }, []);
+
+    useEffect(() => {
+        if (sortOption) {
+            fetchSortedProducts();
+        }else{
+            fetchProductsByBrand();
+        }
+    }, [sortOption]);
+
 
     const toggleLike = (productId) => {
         if (!isAuthenticated) {
@@ -138,12 +273,50 @@ export const Brand = () => {
                             <b><IoMdHome /> Home</b>
                         </a>
                         <span> {greater} </span>
-                        <a onClick={() => navigate(`/ecommerce/shop-by-brand`)}>Brand</a>
+                        <a onClick={() => {
+                            navigate(`/ecommerce/shop-by-brand`);
+                            window.location.reload();
+                        }}
+                        >Brand</a>
                         <span> {greater} </span>
-                        <a>Loading...</a>
+                        <a onClick={() => { window.location.reload() }}>{brandName || "Loading..."}</a>
                     </span>
                 </section>
-                <h1 style={{color:"#133365"}}>No Products Found...</h1>
+                <section className='brand-main'>
+                    <div className="brand-selector-container">
+                        <div className="brand-scroll" ref={brandScrollRef}>
+                            {brands.map((brand) => {
+                                const imageSrc = imageMap1[brand.image_url] || imageMap["default.jpg"];
+                                return (
+                                    <div
+                                        key={brand.id}
+                                        className={`brand-item ${brand.slug_title === brandSlugTitle ? "selected" : ""}`}
+                                        onClick={() => {
+                                            navigate(`/ecommerce/brand/${brand.slug_title}`);
+                                            window.location.reload();
+                                        }}
+                                    >
+                                        <img src={imageSrc} alt={brand.name} />
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    <div className='brand-header'>
+                        <span className="brand-name">{brandName}</span>
+                        <select className="sort-dropdown" onChange={handleSortChange}>
+                            <option>Sort by: Recommended</option>
+                            <option>Sort by: Price (Low to High)</option>
+                            <option>Sort by: Price (High to Low)</option>
+                            <option>Sort by: Discount (High to Low)</option>
+                            <option>Sort by: Discount (Low to High)</option>
+                            <option>Sort by: Name (A to Z)</option>
+                            <option>Sort by: Name (Z to A)</option>
+                        </select>
+                    </div>
+                    <h1>No Products Found!</h1>
+                </section>
             </div>
         );
     }
@@ -156,89 +329,133 @@ export const Brand = () => {
                         <b><IoMdHome /> Home</b>
                     </a>
                     <span> {greater} </span>
-                    <a onClick={() => navigate(`/ecommerce/shop-by-brand`)}>Brand</a>
+                    <a onClick={() => {
+                        navigate(`/ecommerce/shop-by-brand`);
+                        window.location.reload();
+                    }}
+                    >Brand</a>
                     <span> {greater} </span>
-                    <a>{products[0]?.brand?.name || "Loading..."}</a>
+                    <a onClick={() => { window.location.reload() }}>{brandName || "Loading..."}</a>
                 </span>
             </section>
-            <div className='card-section-lower1'>
-                {products.map((product) => {
-                    const imageSrc = imageMap[product.image_url] || imageMap["default.jpg"];
-                    const discount = discountMap[product.id] || 0;
-                    const rating = product.average_rating ? parseFloat(product.average_rating).toFixed(1) : 0;
-                    const mrp = product.mrp ? `₹${product.mrp.toFixed(2)}` : "N/A";
-                    const discountAmt = product.discount_amt ? `₹${product.discount_amt.toFixed(2)}` : "N/A";
 
-                    return (
-                        <div className='product1' key={product.id}>
-                            <div className='product-header1'>
-                                {discount > 0 && (
-                                    <span className='product-discount1' onClick={navigateToProductPage(product.slug_title)}>
-                                        {discount}% OFF
-                                    </span>
-                                )}
-                                <span className='like-icon1' onClick={() => toggleLike(product.id)}>
-                                    {likedProducts[product.id] ? <FaHeart color='red' /> : <FaRegHeart color='grey' />}
-                                </span>
-                                <div onClick={navigateToProductPage(product.slug_title)}>
-                                    <img className='product-image1' src={imageSrc} alt={product.name} loading='lazy' />
+            <section className='brand-main'>
+
+                <div className="brand-selector-container">
+                    <div className="brand-scroll" ref={brandScrollRef}>
+                        {brands.map((brand) => {
+                            const imageSrc = imageMap1[brand.image_url] || imageMap["default.jpg"];
+                            return (
+                                <div
+                                    key={brand.id}
+                                    className={`brand-item ${brand.slug_title === brandSlugTitle ? "selected" : ""}`}
+                                    onClick={() => {
+                                        navigate(`/ecommerce/brand/${brand.slug_title}`);
+                                        window.location.reload();
+                                    }}
+                                >
+                                    <img src={imageSrc} alt={brand.name} />
                                 </div>
-                            </div>
-                            <div className='product-body1'>
-                                <h5 className='product-text1'>{product.name}</h5>
-                            </div>
-                            <div className='product-rating-main1'>
-                                {rating > 0 ? (
-                                    <>
-                                        <div className='product-rating-avg1'>
-                                            <span className='rating1'>{rating} <MdOutlineStarPurple500 color='gold' /></span>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                <div className='brand-header'>
+                    <span class="brand-name">{brandName}</span>
+                    <select class="sort-dropdown" onChange={handleSortChange}>
+                        <option>Sort by: Recommended</option>
+                        <option>Sort by: Price (Low to High)</option>
+                        <option>Sort by: Price (High to Low)</option>
+                        <option>Sort by: Discount (High to Low)</option>
+                        <option>Sort by: Discount (Low to High)</option>
+                        <option>Sort by: Name (A to Z)</option>
+                        <option>Sort by: Name (Z to A)</option>
+                    </select>
+                </div>
+
+                <div className='card-section-lower1'>
+                    {products.map((product) => {
+                        const imageSrc = imageMap[product.image_url] || imageMap["default.jpg"];
+                        const discount = discountMap[product.id] || 0;
+                        const rating = product.average_rating ? parseFloat(product.average_rating).toFixed(1) : 0;
+                        const mrp = product.mrp ? `₹${product.mrp.toFixed(2)}` : "N/A";
+                        const discountAmt = product.discount_amt ? `₹${product.discount_amt.toFixed(2)}` : "N/A";
+
+                        return (
+                            <>
+                                <div className='product1' key={product.id}>
+                                    <div className='product-header1'>
+                                        {discount > 0 && (
+                                            <span className='product-discount1' onClick={navigateToProductPage(product.slug_title)}>
+                                                {discount}% OFF
+                                            </span>
+                                        )}
+                                        <span className='like-icon1' onClick={() => toggleLike(product.id)}>
+                                            {likedProducts[product.id] ? <FaHeart color='red' /> : <FaRegHeart color='grey' />}
+                                        </span>
+                                        <div onClick={navigateToProductPage(product.slug_title)}>
+                                            <img className='product-image1' src={imageSrc} alt={product.name} loading='lazy' />
                                         </div>
-                                        <div className='product-rating-total1'>
-                                            <p>{product.no_of_rating} Ratings</p>
-                                        </div>
-                                    </>
-                                ) : (
-                                    <p className='no-rating1'>No Rating Yet</p>
-                                )}
-                            </div>
-                            <div className='product-footer1'>
-                                <div className='product-offer-price1'>
-                                    {discount > 0 && <span className='product-regular-price1'>{mrp}</span>}
-                                    <span className='product-discount-price1'>{discountAmt}</span>
-                                </div>
-                            </div>
-                            {cartState[product.id]?.cartBtnClicked ? (
-                                <div className='add-to-cart-quantity1'>
-                                    <button onClick={() => updateCartCount(product.id, -1)}>-</button>
-                                    <span>{cartState[product.id]?.cartCount || 0}</span>
-                                    <button onClick={() => updateCartCount(product.id, 1)}>+</button>
-                                </div>
-                            ) : (
-                                product.productIsActive === 1 ? (
-                                    <button className='add-to-cart1' onClick={() => toggleCartState(product.id)}>
-                                        <MdOutlineShoppingCart /> Add To Cart
-                                    </button>
-                                ) : (
-                                    product.productIsActive === 2 ? (
-                                        <button className='out-of-stock1'><MdRemoveShoppingCart /> Out Of Stock</button>
-                                    ) : (
-                                        product.productIsActive === 3 ? (
-                                            <button className='coming-soon1'><MdAccessTime /> Coming Soon</button>
+                                    </div>
+                                    <div className='product-body1'>
+                                        <h5 className='product-text1'>{product.name}</h5>
+                                    </div>
+                                    <div className='product-rating-main1'>
+                                        {rating > 0 ? (
+                                            <>
+                                                <div className='product-rating-avg1'>
+                                                    <span className='rating1'>{rating} <MdOutlineStarPurple500 color='gold' /></span>
+                                                </div>
+                                                <div className='product-rating-total1'>
+                                                    <p>{product.no_of_rating} Ratings</p>
+                                                </div>
+                                            </>
                                         ) : (
-                                            product.productIsActive === 4 ? (
-                                                <span className='inquiry-now1'
-                                                    onClick={() => handleInquiryClick(product.id)}><MdOutlineChatBubbleOutline /> Inquiry Now</span>
-                                            ) : null)
-                                    )
-                                )
-                            )}
-                        </div>
-                    );
-                })}
-            </div>
+                                            <p className='no-rating1'>No Rating Yet</p>
+                                        )}
+                                    </div>
+                                    <div className='product-footer1'>
+                                        <div className='product-offer-price1'>
+                                            {discount > 0 && <span className='product-regular-price1'>{mrp}</span>}
+                                            <span className='product-discount-price1'>{discountAmt}</span>
+                                        </div>
+                                    </div>
+                                    {cartState[product.id]?.cartBtnClicked ? (
+                                        <div className='add-to-cart-quantity1'>
+                                            <button onClick={() => updateCartCount(product.id, -1)}>-</button>
+                                            <span>{cartState[product.id]?.cartCount || 0}</span>
+                                            <button onClick={() => updateCartCount(product.id, 1)}>+</button>
+                                        </div>
+                                    ) : (
+                                        product.productIsActive === 1 ? (
+                                            <button className='add-to-cart1' onClick={() => toggleCartState(product.id)}>
+                                                <MdOutlineShoppingCart /> Add To Cart
+                                            </button>
+                                        ) : (
+                                            product.productIsActive === 2 ? (
+                                                <button className='out-of-stock1'><MdRemoveShoppingCart /> Out Of Stock</button>
+                                            ) : (
+                                                product.productIsActive === 3 ? (
+                                                    <button className='coming-soon1'><MdAccessTime /> Coming Soon</button>
+                                                ) : (
+                                                    product.productIsActive === 4 ? (
+                                                        <span className='inquiry-now1'
+                                                            onClick={() => handleInquiryClick(product.id)}><MdOutlineChatBubbleOutline /> Inquiry Now</span>
+                                                    ) : null)
+                                            )
+                                        )
+                                    )}
+                                </div>
+                            </>
+                        );
+                    })}
+                </div>
+            </section>
             {showModal && <InquiryNow closeModal={closeModal} productId={inquiryProductId} brandSlugTitle={brandSlugTitle} flag={3} />}
 
             {showLoginModal && <LoginSignUpModal closeModal={() => setShowLoginModal(false)} flag={3} brandSlugTitle={brandSlugTitle} />}
         </div>
     );
 };
+

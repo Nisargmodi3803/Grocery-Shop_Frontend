@@ -1,4 +1,4 @@
-import React, { useEffect,useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import './ShopByBrand.css'
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -16,6 +16,7 @@ const imageMap = importAll(require.context("../assets/Brand", false, /\.(png|jpe
 export const ShopByBrand = () => {
     const [brands, setBrands] = useState([]);
     const navigate = useNavigate();
+
     const fetchBrands = async () => {
         try {
             const response = await axios.get('http://localhost:9000/brand');
@@ -35,7 +36,7 @@ export const ShopByBrand = () => {
 
     useEffect(() => {
         fetchBrands();
-    },[])
+    }, [])
     return (
         <section className='shop-by-brand'>
             <section className='container-title'>
@@ -47,10 +48,13 @@ export const ShopByBrand = () => {
                         const imageSrc = imageMap[brand.image_url] || imageMap["default.png"];
 
                         return (
-                            <div 
-                            key={brand.id} 
-                            className='brand-card'
-                            onClick={() => navigate(`/ecommerce/brand/${brand.slug_title}`)}>
+                            <div
+                                key={brand.id}
+                                className='brand-card'
+                                onClick={() => {
+                                    navigate(`/ecommerce/brand/${brand.slug_title}`);
+                                    window.location.reload();
+                                }}>
                                 <img src={imageSrc} alt={brand.name} loading="lazy" />
                                 <h6>{brand.name}</h6>
                             </div>

@@ -25,8 +25,8 @@ export const Home = () => {
     const [transitionDirection, setTransitionDirection] = useState('forward');
     const [isPaused, setIsPaused] = useState(false);
     const navigate = useNavigate();
-
     const [categories, setCategories] = useState([]);
+
 
     const fetchCategories = async () => {
         try {

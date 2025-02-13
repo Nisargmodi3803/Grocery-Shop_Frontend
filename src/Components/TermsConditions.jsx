@@ -2,6 +2,7 @@ import React from 'react'
 import './TermsConditions.css'
 
 export const TermsConditions = () => {
+
   return (
     <div className='terms-conditions'>
       <section className='container-title'>

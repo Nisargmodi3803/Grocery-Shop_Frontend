@@ -16,6 +16,7 @@ import { MdOutlineChatBubbleOutline } from "react-icons/md";
 import { LoginSignUpModal } from './LoginSignUpModal';
 import { InquiryNow } from './InquiryNow';
 
+
 export default function Product() {
     const [product, setProduct] = useState(null);
     const [likedProduct, setLikedProduct] = useState(false);

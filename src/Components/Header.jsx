@@ -15,7 +15,6 @@ export const Header = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [customerEmail, setCustomerEmail] = useState("");
     const [customerDetails, setCustomerDetails] = useState({});
-
     // Function to fetch customer details from the backend
     const fetchCustomerDetails = async () => {
         if (isAuthenticated && customerEmail) {

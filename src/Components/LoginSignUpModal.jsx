@@ -6,9 +6,8 @@ import { FaArrowRight } from "react-icons/fa6";
 import axios, { HttpStatusCode } from 'axios';
 import { useNavigate } from 'react-router-dom';
 import "./LoginSignUpModal.css";
-import { use } from 'react';
 
-// 1 => navigate to Home page and 2 => navigate to Product page
+// 1 => navigate to Home page, 2 => navigate to Product page and 3 => navigate to Brand page
 
 export const LoginSignUpModal = ({ closeModal, flag, productSlugTitle, brandSlugTitle }) => {
     const navigate = useNavigate();

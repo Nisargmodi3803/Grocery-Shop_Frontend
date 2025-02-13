@@ -3,7 +3,6 @@ import { FaCalendarDay } from "react-icons/fa";
 import "./BlogCard.css";
 import axios from "axios";
 
-// Dynamically import all images from the 'assets/Blog' folder
 const importAll = (r) => {
     let images = {};
     r.keys().forEach((item) => {
@@ -12,7 +11,6 @@ const importAll = (r) => {
     return images;
 };
 
-// Load all images from 'src/assets/Blog/'
 const imageMap = importAll(require.context("../assets/Blog", false, /\.(png|jpe?g|svg)$/));
 
 export default function BlogCard() {

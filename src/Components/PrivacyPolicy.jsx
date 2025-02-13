@@ -2,6 +2,7 @@ import React from 'react'
 import './PrivacyPolicy.css'
 
 export const PrivacyPolicy = () => {
+
   return (
     <div className='privacy-policy'>
       <section className='container-title'>
@@ -26,9 +27,9 @@ export const PrivacyPolicy = () => {
         <h3>SECTION 4 - THIRD-PARTY SERVICES</h3>
         <p>We work with third-party service providers to support our operations, such as payment processors and analytics tools. These providers only collect, use, and disclose your information to the extent necessary to perform their services.
 
-        Some providers may operate in different jurisdictions, meaning your data may become subject to the laws of those regions. For example, if you process a transaction through a third-party payment gateway, your information may be stored on servers located outside your country.
+          Some providers may operate in different jurisdictions, meaning your data may become subject to the laws of those regions. For example, if you process a transaction through a third-party payment gateway, your information may be stored on servers located outside your country.
 
-        We recommend reviewing the privacy policies of any third-party services we use to understand how your data is managed.</p>
+          We recommend reviewing the privacy policies of any third-party services we use to understand how your data is managed.</p>
       </section>
     </div>
   )

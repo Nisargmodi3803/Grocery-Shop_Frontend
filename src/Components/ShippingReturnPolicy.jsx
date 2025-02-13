@@ -2,6 +2,7 @@ import React from 'react'
 import './ShippingReturnPolicy.css'
 
 export const ShippingReturnPolicy = () => {
+
   return (
     <div className='shipping-return-policy'>
       <section className='container-title'>
