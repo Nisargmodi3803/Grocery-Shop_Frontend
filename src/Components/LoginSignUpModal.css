@@ -238,7 +238,7 @@ form button {
 .password-info {
     color: #555555;
     font-size: 12px;
-    margin-top: -10px;
+    margin-top: 0px;
     margin-bottom: 10px;
     font-style: italic;
     text-align: left;

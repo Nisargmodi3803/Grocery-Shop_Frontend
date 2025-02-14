@@ -14,6 +14,7 @@ import { TermsConditions } from './TermsConditions';
 import Product from './Product';
 import { ShopByBrand } from './ShopByBrand';
 import { Brand } from './Brand';
+import { SubCategory } from './SubCategory';
 
 export const NavRouters = () => {
 
@@ -36,7 +37,7 @@ export const NavRouters = () => {
           <Route path="/ecommerce/product/:productSlugTitle" element={<Product />} />
           <Route path='/ecommerce/shop-by-brand' element={<ShopByBrand />} />
           <Route path='/ecommerce/brand/:brandSlugTitle' element={<Brand />} />
-          <Route path='/ecommerce/category/:categorySlugTitle' />
+          <Route path='/ecommerce/sub-category/:subcategorySlugTitle' element={<SubCategory/>} />
         </Routes>
       <Footer />
     </>

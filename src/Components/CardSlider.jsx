@@ -3,8 +3,8 @@ import './CardSlider.css';
 import { BsArrowLeftCircleFill, BsArrowRightCircleFill } from 'react-icons/bs';
 import { useSwipeable } from "react-swipeable";
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
-// 🔥 Import all images dynamically from the Subcategory folder
 const importAll = (r) => {
     let images = {};
     r.keys().forEach((item) => {
@@ -13,7 +13,6 @@ const importAll = (r) => {
     return images;
 };
 
-// Load images from 'src/assets/Subcategory/'
 const imageMap = importAll(require.context("../assets/Subcategory", false, /\.(png|jpe?g|svg|jpg)$/));
 
 const CardSlider = () => {
@@ -21,6 +20,7 @@ const CardSlider = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isPaused, setIsPaused] = useState(false);
     const [cardData, setCardData] = useState([]);
+    const naviagate = useNavigate();
 
     const fetchCardDatas = async () => {
         try {
@@ -91,7 +91,13 @@ const CardSlider = () => {
                     const imageSrc = imageMap[d.image_url] || imageMap["default.jpg"];
 
                     return (
-                        <div className='card' key={d.id}>
+                        <div 
+                        className='card' 
+                        key={d.id}
+                        onClick={()=>{
+                            naviagate(`/ecommerce/sub-category/${d.slug_title}`);
+                            window.location.reload();
+                        }}>
                             <div className='card-image-container'>
                                 <img src={imageSrc} alt={d.name} loading='lazy' />
                             </div>

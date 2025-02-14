@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './ContactUs.css';
 import { IoLocationSharp } from "react-icons/io5";
 import { MdLocalPhone, MdEmail } from "react-icons/md";
@@ -6,6 +6,8 @@ import { FaMobileScreen, FaFacebook } from "react-icons/fa6";
 import { BsBrowserFirefox } from "react-icons/bs";
 import { FaSquareXTwitter } from "react-icons/fa6";
 import { IoMdRefresh } from "react-icons/io";
+import axios from 'axios';
+import { useLoading } from '../Context/LoadingContext';
 
 export const ContactUs = () => {
   const [formData, setFormData] = useState({
@@ -22,7 +24,51 @@ export const ContactUs = () => {
 
   const randomString = Math.random().toString(36).slice(2, 8);
   const [captcha, setCaptcha] = useState(randomString);
-  const [count,setCount] = useState(0);
+  const [count, setCount] = useState(0);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [customer, setCustomer] = useState({});
+  const [success, setSuccess] = useState();
+
+  const { setLoading } = useLoading();
+
+  const fetchCustomerDetails = async () => {
+    try {
+      const response = await axios.get(`http://localhost:9000/customer-email/${sessionStorage.getItem("customerEmail")}`);
+
+      if (response.status === 200) {
+        setCustomer(response.data);
+      }
+    } catch (error) {
+      if (error.response.status === 404) {
+        console.log("Customer not found");
+      } else {
+        console.error("Error fetching customer details:", error);
+        alert("Something went wrong. Please try again!");
+      }
+    }
+  }
+
+  useEffect(() => {
+    const authStatus = sessionStorage.getItem("isAuthenticated") === "true";
+    setIsAuthenticated(authStatus);
+
+    if (authStatus) {
+      fetchCustomerDetails();
+    }
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    if (isAuthenticated && customer) {
+      setFormData((prevData) => ({
+        ...prevData,
+        fullName: customer.customerName || '',
+        mobile: customer.customerMobile || '',
+        email: customer.customerEmail || ''
+      }));
+    }
+  }, [customer, isAuthenticated]);
+
+
 
   const refreshString = () => {
     setCaptcha(Math.random().toString(36).slice(2, 8));
@@ -35,9 +81,9 @@ export const ContactUs = () => {
       [name]: value
     }));
 
-  if (name === 'message') {
-    setCount(value.length);
-  }
+    if (name === 'message') {
+      setCount(value.length);
+    }
 
     validateField(name, value);
   };
@@ -76,8 +122,43 @@ export const ContactUs = () => {
     setErrors(validationErrors);
   };
 
+  const handleContactUs = async () => {
+    try {
+      const response = await axios.post(`http://localhost:9000/contact`, {
+        name: formData.fullName,
+        mobile: formData.mobile,
+        email: formData.email,
+        message: formData.message
+      });
+
+      if (response.status === 200) {
+        setSuccess(true);
+      }
+    } catch (error) {
+      if (error.response) {
+        if (error.response.status === 400) {
+          setSuccess(false);
+          console.log("Bad Request: ", error.response.data);
+        } else {
+          setSuccess(false);
+          console.error("Error sending message:", error.response.data);
+          alert("Something went wrong. Please try again!");
+        }
+      } else if (error.request) {
+        console.error("No response received from server", error.request);
+        alert("Server is unreachable. Please try again later.");
+      } else {
+        console.error("Request setup error", error.message);
+        alert("An unexpected error occurred. Please try again.");
+      }
+    }finally {
+      setLoading(false); // Hide Loading
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    setLoading(true);
     const formErrors = {};
 
     Object.keys(formData).forEach((key) => {
@@ -90,7 +171,7 @@ export const ContactUs = () => {
     setErrors(formErrors);
 
     if (Object.keys(formErrors).length === 0 && formData.captcha === captcha) {
-      alert('Message sent successfully');
+      handleContactUs();
       setFormData({
         fullName: '',
         mobile: '',
@@ -102,6 +183,11 @@ export const ContactUs = () => {
     } else if (formData.captcha !== captcha) {
       setErrors((prevErrors) => ({ ...prevErrors, captcha: "Captcha does not match" }));
     }
+
+    setTimeout(() => {
+      setSuccess();
+      window.location.reload();
+    }, 4000);
   };
 
   return (
@@ -165,7 +251,7 @@ export const ContactUs = () => {
               id='full-name'
               name='fullName'
               placeholder='Full Name'
-              value={formData.fullName}
+              value={isAuthenticated ? customer.customerName || '' : formData.fullName}
               onChange={handleInputChange}
             />
             {errors.fullName && <div className="error">{errors.fullName}</div>}
@@ -178,7 +264,7 @@ export const ContactUs = () => {
                 id='mobile'
                 name='mobile'
                 placeholder='Mobile Number'
-                value={formData.mobile}
+                value={isAuthenticated ? customer.customerMobile || '' : formData.mobile}
                 onChange={handleInputChange}
               />
               {errors.mobile && <div className="error">{errors.mobile}</div>}
@@ -190,7 +276,7 @@ export const ContactUs = () => {
                 id='email'
                 name='email'
                 placeholder='Email'
-                value={formData.email}
+                value={isAuthenticated ? customer.customerEmail || '' : formData.email}
                 onChange={handleInputChange}
               />
               {errors.email && <div className="error">{errors.email}</div>}
@@ -200,7 +286,7 @@ export const ContactUs = () => {
             <label htmlFor='message'>Message
               <span className="required">*</span>
               <span> (Maximum 250 characters)</span>
-              {count>0 && <span className='count-characters'>  {count}</span>}
+              {count > 0 && <span className='count-characters'>  {count}</span>}
             </label>
             <textarea
               id='message'
@@ -229,11 +315,16 @@ export const ContactUs = () => {
                 {captcha} <IoMdRefresh onClick={refreshString} className='refresh-button' />
               </span>
             </div>
-            {errors.captcha && <div className="error">{errors.captcha}</div>}
           </div>
+          {errors.captcha && <div className="error">{errors.captcha}</div>}
           <div className='send-message'>
             <button type='submit'>Send Message</button>
           </div>
+          {success === true ? (
+            <span className="otp-success-message">✅ Message Sent Successfully!</span>
+          ) : success === false ? (
+            <span className="otp-error-message">❌ Unable to send message</span>
+          ) : null}
         </form>
       </section>
     </div>

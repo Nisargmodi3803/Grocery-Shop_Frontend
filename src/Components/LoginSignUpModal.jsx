@@ -7,9 +7,9 @@ import axios, { HttpStatusCode } from 'axios';
 import { useNavigate } from 'react-router-dom';
 import "./LoginSignUpModal.css";
 
-// 1 => navigate to Home page, 2 => navigate to Product page and 3 => navigate to Brand page
+// 1 => navigate to Home page, 2 => navigate to Product page, 3 => navigate to Brand page and 4 => navigate to SubCategory page
 
-export const LoginSignUpModal = ({ closeModal, flag, productSlugTitle, brandSlugTitle }) => {
+export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle, subcategorySlugTitle}) => {
     const navigate = useNavigate();
     const [isLogin, setIsLogin] = useState(true);
     const [OTP, setOTP] = useState('');
@@ -146,10 +146,7 @@ export const LoginSignUpModal = ({ closeModal, flag, productSlugTitle, brandSlug
                 setIsAuthenticated(true);
                 // console.log("Slug title : "+productSlugTitle);
                 const timer = setTimeout(() => {
-                    if (flag === 1) navigate('/ecommerce');
-                    else if (flag === 2) navigate(`/ecommerce/product/${inquiryProductSlugTitle}`);
-                    else if (flag === 3) navigate(`/ecommerce/brand/${brandSlugTitle}`);
-                    else alert("Wrong Navigate Flag");
+                    window.location.reload();
                     closeModal();
                     window.location.reload();
                 }, 3000);
@@ -186,10 +183,7 @@ export const LoginSignUpModal = ({ closeModal, flag, productSlugTitle, brandSlug
                 setIsAuthenticated(true);
 
                 const timer = setTimeout(() => {
-                    if (flag === 1) navigate('/ecommerce');
-                    else if (flag === 2) navigate(`/ecommerce/product/${inquiryProductSlugTitle}`);
-                    else if (flag === 3) navigate(`/ecommerce/brand/${brandSlugTitle}`);
-                    else alert("Wrong Navigate Flag");
+                    window.location.reload();
                     closeModal();
                     window.location.reload();
                 }, 3000);
@@ -339,10 +333,6 @@ export const LoginSignUpModal = ({ closeModal, flag, productSlugTitle, brandSlug
             if (response.status === 200) {
                 setSuccessfulForgotPassword(true);
                 const timer = setTimeout(() => {
-                    if (flag === 1) navigate('/ecommerce');
-                    else if (flag === 2) navigate(`/ecommerce/product/${inquiryProductSlugTitle}`);
-                    else if (flag === 3) navigate(`/ecommerce/brand/${brandSlugTitle}`);
-                    else alert("Wrong Navigate Flag");
                     window.location.reload();
                     setIsLogin(true);
                     setForgotPassword(false);
@@ -373,10 +363,6 @@ export const LoginSignUpModal = ({ closeModal, flag, productSlugTitle, brandSlug
         setIsAuthenticated(true);
         const timer = setTimeout(() => {
             closeModal();
-            if (flag === 1) navigate('/ecommerce');
-            else if (flag === 2) navigate(`/ecommerce/product/${inquiryProductSlugTitle}`);
-            else if (flag === 3) navigate(`ecommerce/brand/${brandSlugTitle}`);
-            else alert("Wrong Navigate Flag");
             window.location.reload();
         }, 3000);
     };
@@ -722,7 +708,6 @@ export const LoginSignUpModal = ({ closeModal, flag, productSlugTitle, brandSlug
                                     {verified === true && <span className="otp-success-message">{otpResponse}</span>}
                                     {verified === false && <span className="otp-error-message">{otpResponse}</span>}
 
-                                    {/* Always show password fields once verified is true */}
                                     {verified === true && (
                                         <>
                                             <label>Enter New Password <span className="required">*</span></label>
@@ -747,7 +732,6 @@ export const LoginSignUpModal = ({ closeModal, flag, productSlugTitle, brandSlug
                                             />
                                             {errors.confirmPassword && <div className="error">{errors.confirmPassword}</div>}
 
-                                            {/* Submit button should be disabled if required fields are missing */}
                                             {Object.keys(errors).length === 0 &&
                                                 forgotPasswordData.email &&
                                                 forgotPasswordData.password &&
@@ -818,6 +802,7 @@ export const LoginSignUpModal = ({ closeModal, flag, productSlugTitle, brandSlug
                                 disabled={otpSent}
                             />
                             {errors.password && <div className="error">{errors.password}</div>}
+
                             <label className="password-info">Password must be 4 to 15 characters</label>
 
                             <label>Confirm Password <span className="required">*</span></label>
@@ -830,6 +815,8 @@ export const LoginSignUpModal = ({ closeModal, flag, productSlugTitle, brandSlug
                                 onChange={handleInputChange}
                                 disabled={otpSent}
                             />
+                            {errors.confirmPassword && <div className="error">{errors.confirmPassword}</div>}
+                            
                             <label>Enter Referral Code <span className="required">(Optional)</span></label>
                             <input
                                 type='text'
@@ -840,7 +827,6 @@ export const LoginSignUpModal = ({ closeModal, flag, productSlugTitle, brandSlug
                                 disabled={otpSent}
                             />
                             <label className="password-info">Please enter the referral code shared by your friend if available.</label>
-                            {errors.confirmPassword && <div className="error">{errors.confirmPassword}</div>}
 
                             {Object.keys(errors).length === 0 && formData.name && formData.mobileNumber && formData.password && formData.confirmPassword && formData.email && (
                                 <>

@@ -3,13 +3,13 @@ import "./InquiryNow.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-export const InquiryNow = ({ closeModal, productId, flag, productSlugTitle, brandSlugTitle }) => {
+export const InquiryNow = ({ closeModal,flag, productId,productSlugTitle, brandSlugTitle, subcategorySlugTitle}) => {
     const navigate = useNavigate();
     const [quantity, setQuantity] = useState("");
     const [message, setMessage] = useState("");
     const [errors, setError] = useState({});
     const [buttonDisable, setButtonDisable] = useState(true);
-    const [inquiryProductId, setInquiryProductId] = useState(productId); 
+    const [inquiryProductId, setInquiryProductId] = useState(productId);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [customerEmail, setCustomerEmail] = useState(null);
     const [successMessage, setSuccessMessage] = useState(null);
@@ -68,10 +68,6 @@ export const InquiryNow = ({ closeModal, productId, flag, productSlugTitle, bran
                 setSuccessMessage("✅ Inquiry submitted successfully");
                 setTimeout(() => {
                     closeModal();
-                    if(flag===1) navigate('/ecommerce');
-                    else if(flag===2) navigate(`/ecommerce/product/${productSlugTitle}`);
-                    else if(flag===3) navigate(`/ecommerce/brand/${brandSlugTitle}`);
-                    else alert("Wrong Navigate Flag");
                     window.location.reload();
                 }, 3000);
             }

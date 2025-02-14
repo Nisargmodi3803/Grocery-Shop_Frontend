@@ -16,6 +16,7 @@ const imageMap = importAll(require.context("../assets/Category", false, /\.(png|
 export const ShopByCategory = () => {
     const [categories, setCategories] = useState([]);
     const navigate = useNavigate();
+    const [subcategories, setSubCategories] = useState([]);
 
     const fetchCategories = async () => {
         try {
@@ -24,13 +25,48 @@ export const ShopByCategory = () => {
                 setCategories(response.data);
             }
         } catch (error) {
-            console.error("Error fetching categories:", error);
+            if (error.response.status === 404) {
+                console.log("No Categories Found");
+            } else {
+                console.error("Error fetching categories:", error);
+                alert("Something went wrong. Please try again!");
+            }
         }
     };
 
     useEffect(() => {
         fetchCategories();
     }, []);
+
+    const handleCategoryClick = async (categorySlugTitle) => {
+        try {
+            const response = await axios.get(`http://localhost:9000/subcategories-category-title/${categorySlugTitle}`);
+
+            if (response.status === 200) {
+                setSubCategories(response.data);
+
+                if (response.data.length > 0) {
+                    navigate(`/ecommerce/sub-category/${response.data[0].slug_title}`);
+                    window.location.reload();
+                } else {
+                    console.log("No Subcategories Found");
+                }
+            }
+        } catch (error) {
+            if (error.response) {
+                if (error.response.status === 404) {
+                    console.log("No Subcategories Found");
+                } else {
+                    console.error("Error fetching subcategories:", error);
+                    alert("Something went wrong. Please try again!");
+                }
+            } else {
+                console.error("Network Error or Server Down:", error);
+                alert("Server is unreachable. Check your internet connection or backend server.");
+            }
+        }
+    };
+
 
     return (
         <div className='shop-by-category'>
@@ -43,10 +79,10 @@ export const ShopByCategory = () => {
                         const imageSrc = imageMap[category.image_url] || imageMap["default.png"];
 
                         return (
-                            <div 
-                                key={category.id} 
+                            <div
+                                key={category.id}
                                 className='category-card'
-                                onClick={()=>navigate(`/ecommerce/category/${category.slug_title}`)}>
+                                onClick={() => handleCategoryClick(category.slug_title)}>
                                 <img src={imageSrc} alt={category.name} loading="lazy" />
                                 <h6>{category.name}</h6>
                             </div>

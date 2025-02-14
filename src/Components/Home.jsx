@@ -26,6 +26,7 @@ export const Home = () => {
     const [isPaused, setIsPaused] = useState(false);
     const navigate = useNavigate();
     const [categories, setCategories] = useState([]);
+    const [subcategories, setSubCategories] = useState([]);
 
 
     const fetchCategories = async () => {
@@ -68,6 +69,35 @@ export const Home = () => {
         }
     }, [currentSlide, isPaused]);
 
+    const handleCategoryClick = async (categorySlugTitle) => {
+        try {
+            const response = await axios.get(`http://localhost:9000/subcategories-category-title/${categorySlugTitle}`);
+
+            if (response.status === 200) {
+                setSubCategories(response.data);
+
+                if (response.data.length > 0) {
+                    navigate(`/ecommerce/sub-category/${response.data[0].slug_title}`);
+                    window.location.reload();
+                } else {
+                    console.log("No Subcategories Found");
+                }
+            }
+        } catch (error) {
+            if (error.response) {
+                if (error.response.status === 404) {
+                    console.log("No Subcategories Found");
+                } else {
+                    console.error("Error fetching subcategories:", error);
+                    alert("Something went wrong. Please try again!");
+                }
+            } else {
+                console.error("Network Error or Server Down:", error);
+                alert("Server is unreachable. Check your internet connection or backend server.");
+            }
+        }
+    };
+
     return (
         <>
             <div className='Home'>
@@ -106,25 +136,26 @@ export const Home = () => {
             <section className='shop-by-category-home'>
                 <div className='top-section'>
                     <h5>Shop By Category</h5>
-                    <button onClick={() => navigate('/ecommerce/shop-by-category')}>View All</button>
+                    <button onClick={() => {
+                        navigate('/ecommerce/shop-by-category');
+                        window.location.reload();
+                    }}>View All</button>
                 </div>
                 <div className='bottom-section'>
                     {categories.map((category) => {
-                        // 🔥 Get image from imageMap, fallback to 'default.png' if missing
                         const imageSrc = imageMap[category.image_url] || imageMap["default.png"];
 
                         return (
-                            <div key={category.id} className='category-card'>
-                                <a href='#'>
-                                    <img
-                                        src={imageSrc}
-                                        alt={category.name}
-                                        loading='lazy'
-                                    />
-                                </a>
-                                <a href='#'>
-                                    <h6>{category.name}</h6>
-                                </a>
+                            <div
+                                key={category.id}
+                                className='category-card'
+                                onClick={() => handleCategoryClick(category.slug_title)}>
+                                <img
+                                    src={imageSrc}
+                                    alt={category.name}
+                                    loading='lazy'
+                                />
+                                <h6>{category.name}</h6>
                             </div>
                         );
                     })}
@@ -135,7 +166,7 @@ export const Home = () => {
                 <ProductCard />
             </section>
             <section>
-                <BrandCardSlider/>
+                <BrandCardSlider />
             </section>
         </>
     );

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import './Brand.css';
+import './SubCategory.css'
 import { IoMdHome } from "react-icons/io";
 import { useNavigate, useParams } from 'react-router-dom';
 import { MdOutlineStarPurple500, MdOutlineShoppingCart, MdRemoveShoppingCart } from "react-icons/md";
@@ -8,7 +8,6 @@ import axios from 'axios';
 import { MdAccessTime, MdOutlineChatBubbleOutline } from "react-icons/md";
 import { InquiryNow } from './InquiryNow';
 import { LoginSignUpModal } from './LoginSignUpModal';
-import BrandSelector from './BrandSelector';
 
 const importAll = (r) => {
     let images = {};
@@ -19,12 +18,11 @@ const importAll = (r) => {
 };
 
 const imageMap = importAll(require.context("../assets/Product", false, /\.(png|jpeg|svg|jpg|JPEG)$/));
-const imageMap1 = importAll(require.context("../assets/Brand", false, /\.(png|jpeg|svg|jpg|JPEG)$/));
 
-export const Brand = () => {
+export const SubCategory = () => {
     const greater = '>';
     const navigate = useNavigate();
-    const { brandSlugTitle } = useParams();
+    const { subcategorySlugTitle } = useParams();
     const [products, setProducts] = useState([]);
     const [likedProducts, setLikedProducts] = useState({});
     const [cartState, setCartState] = useState({});
@@ -33,10 +31,11 @@ export const Brand = () => {
     const [inquiryProductId, setInquiryProductId] = useState(null);
     const [showLoginModal, setShowLoginModal] = useState(false);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [brandName, setBrandName] = useState('');
-    const [brands, setBrands] = useState([]);
+    const [subcategoryName, setsubCategoryName] = useState('');
+    const [categoryName, setCategoryName] = useState('');
     const [sortOption, setSortOption] = useState("");
-    
+    const [subcategories, setSubCategories] = useState([]);
+
     const handleSortChange = (event) => {
         setSortOption(event.target.value);
     };
@@ -45,9 +44,9 @@ export const Brand = () => {
         setIsAuthenticated(sessionStorage.getItem("isAuthenticated") === "true");
     }, []);
 
-    const fetchProductsByBrand = async () => {
+    const fetchProductsBySubCategory = async () => {
         try {
-            const response = await axios.get(`http://localhost:9000/products-brand-title/${brandSlugTitle}`);
+            const response = await axios.get(`http://localhost:9000/products-subcategory-title/${subcategorySlugTitle}`);
 
             if (response.status === 200) {
                 const productData = response.data;
@@ -61,6 +60,8 @@ export const Brand = () => {
                     discountData[product.id] = mrp > 0 ? Math.round(((mrp - discountAmt) * 100) / mrp) : 0;
                 });
                 setDiscountMap(discountData);
+            } else {
+                setProducts([]);
             }
         } catch (error) {
             if (error.response?.status === 404) {
@@ -68,21 +69,24 @@ export const Brand = () => {
                 // alert("No Product Found");
             } else {
                 console.error("Error fetching product:", error);
+                setProducts([]);
                 alert("Something went wrong. Please try again!");
             }
         }
     };
 
-    const fetchBrandName = async () => {
+    const fetchSubcategoryName = async () => {
         try {
-            const response = await axios.get(`http://localhost:9000/brand-slug/${brandSlugTitle}`);
+            const response = await axios.get(`http://localhost:9000/subcategory-title/${subcategorySlugTitle}`);
             if (response.status === 200) {
-                setBrandName(response.data.name);
+                setsubCategoryName(response.data.name);
+                const categorySlugTitle = response.data.category.slug_title;
+                fetchAllSubcategoriesByCategory(categorySlugTitle);
                 // window.location.reload();
             }
         } catch (error) {
             if (error.response?.status === 404) {
-                console.log("No Brand Found");
+                console.log("No Subcategory Found");
             } else {
                 console.error("Error fetching product:", error);
                 alert("Something went wrong. Please try again!");
@@ -90,90 +94,97 @@ export const Brand = () => {
         }
     };
 
-    const fetchBrands = async () => {
+    const fetchAllSubcategoriesByCategory = async (categorySlugTitle) => {
+        // console.log("Fetching subcategories by category:", categorySlugTitle);
         try {
-            const response = await axios.get('http://localhost:9000/brand');
+            const response = await axios.get(`http://localhost:9000/subcategories-category-title/${categorySlugTitle}`);
             if (response.status === 200) {
-                setBrands(response.data);
+                setSubCategories(response.data);
             }
         } catch (error) {
             if (error.response?.status === 404) {
-                console.log("No Brands Found");
+                console.log("No Category Found");
             } else {
-                console.error(error);
+                console.error("Error fetching product:", error);
                 alert("Something went wrong. Please try again!");
             }
         }
-    };
+    }
+
+    const fetchCategoryName = async () => {
+        try {
+            const response = await axios.get(`http://localhost:9000/subcategory-title/${subcategorySlugTitle}`);
+            if (response.status === 200) {
+                setCategoryName(response.data.name);
+            }
+        } catch (error) {
+            if (error.response?.status === 404) {
+                console.log("No Category Found");
+            } else {
+                console.error("Error fetching product:", error);
+                alert("Something went wrong. Please try again!");
+            }
+        }
+    }
 
     const fetchSortedProducts = async () => {
         let api = "";
-    
-        switch(sortOption){
+
+        switch (sortOption) {
             case "Sort by: Recommended":
-                api = `http://localhost:9000/products-brand-title/${brandSlugTitle}`;
+                api = `http://localhost:9000/products-subcategory-title/${subcategorySlugTitle}`;
                 break;
             case "Sort by: Price (Low to High)":
-                api = `http://localhost:9000/product-ascending-brand-mrp/${brandSlugTitle}`;
+                api = `http://localhost:9000/product-ascending-sub-mrp/${subcategorySlugTitle}`;
                 break;
             case "Sort by: Price (High to Low)":
-                api = `http://localhost:9000/product-descending-brand-mrp/${brandSlugTitle}`;
+                api = `http://localhost:9000/product-descending-sub-mrp/${subcategorySlugTitle}`;
                 break;
             case "Sort by: Discount (High to Low)":
-                api = `http://localhost:9000/product-descending-brand-discount/${brandSlugTitle}`;
+                api = `http://localhost:9000/product-descending-sub-discount/${subcategorySlugTitle}`;
                 break;
             case "Sort by: Discount (Low to High)":
-                api = `http://localhost:9000/product-ascending-brand-discount/${brandSlugTitle}`;
+                api = `http://localhost:9000/product-ascending-sub-discount/${subcategorySlugTitle}`;
                 break;
             case "Sort by: Name (A to Z)":
-                api = `http://localhost:9000/product-ascending-brand-name/${brandSlugTitle}`;
+                api = `http://localhost:9000/product-ascending-sub-name/${subcategorySlugTitle}`;
                 break;
             case "Sort by: Name (Z to A)":
-                api = `http://localhost:9000/product-descending-brand-name/${brandSlugTitle}`;
+                api = `http://localhost:9000/product-descending-sub-name/${subcategorySlugTitle}`;
                 break;
             default:
-                api = `http://localhost:9000/products-brand-title/${brandSlugTitle}`;
+                api = `http://localhost:9000/products-subcategory-title/${subcategorySlugTitle}`;
                 break;
         }
-    
+
         try {
             const response = await axios.get(api);
             if (response.status === 200) {
                 setProducts(response.data);
+            } else {
+                setProducts([]);
             }
         } catch (error) {
             if (error.response?.status === 404) {
                 console.log("No Product Found");
             } else {
                 console.error("Error fetching product:", error);
+                setProducts([]);
                 alert("Something went wrong. Please try again!");
-            }
-        }
-    };
-    
-
-    const brandScrollRef = useRef(null);
-
-    const scrollToSelectedBrand = () => {
-        if (brandScrollRef.current) {
-            const selectedBrand = brandScrollRef.current.querySelector(".selected");
-            if (selectedBrand) {
-                selectedBrand.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
             }
         }
     };
 
     useEffect(() => {
-        fetchBrandName();
-        fetchBrands();
-        setTimeout(scrollToSelectedBrand, 300);
+        fetchSubcategoryName();
+        fetchCategoryName();
     }, []);
 
     useEffect(() => {
         if (sortOption) {
             fetchSortedProducts();
-        }else{
-            fetchProductsByBrand();
+        } else {
+            fetchProductsBySubCategory();
         }
     }, [sortOption]);
 
@@ -250,55 +261,44 @@ export const Brand = () => {
                         </a>
                         <span> {greater} </span>
                         <a onClick={() => {
-                            navigate(`/ecommerce/shop-by-brand`);
+                            navigate(`/ecommerce/shop-by-category`);
                             window.location.reload();
                         }}
-                        >Brand</a>
+                        >Category</a>
                         <span> {greater} </span>
-                        <a onClick={() => { window.location.reload() }}>{brandName || "Loading..."}</a>
+                        <a onClick={() => { window.location.reload() }}>{categoryName || "Loading..."}</a>
+                        <span> {greater} </span>
+                        <a onClick={() => {
+                            {
+                                navigate(`/ecommerce/subcategory/${subcategorySlugTitle}`);
+                                window.location.reload();
+                            }
+                        }}>{subcategoryName || "Loading..."}</a>
                     </span>
-                </section>
-                <section className='brand-main'>
-                    <div className="brand-selector-container">
-                        <div className="brand-scroll" ref={brandScrollRef}>
-                            {brands.map((brand) => {
-                                const imageSrc = imageMap1[brand.image_url] || imageMap["default.jpg"];
-                                return (
-                                    <div
-                                        key={brand.id}
-                                        className={`brand-item ${brand.slug_title === brandSlugTitle ? "selected" : ""}`}
-                                        onClick={() => {
-                                            navigate(`/ecommerce/brand/${brand.slug_title}`);
-                                            window.location.reload();
-                                        }}
-                                    >
-                                        <img src={imageSrc} alt={brand.name} />
-                                    </div>
-                                );
-                            })}
+                    <section className='brand-main'>
+                        <div className="subcategory-menu">
+                            {subcategories.map((subcategory, index) => (
+                                <div
+                                    key={index}
+                                    className={`subcategory-item ${subcategory.slug_title === subcategorySlugTitle ? "active" : ""}`}
+                                    onClick={() => {
+                                        navigate(`/ecommerce/sub-category/${subcategorySlugTitle}`);
+                                        window.location.reload();
+                                    }}
+                                >
+                                    {subcategory.name}
+                                </div>
+                            ))}
                         </div>
-                    </div>
-
-                    <div className='brand-header'>
-                        <span className="brand-name">{brandName}</span>
-                        <select className="sort-dropdown" onChange={handleSortChange}>
-                            <option>Sort by: Recommended</option>
-                            <option>Sort by: Price (Low to High)</option>
-                            <option>Sort by: Price (High to Low)</option>
-                            <option>Sort by: Discount (High to Low)</option>
-                            <option>Sort by: Discount (Low to High)</option>
-                            <option>Sort by: Name (A to Z)</option>
-                            <option>Sort by: Name (Z to A)</option>
-                        </select>
-                    </div>
-                    <h1>No Products Found!</h1>
+                        <h1>No Products Found!</h1>
+                    </section>
                 </section>
             </div>
         );
     }
 
     return (
-        <div className='brand'>
+        <div className='subcategory'>
             <section className='product-navigate-section'>
                 <span className='navigate'>
                     <a onClick={() => navigate('/ecommerce/')}>
@@ -306,39 +306,40 @@ export const Brand = () => {
                     </a>
                     <span> {greater} </span>
                     <a onClick={() => {
-                        navigate(`/ecommerce/shop-by-brand`);
+                        navigate(`/ecommerce/shop-by-category`);
                         window.location.reload();
                     }}
-                    >Brand</a>
+                    >Category</a>
                     <span> {greater} </span>
-                    <a onClick={() => { window.location.reload() }}>{brandName || "Loading..."}</a>
+                    <a onClick={() => { window.location.reload() }}>{categoryName || "Loading..."}</a>
+                    <span> {greater} </span>
+                    <a onClick={() => {
+                        {
+                            navigate(`/ecommerce/sub-category/${subcategorySlugTitle}`);
+                            window.location.reload();
+                        }
+                    }}>{subcategoryName || "Loading..."}</a>
                 </span>
             </section>
 
             <section className='brand-main'>
-
-                <div className="brand-selector-container">
-                    <div className="brand-scroll" ref={brandScrollRef}>
-                        {brands.map((brand) => {
-                            const imageSrc = imageMap1[brand.image_url] || imageMap["default.jpg"];
-                            return (
-                                <div
-                                    key={brand.id}
-                                    className={`brand-item ${brand.slug_title === brandSlugTitle ? "selected" : ""}`}
-                                    onClick={() => {
-                                        navigate(`/ecommerce/brand/${brand.slug_title}`);
-                                        window.location.reload();
-                                    }}
-                                >
-                                    <img src={imageSrc} alt={brand.name} />
-                                </div>
-                            );
-                        })}
-                    </div>
+                <div className="subcategory-menu">
+                    {subcategories.map((subcategory, index) => (
+                        <div
+                            key={index}
+                            className={`subcategory-item ${subcategory.slug_title === subcategorySlugTitle ? "active" : ""}`}
+                            onClick={() => {
+                                navigate(`/ecommerce/sub-category/${subcategory.slug_title}`,);
+                                window.location.reload();
+                            }}
+                        >
+                            {subcategory.name}
+                        </div>
+                    ))}
                 </div>
 
                 <div className='brand-header'>
-                    <span class="brand-name">{brandName}</span>
+                    <span class="brand-name">{categoryName}</span>
                     <select class="sort-dropdown" onChange={handleSortChange}>
                         <option>Sort by: Recommended</option>
                         <option>Sort by: Price (Low to High)</option>
@@ -428,10 +429,9 @@ export const Brand = () => {
                     })}
                 </div>
             </section>
-            {showModal && <InquiryNow closeModal={closeModal} productId={inquiryProductId} brandSlugTitle={brandSlugTitle} />}
+            {showModal && <InquiryNow closeModal={closeModal} productId={inquiryProductId} subcategorySlugTitle={subcategorySlugTitle} />}
 
-            {showLoginModal && <LoginSignUpModal closeModal={() => setShowLoginModal(false)} brandSlugTitle={brandSlugTitle} />}
+            {showLoginModal && <LoginSignUpModal closeModal={() => setShowLoginModal(false)} subcategorySlugTitle={subcategorySlugTitle} />}
         </div>
-    );
-};
-
+    )
+}

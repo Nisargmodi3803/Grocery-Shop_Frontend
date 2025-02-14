@@ -258,8 +258,8 @@ export const ProductCard = () => {
           <BsArrowRightCircleFill className="arrow2 arrow-right" onClick={handleNext} />
         </div>
       </section>
-      {showModal && <InquiryNow closeModal={closeModal} productId={inquiryProductId} flag={1} />}
-      {showLoginModal && <LoginSignUpModal closeModal={() => setShowLoginModal(false)} flag={1} />}
+      {showModal && <InquiryNow closeModal={closeModal} productId={inquiryProductId} />}
+      {showLoginModal && <LoginSignUpModal closeModal={() => setShowLoginModal(false)}/>}
     </>
   );
 };

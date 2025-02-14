@@ -311,7 +311,7 @@ export default function Product() {
                 <h1>Quick Overview</h1>
                 <p dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.long_description) }}></p>
             </section>
-            {showLoginModal && <LoginSignUpModal closeModal={() => setShowLoginModal(false)} flag={2} productSlugTitle={inquiryProductSlugTitle} />}
+            {showLoginModal && <LoginSignUpModal closeModal={() => setShowLoginModal(false)} productSlugTitle={inquiryProductSlugTitle} />}
             {showModal && <InquiryNow closeModal={closeModal} productId={inquiryProductId} flag={2} />}
         </div>
 

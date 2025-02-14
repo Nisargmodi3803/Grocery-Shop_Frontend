@@ -15,7 +15,7 @@ export const Header = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [customerEmail, setCustomerEmail] = useState("");
     const [customerDetails, setCustomerDetails] = useState({});
-    // Function to fetch customer details from the backend
+    
     const fetchCustomerDetails = async () => {
         if (isAuthenticated && customerEmail) {
             try {
@@ -33,7 +33,6 @@ export const Header = () => {
         }
     };
 
-    // Load authentication data and cart data from sessionStorage on mount
     useEffect(() => {
         const storedAuth = sessionStorage.getItem("isAuthenticated");
         const storedCustomerEmail = sessionStorage.getItem("customerEmail");
@@ -50,16 +49,14 @@ export const Header = () => {
 
         console.log("Email : " + storedCustomerEmail);
 
-    }, []); // Only run on mount
+    }, []);
 
-    // Fetch customer details whenever `customerEmail` or `isAuthenticated` changes
     useEffect(() => {
         if (isAuthenticated && customerEmail) {
             fetchCustomerDetails();
         }
-    }, [isAuthenticated, customerEmail]); // Trigger fetch when authentication or email changes
+    }, [isAuthenticated, customerEmail]);
 
-    // Save cart count in sessionStorage
     useEffect(() => {
         sessionStorage.setItem("cartCount", cartCount.toString());
     }, [cartCount]);
@@ -69,6 +66,10 @@ export const Header = () => {
     };
 
     const handleCart = () => {
+        if(!isAuthenticated){
+            setShowModal(true);
+            return;
+        }
         alert("Cart Clicked");
     };
 

@@ -3,7 +3,6 @@
     font-family: "Maven pro", sans-serif;
     background: #f4f4f4;
     height: max-content;
-    overflow: visible;
     padding-bottom: 20px;
 }
 
@@ -236,7 +235,7 @@
 
 
 .brand-selector-container {
-    width: 90%;
+    width: 97%;
     height: 140px;
     box-sizing: border-box;
     overflow: hidden;
