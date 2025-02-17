@@ -6,7 +6,7 @@
     flex: 3;
     margin-left: 50px;
     justify-items: center;
-    
+    padding-bottom: 40px;
 }
 
 .blog-card {
@@ -24,12 +24,12 @@
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     justify-items: left;
     text-align: left;
-    margin-bottom: 20px;
+    margin-bottom: -20px;
 }
 
 .blog-image img {
     width: 200px;
-    height: 320px;
+    height: 300px;
     display: flex;
     padding-left: 122px;
     padding-bottom: 20px;
@@ -73,4 +73,10 @@
     margin: 10px 15px;
     cursor: pointer;
     transition: color 0.3s ease;
+}
+
+.blog-image,
+.blog-title,
+.blog-date{
+    cursor: pointer;
 }

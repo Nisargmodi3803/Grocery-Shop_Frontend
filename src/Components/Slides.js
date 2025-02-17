@@ -1,16 +1,25 @@
+import image1 from '../assets/Slider/030822061628native.png';
+import image2 from '../assets/Slider/030822065643native(1).png';
+import image3 from '../assets/Slider/030822070802Untitleddesign(25).png';
+import image4 from '../assets/Slider/3.png';
+
 const Slides =
     [
         {
-            "src": "https://bitsinfotech.in/ecommerce/fmcg_upload/offer/0308220712141(2).png",
+            "src": image1,
             "alt": "Image-1"
         },
         {
-            "src": "https://bitsinfotech.in/ecommerce/fmcg_upload/offer/0308220712343.png",
+            "src": image2,
             "alt": "Image-2"
         },
         {
-            "src": "https://bitsinfotech.in/ecommerce/fmcg_upload/offer/0111220539460308220712141(2).png",
+            "src": image3,
             "alt": "Image-3"
+        },
+        {
+            "src": image4,
+            "alt": "Image-4"
         }
     ];
 

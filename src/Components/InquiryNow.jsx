@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import "./InquiryNow.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useLoading } from "../Context/LoadingContext";
 
-export const InquiryNow = ({ closeModal,flag, productId,productSlugTitle, brandSlugTitle, subcategorySlugTitle}) => {
+export const InquiryNow = ({ closeModal, flag, productId, productSlugTitle, brandSlugTitle, subcategorySlugTitle }) => {
     const navigate = useNavigate();
     const [quantity, setQuantity] = useState("");
     const [message, setMessage] = useState("");
@@ -14,6 +15,8 @@ export const InquiryNow = ({ closeModal,flag, productId,productSlugTitle, brandS
     const [customerEmail, setCustomerEmail] = useState(null);
     const [successMessage, setSuccessMessage] = useState(null);
     const [isSuccess, setIsSuccess] = useState(null);
+
+    const { setLoading } = useLoading();
 
     useEffect(() => {
         const authStatus = sessionStorage.getItem("isAuthenticated") === "true";
@@ -32,6 +35,7 @@ export const InquiryNow = ({ closeModal,flag, productId,productSlugTitle, brandS
     }, []);
 
     const getProductId = async () => {
+        setLoading(true);
         try {
             const response = await axios.get(`http://localhost:9000/product-title/${productSlugTitle}`);
             if (response.status === 200) {
@@ -45,11 +49,14 @@ export const InquiryNow = ({ closeModal,flag, productId,productSlugTitle, brandS
             } else {
                 alert("Something went wrong. Please try again!");
             }
+        } finally {
+            setLoading(false);
         }
         return null;
     };
 
     const submitInquiry = async (finalProductId) => {
+        setLoading(true);
         if (!finalProductId) {
             alert("Invalid product ID");
             return;
@@ -75,6 +82,8 @@ export const InquiryNow = ({ closeModal,flag, productId,productSlugTitle, brandS
             console.error("Error submitting inquiry:", error);
             alert("Something went wrong. Please try again!");
             setIsSuccess(false);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -103,6 +112,13 @@ export const InquiryNow = ({ closeModal,flag, productId,productSlugTitle, brandS
             setButtonDisable(false);
         }
     };
+
+    useEffect(() => {
+        setLoading(true);
+        const timer = setTimeout(() => setLoading(false), 1000);
+
+        return () => clearTimeout(timer);
+    }, [setLoading]);
 
     return (
         <div className="inquiry-modal-overlay">

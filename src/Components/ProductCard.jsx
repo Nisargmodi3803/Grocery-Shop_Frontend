@@ -9,6 +9,7 @@ import { MdAccessTime } from "react-icons/md";
 import { MdOutlineChatBubbleOutline } from "react-icons/md";
 import { InquiryNow } from './InquiryNow';
 import { LoginSignUpModal } from './LoginSignUpModal';
+import { useLoading } from '../Context/LoadingContext';
 
 export const ProductCard = () => {
   const navigate = useNavigate();
@@ -22,10 +23,18 @@ export const ProductCard = () => {
   const [inquiryProductId, setInquiryProductId] = useState(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { setLoading } = useLoading();
 
   useEffect(() => {
     setIsAuthenticated(sessionStorage.getItem("isAuthenticated") === "true");
   }, []);
+
+  useEffect(() => {
+    setLoading(true);
+    const timer = setTimeout(() => setLoading(false), 1000);
+
+    return () => clearTimeout(timer);
+  }, [setLoading]);
 
   const importAll = (r) => {
     let images = {};
@@ -38,6 +47,7 @@ export const ProductCard = () => {
   const imageMap = importAll(require.context("../assets/Product", false, /\.(png|jpeg|svg|jpg|JPEG)$/));
 
   const fetchProducts = async () => {
+    setLoading(true);
     try {
       const [vegetablesResponse, fruitsResponse] = await Promise.all([
         axios.get('http://localhost:9000/products-subcategory-title/vegetables'),
@@ -64,6 +74,8 @@ export const ProductCard = () => {
         console.error("Error fetching products:", error);
         alert('Something went wrong. Please try again!');
       }
+    }finally{
+      setLoading(false);
     }
   };
 
@@ -259,7 +271,7 @@ export const ProductCard = () => {
         </div>
       </section>
       {showModal && <InquiryNow closeModal={closeModal} productId={inquiryProductId} />}
-      {showLoginModal && <LoginSignUpModal closeModal={() => setShowLoginModal(false)}/>}
+      {showLoginModal && <LoginSignUpModal closeModal={() => setShowLoginModal(false)} />}
     </>
   );
 };

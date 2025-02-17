@@ -9,6 +9,7 @@ import { MdAccessTime, MdOutlineChatBubbleOutline } from "react-icons/md";
 import { InquiryNow } from './InquiryNow';
 import { LoginSignUpModal } from './LoginSignUpModal';
 import BrandSelector from './BrandSelector';
+import { useLoading } from '../Context/LoadingContext';
 
 const importAll = (r) => {
     let images = {};
@@ -36,6 +37,7 @@ export const Brand = () => {
     const [brandName, setBrandName] = useState('');
     const [brands, setBrands] = useState([]);
     const [sortOption, setSortOption] = useState("");
+    const {setLoading} = useLoading();
     
     const handleSortChange = (event) => {
         setSortOption(event.target.value);
@@ -46,6 +48,7 @@ export const Brand = () => {
     }, []);
 
     const fetchProductsByBrand = async () => {
+        setLoading(true);
         try {
             const response = await axios.get(`http://localhost:9000/products-brand-title/${brandSlugTitle}`);
 
@@ -70,10 +73,13 @@ export const Brand = () => {
                 console.error("Error fetching product:", error);
                 alert("Something went wrong. Please try again!");
             }
+        }finally{
+            setLoading(false);
         }
     };
 
     const fetchBrandName = async () => {
+        setLoading(true);
         try {
             const response = await axios.get(`http://localhost:9000/brand-slug/${brandSlugTitle}`);
             if (response.status === 200) {
@@ -87,10 +93,13 @@ export const Brand = () => {
                 console.error("Error fetching product:", error);
                 alert("Something went wrong. Please try again!");
             }
+        }finally{
+            setLoading(false);
         }
     };
 
     const fetchBrands = async () => {
+        setLoading(true);
         try {
             const response = await axios.get('http://localhost:9000/brand');
             if (response.status === 200) {
@@ -103,6 +112,8 @@ export const Brand = () => {
                 console.error(error);
                 alert("Something went wrong. Please try again!");
             }
+        }finally{
+            setLoading(false);
         }
     };
 
@@ -135,7 +146,7 @@ export const Brand = () => {
                 api = `http://localhost:9000/products-brand-title/${brandSlugTitle}`;
                 break;
         }
-    
+        setLoading(true);
         try {
             const response = await axios.get(api);
             if (response.status === 200) {
@@ -148,6 +159,8 @@ export const Brand = () => {
                 console.error("Error fetching product:", error);
                 alert("Something went wrong. Please try again!");
             }
+        }finally{
+            setLoading(false);
         }
     };
     
@@ -176,6 +189,13 @@ export const Brand = () => {
             fetchProductsByBrand();
         }
     }, [sortOption]);
+
+    useEffect(() => {
+        setLoading(true); 
+        const timer = setTimeout(() => setLoading(false), 1000); 
+    
+        return () => clearTimeout(timer);
+      }, [setLoading]);
 
 
     const toggleLike = (productId) => {

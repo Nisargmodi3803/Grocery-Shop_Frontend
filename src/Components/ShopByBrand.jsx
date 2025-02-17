@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import './ShopByBrand.css'
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useLoading } from '../Context/LoadingContext';
 
 const importAll = (r) => {
     let images = {};
@@ -16,8 +17,17 @@ const imageMap = importAll(require.context("../assets/Brand", false, /\.(png|jpe
 export const ShopByBrand = () => {
     const [brands, setBrands] = useState([]);
     const navigate = useNavigate();
+    const { setLoading } = useLoading();
+
+    useEffect(() => {
+        setLoading(true);
+        const timer = setTimeout(() => setLoading(false), 1000);
+
+        return () => clearTimeout(timer);
+    }, [setLoading]);
 
     const fetchBrands = async () => {
+        setLoading(true);
         try {
             const response = await axios.get('http://localhost:9000/brand');
             if (response.status === 200) {
@@ -31,6 +41,8 @@ export const ShopByBrand = () => {
                 console.error(error);
                 alert("Something went wrong. Please try again");
             }
+        }finally {
+            setLoading(false);
         }
     }
 

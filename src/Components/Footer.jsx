@@ -9,22 +9,37 @@ import { FaInstagramSquare } from "react-icons/fa";
 import { FaSquareXTwitter } from "react-icons/fa6";
 import { FaRegCalendarAlt } from "react-icons/fa";
 import axios from 'axios';
+import { useLoading } from '../Context/LoadingContext';
+import companyLogo from '../assets/Logo/060622034612bits.png';
+import playstore from '../assets/Logo/playstore.png';
+import appleStore from '../assets/Logo/app-store.png';
 
 const Footer = () => {
     const [blogs, setBlogs] = useState([]);
+    const { setLoading } = useLoading();
 
     const fetchBlogs = async () => {
+        setLoading(true);
         try {
             const response = await axios.get('http://localhost:9000/blogs');
             setBlogs(response.data);
         } catch (error) {
             console.error("Error fetching blogs:", error);
+        } finally {
+            setLoading(false);
         }
     }
 
     useEffect(() => {
         fetchBlogs();
     }, [])
+
+    useEffect(() => {
+        setLoading(true);
+        const timer = setTimeout(() => setLoading(false), 1000);
+
+        return () => clearTimeout(timer);
+    }, [setLoading]);
 
     return (
         <>
@@ -46,7 +61,7 @@ const Footer = () => {
                 <div className="footer-middle">
                     <div className="company-info">
                         <img
-                            src="https://bitsinfotech.in/ecommerce/fmcg_upload/logo/060622034612bits.png"
+                            src={companyLogo}
                             alt="Company Logo"
                             title="Bits Infotech"
                             className="company-logo"

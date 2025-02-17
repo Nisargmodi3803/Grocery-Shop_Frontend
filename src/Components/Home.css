@@ -15,10 +15,11 @@
 
 .slider-image {
     width: 100%;
-    max-width: fit-content;
+    /* max-width: fit-content; */
     height: auto;
     border-radius: 10px;
     box-shadow: 0px 0px #666;
+    object-fit: contain;
     /* transition: translateX(0%); */
 }
 

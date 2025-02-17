@@ -1,8 +1,17 @@
 import React from 'react'
 import './PrivacyPolicy.css'
+import { useLoading } from '../Context/LoadingContext'
+import { useEffect } from 'react'
 
 export const PrivacyPolicy = () => {
+  const { setLoading } = useLoading();
+  
+  useEffect(() => {
+    setLoading(true);
+    const timer = setTimeout(() => setLoading(false), 1000);
 
+    return () => clearTimeout(timer);
+  }, [setLoading]);
   return (
     <div className='privacy-policy'>
       <section className='container-title'>

@@ -1,14 +1,32 @@
 import React, { useEffect, useState } from 'react';
 import './Home.css';
-import Slides from './Slides';
+import image1 from '../assets/Slider/0111220539460308220712141(2).png';
+import image2 from '../assets/Slider/0308220712242.png';
+import image3 from '../assets/Slider/030822070802Untitleddesign(25).png';
 import { BsArrowLeftCircleFill, BsArrowRightCircleFill } from "react-icons/bs";
 import CardSlider from './CardSlider';
 import { Link, useNavigate } from 'react-router-dom';
 import { ProductCard } from './ProductCard';
 import axios from 'axios';
 import { BrandCardSlider } from './BrandCardSlider';
+import { useLoading } from '../Context/LoadingContext';
 
-// 🔥 Import all images dynamically from the Category folder
+const Slides =
+    [
+        {
+            "src": image1,
+            "alt": "Image-1"
+        },
+        {
+            "src": image2,
+            "alt": "Image-2"
+        },
+        {
+            "src": image3,
+            "alt": "Image-3"
+        }
+    ];
+    
 const importAll = (r) => {
     let images = {};
     r.keys().forEach((item) => {
@@ -27,9 +45,11 @@ export const Home = () => {
     const navigate = useNavigate();
     const [categories, setCategories] = useState([]);
     const [subcategories, setSubCategories] = useState([]);
+    const { setLoading } = useLoading();
 
 
     const fetchCategories = async () => {
+        setLoading(true);
         try {
             const response = await axios.get('http://localhost:9000/categories');
             if (response.status === 200) {
@@ -37,6 +57,8 @@ export const Home = () => {
             }
         } catch (error) {
             console.error("Error fetching categories:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -70,6 +92,7 @@ export const Home = () => {
     }, [currentSlide, isPaused]);
 
     const handleCategoryClick = async (categorySlugTitle) => {
+        setLoading(true);
         try {
             const response = await axios.get(`http://localhost:9000/subcategories-category-title/${categorySlugTitle}`);
 
@@ -95,8 +118,17 @@ export const Home = () => {
                 console.error("Network Error or Server Down:", error);
                 alert("Server is unreachable. Check your internet connection or backend server.");
             }
+        } finally {
+            setLoading(false);
         }
     };
+
+    useEffect(() => {
+        setLoading(true);
+        const timer = setTimeout(() => setLoading(false), 1000);
+
+        return () => clearTimeout(timer);
+    }, [setLoading]);
 
     return (
         <>

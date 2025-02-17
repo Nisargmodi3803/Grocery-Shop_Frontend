@@ -4,6 +4,7 @@ import { BsArrowLeftCircleFill, BsArrowRightCircleFill } from 'react-icons/bs';
 import { useSwipeable } from "react-swipeable";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useLoading } from '../Context/LoadingContext';
 
 const importAll = (r) => {
     let images = {};
@@ -13,7 +14,7 @@ const importAll = (r) => {
     return images;
 };
 
-const imageMap = importAll(require.context("../assets/Subcategory", false, /\.(png|jpe?g|svg|jpg)$/));
+const imageMap = importAll(require.context("../assets/Subcategory", false, /\.(png|jpeg|svg|jpg|JPEG)$/));
 
 const CardSlider = () => {
     const direction = useRef("normal");
@@ -21,8 +22,10 @@ const CardSlider = () => {
     const [isPaused, setIsPaused] = useState(false);
     const [cardData, setCardData] = useState([]);
     const naviagate = useNavigate();
+    const {setLoading} = useLoading();
 
     const fetchCardDatas = async () => {
+        setLoading(true);
         try {
             const response = await axios.get('http://localhost:9000/subcategories');
 
@@ -31,6 +34,8 @@ const CardSlider = () => {
             }
         } catch (error) {
             console.error("Error fetching card data:", error);
+        }finally{
+            setLoading(false);
         }
     };
 
@@ -59,6 +64,13 @@ const CardSlider = () => {
         }
     }, [currentIndex, isPaused]);
 
+    useEffect(() => {
+        setLoading(true);
+        const timer = setTimeout(() => setLoading(false), 1000);
+
+        return () => clearTimeout(timer);
+    }, [setLoading]);
+
     const swipeHandlers = useSwipeable({
         onSwipedLeft: handleNext,
         onSwipedRight: handlePrev,
@@ -79,11 +91,11 @@ const CardSlider = () => {
                     onClick={handlePrev}
                 />
             </div>
-            <div 
+            <div
                 className="card-slider-wrapper"
-                style={{ 
-                    animation: direction.current === "normal" 
-                        ? "slideIn 0.5s ease-in-out" 
+                style={{
+                    animation: direction.current === "normal"
+                        ? "slideIn 0.5s ease-in-out"
                         : "slideInReverse 0.5s ease-in-out"
                 }}
             >
@@ -91,13 +103,13 @@ const CardSlider = () => {
                     const imageSrc = imageMap[d.image_url] || imageMap["default.jpg"];
 
                     return (
-                        <div 
-                        className='card' 
-                        key={d.id}
-                        onClick={()=>{
-                            naviagate(`/ecommerce/sub-category/${d.slug_title}`);
-                            window.location.reload();
-                        }}>
+                        <div
+                            className='card'
+                            key={d.id}
+                            onClick={() => {
+                                naviagate(`/ecommerce/sub-category/${d.slug_title}`);
+                                window.location.reload();
+                            }}>
                             <div className='card-image-container'>
                                 <img src={imageSrc} alt={d.name} loading='lazy' />
                             </div>

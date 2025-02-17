@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './ShopByCategory.css';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useLoading } from '../Context/LoadingContext';
 
 const importAll = (r) => {
     let images = {};
@@ -17,8 +18,17 @@ export const ShopByCategory = () => {
     const [categories, setCategories] = useState([]);
     const navigate = useNavigate();
     const [subcategories, setSubCategories] = useState([]);
+    const { setLoading } = useLoading();
+
+    useEffect(() => {
+        setLoading(true);
+        const timer = setTimeout(() => setLoading(false), 1000);
+
+        return () => clearTimeout(timer);
+    }, [setLoading]);
 
     const fetchCategories = async () => {
+        setLoading(true);
         try {
             const response = await axios.get('http://localhost:9000/categories');
             if (response.status === 200) {
@@ -31,6 +41,8 @@ export const ShopByCategory = () => {
                 console.error("Error fetching categories:", error);
                 alert("Something went wrong. Please try again!");
             }
+        }finally{
+            setLoading(false);
         }
     };
 
@@ -39,6 +51,7 @@ export const ShopByCategory = () => {
     }, []);
 
     const handleCategoryClick = async (categorySlugTitle) => {
+        setLoading(true);
         try {
             const response = await axios.get(`http://localhost:9000/subcategories-category-title/${categorySlugTitle}`);
 
@@ -64,6 +77,8 @@ export const ShopByCategory = () => {
                 console.error("Network Error or Server Down:", error);
                 alert("Server is unreachable. Check your internet connection or backend server.");
             }
+        }finally{
+            setLoading(false);
         }
     };
 

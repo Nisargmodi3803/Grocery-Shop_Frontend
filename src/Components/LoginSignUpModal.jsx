@@ -6,10 +6,11 @@ import { FaArrowRight } from "react-icons/fa6";
 import axios, { HttpStatusCode } from 'axios';
 import { useNavigate } from 'react-router-dom';
 import "./LoginSignUpModal.css";
+import { useLoading } from '../Context/LoadingContext';
 
 // 1 => navigate to Home page, 2 => navigate to Product page, 3 => navigate to Brand page and 4 => navigate to SubCategory page
 
-export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle, subcategorySlugTitle}) => {
+export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle, subcategorySlugTitle }) => {
     const navigate = useNavigate();
     const [isLogin, setIsLogin] = useState(true);
     const [OTP, setOTP] = useState('');
@@ -43,6 +44,14 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
     const [inquiryProductSlugTitle, setInquiryProductSlugTitle] = useState(productSlugTitle);
     const mobileRegex = /^[6-9]\d{9}$/;
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const { setLoading } = useLoading();
+
+    // useEffect(() => {
+    //     setLoading(true);
+    //     const timer = setTimeout(() => setLoading(false), 1000);
+
+    //     return () => clearTimeout(timer);
+    // }, [setLoading]);
 
     useEffect(() => {
         const storedAuth = sessionStorage.getItem("isAuthenticated");
@@ -134,6 +143,7 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
     };
 
     const handleLogin = async () => {
+        setLoading(true);
         try {
             const response = await axios.post('http://localhost:9000/login', {
                 email: formData.email,
@@ -163,10 +173,13 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
                 console.error(error);
                 alert('Login Failed');
             }
+        }finally{
+            setLoading(false);
         }
     };
 
     const handleRegistration = async () => {
+        setLoading(true);
         try {
             const response = await axios.post('http://localhost:9000/register', {
                 customerName: formData.name,
@@ -194,11 +207,14 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
         } catch (error) {
             console.error(error);
             alert('Registration Failed');
+        }finally{
+            setLoading(false);
         }
     };
 
 
     const handleOTP = async () => {
+        setLoading(true);
         if (isLogin) { // Login with OTP
             try {
                 console.log(loginWithOTPData.email);
@@ -221,9 +237,12 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
                     console.error(error);
                     alert('OTP sending failed due to network or server error');
                 }
+            }finally{
+                setLoading(false);
             }
         }
         else { // Registration with OTP
+            setLoading(true);
             try {
                 const response = await axios.post('http://localhost:9000/send-email-registration', {
                     email: formData.email,
@@ -247,6 +266,8 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
                     console.error(error);
                     alert('OTP sending failed due to network or server error');
                 }
+            }finally{
+                setLoading(false);
             }
 
         }
@@ -254,6 +275,7 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
 
     // Forgot Password OTP
     const handleForgotPasswordOTP = async () => {
+        setLoading(true);
         try {
             const response = await axios.post('http://localhost:9000/send-email-forgot-password', {
                 email: forgotPasswordData.email
@@ -276,10 +298,13 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
                 console.error(error);
                 alert('OTP sending failed due to network or server error');
             }
+        }finally{
+            setLoading(false);
         }
     }
 
     const handleVerify = async () => {
+        setLoading(true);
         try {
             console.log(OTP);
             const response = await axios.post('http://localhost:9000/verify-otp', {
@@ -318,12 +343,14 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
                 setOtpResponse(`❌ Unexpected Error: ${error.message}`);
             }
             setVerified(false);
+        }finally{
+            setLoading(false);
         }
     };
 
     const handleForgotPasswordSubmit = async (e) => {
         e.preventDefault();
-
+        setLoading(true);
         try {
             const response = await axios.patch('http://localhost:9000/forgot-password', {
                 email: forgotPasswordData.email,
@@ -352,6 +379,8 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
                 console.error(error);
                 alert('Password Change Failed');
             }
+        }finally{
+            setLoading(false);
         }
     };
 
@@ -816,7 +845,7 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
                                 disabled={otpSent}
                             />
                             {errors.confirmPassword && <div className="error">{errors.confirmPassword}</div>}
-                            
+
                             <label>Enter Referral Code <span className="required">(Optional)</span></label>
                             <input
                                 type='text'

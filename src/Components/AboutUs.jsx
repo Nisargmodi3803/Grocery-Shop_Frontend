@@ -1,8 +1,16 @@
 import React from 'react'
 import './AboutUs.css'
-
+import { useEffect } from 'react'
+import { useLoading } from '../Context/LoadingContext'
 
 export const AboutUs = () => {
+  const { setLoading } = useLoading();
+  useEffect(() => {
+    setLoading(true);
+    const timer = setTimeout(() => setLoading(false), 1000);
+
+    return () => clearTimeout(timer);
+  }, [setLoading]);
 
   return (
     <>

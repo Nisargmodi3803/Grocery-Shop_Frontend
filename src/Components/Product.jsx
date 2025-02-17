@@ -15,7 +15,7 @@ import { MdAccessTime } from "react-icons/md";
 import { MdOutlineChatBubbleOutline } from "react-icons/md";
 import { LoginSignUpModal } from './LoginSignUpModal';
 import { InquiryNow } from './InquiryNow';
-
+import { useLoading } from '../Context/LoadingContext';
 
 export default function Product() {
     const [product, setProduct] = useState(null);
@@ -31,11 +31,19 @@ export default function Product() {
     const [inquiryProductId, setInquiryProductId] = useState(null);
     const [inquiryProductSlugTitle, setInquiryProductSlugTitle] = useState(null);
     const greater = '>';
+    const { setLoading } = useLoading();
 
     useEffect(() => {
         const authStatus = sessionStorage.getItem("isAuthenticated") === "true";
         setIsAuthenticated(authStatus);
     }, []);
+
+    useEffect(() => {
+        setLoading(true);
+        const timer = setTimeout(() => setLoading(false), 1000);
+
+        return () => clearTimeout(timer);
+    }, [setLoading]);
 
     const importAll = (r) => {
         let images = {};
@@ -48,6 +56,7 @@ export default function Product() {
     const imageMap = importAll(require.context("../assets/Product", false, /\.(png|jpeg|svg|jpg|JPEG)$/));
     useEffect(() => {
         const fetchProduct = async () => {
+            setLoading(true);
             try {
                 console.log("Fetching product:", productSlugTitle);
                 const response = await axios.get(`http://localhost:9000/product-title/${productSlugTitle}`);
@@ -62,6 +71,8 @@ export default function Product() {
                     console.error("Error fetching product:", error);
                     alert("Something went wrong. Please try again!");
                 }
+            }finally{
+                setLoading(false);
             }
         };
         fetchProduct();
@@ -73,6 +84,7 @@ export default function Product() {
         if (!product) return;
 
         const fetchRelatedCategories = async () => {
+            setLoading(true);
             try {
                 const response = await axios.get(`http://localhost:9000/product-variants?name=${product.name}`);
                 if (response.status === 200) {
@@ -81,6 +93,8 @@ export default function Product() {
                 }
             } catch (error) {
                 console.error("Error fetching related categories:", error);
+            }finally{
+                setLoading(false);
             }
         };
         fetchRelatedCategories();
@@ -108,30 +122,27 @@ export default function Product() {
         return (
             <div className='product-page'>
                 <section className='product-navigate-section'>
-                <span className='navigate'>
-                    <a onClick={() => navigate('/ecommerce/')}>
-                        <b><IoMdHome /> Home</b>
-                    </a>
-                    <span> {greater} </span>
-                    <a href=''>Loading...</a>
-                    <span> {greater} </span>
-                    <a href=''>Loading...</a>
-                </span>
-            </section>
+                    <span className='navigate'>
+                        <a onClick={() => navigate('/ecommerce/')}>
+                            <b><IoMdHome /> Home</b>
+                        </a>
+                        <span> {greater} </span>
+                        <a href=''>Loading...</a>
+                        <span> {greater} </span>
+                        <a href=''>Loading...</a>
+                    </span>
+                </section>
                 <h1 style={{ color: "#133365" }}>No Products Found...</h1>
             </div>
         );
     }
-    // Image Handling
     const imageSrc = imageMap[product.image_url] || imageMap["default.jpg"];
 
-    // Discount Calculation
     const calculateDiscountPercentage = (mrp, discountAmt) => {
         return mrp > 0 ? Math.round(((mrp - discountAmt) * 100) / mrp) : 0;
     };
     const discount = calculateDiscountPercentage(product.mrp, product.discount_amt);
 
-    // Rating Handling
     const rating = product.average_rating ? parseFloat(product.average_rating).toFixed(1) : 0;
     const noOfRatings = product.no_of_rating || 0;
 

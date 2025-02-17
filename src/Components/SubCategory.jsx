@@ -8,6 +8,7 @@ import axios from 'axios';
 import { MdAccessTime, MdOutlineChatBubbleOutline } from "react-icons/md";
 import { InquiryNow } from './InquiryNow';
 import { LoginSignUpModal } from './LoginSignUpModal';
+import { useLoading } from '../Context/LoadingContext';
 
 const importAll = (r) => {
     let images = {};
@@ -35,6 +36,14 @@ export const SubCategory = () => {
     const [categoryName, setCategoryName] = useState('');
     const [sortOption, setSortOption] = useState("");
     const [subcategories, setSubCategories] = useState([]);
+    const { setLoading } = useLoading();
+
+    useEffect(() => {
+        setLoading(true);
+        const timer = setTimeout(() => setLoading(false), 1000);
+
+        return () => clearTimeout(timer);
+    }, [setLoading]);
 
     const handleSortChange = (event) => {
         setSortOption(event.target.value);
@@ -45,6 +54,7 @@ export const SubCategory = () => {
     }, []);
 
     const fetchProductsBySubCategory = async () => {
+        setLoading(true);
         try {
             const response = await axios.get(`http://localhost:9000/products-subcategory-title/${subcategorySlugTitle}`);
 
@@ -72,10 +82,13 @@ export const SubCategory = () => {
                 setProducts([]);
                 alert("Something went wrong. Please try again!");
             }
+        }finally {
+            setLoading(false);
         }
     };
 
     const fetchSubcategoryName = async () => {
+        setLoading(true);
         try {
             const response = await axios.get(`http://localhost:9000/subcategory-title/${subcategorySlugTitle}`);
             if (response.status === 200) {
@@ -91,11 +104,13 @@ export const SubCategory = () => {
                 console.error("Error fetching product:", error);
                 alert("Something went wrong. Please try again!");
             }
+        }finally {
+            setLoading(false);
         }
     };
 
     const fetchAllSubcategoriesByCategory = async (categorySlugTitle) => {
-        // console.log("Fetching subcategories by category:", categorySlugTitle);
+        setLoading(true);
         try {
             const response = await axios.get(`http://localhost:9000/subcategories-category-title/${categorySlugTitle}`);
             if (response.status === 200) {
@@ -108,10 +123,13 @@ export const SubCategory = () => {
                 console.error("Error fetching product:", error);
                 alert("Something went wrong. Please try again!");
             }
+        }finally {
+            setLoading(false);
         }
     }
 
     const fetchCategoryName = async () => {
+        setLoading(true);
         try {
             const response = await axios.get(`http://localhost:9000/subcategory-title/${subcategorySlugTitle}`);
             if (response.status === 200) {
@@ -124,6 +142,8 @@ export const SubCategory = () => {
                 console.error("Error fetching product:", error);
                 alert("Something went wrong. Please try again!");
             }
+        }finally {
+            setLoading(false);
         }
     }
 
@@ -156,7 +176,7 @@ export const SubCategory = () => {
                 api = `http://localhost:9000/products-subcategory-title/${subcategorySlugTitle}`;
                 break;
         }
-
+        setLoading(true);
         try {
             const response = await axios.get(api);
             if (response.status === 200) {
@@ -172,6 +192,8 @@ export const SubCategory = () => {
                 setProducts([]);
                 alert("Something went wrong. Please try again!");
             }
+        }finally {
+            setLoading(false);
         }
     };
 

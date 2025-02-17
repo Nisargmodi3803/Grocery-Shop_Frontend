@@ -58,6 +58,13 @@ export const ContactUs = () => {
   }, [isAuthenticated]);
 
   useEffect(() => {
+    setLoading(true); 
+    const timer = setTimeout(() => setLoading(false), 1000);
+
+    return () => clearTimeout(timer);
+  }, [setLoading]);
+
+  useEffect(() => {
     if (isAuthenticated && customer) {
       setFormData((prevData) => ({
         ...prevData,

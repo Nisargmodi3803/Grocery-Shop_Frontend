@@ -8,6 +8,9 @@ import HomeIcon from '@mui/icons-material/Home';
 import { LoginSignUpModal } from './LoginSignUpModal';
 import "./Header.css";
 import axios from 'axios';
+import { useLoading } from '../Context/LoadingContext';
+import companyLogo from '../assets/Logo/060622034612bits.png';
+import { useNavigate } from 'react-router-dom';
 
 export const Header = () => {
     const [showModal, setShowModal] = useState(false);
@@ -15,20 +18,25 @@ export const Header = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [customerEmail, setCustomerEmail] = useState("");
     const [customerDetails, setCustomerDetails] = useState({});
-    
+    const { setLoading } = useLoading();
+    const navigate = useNavigate();
+
     const fetchCustomerDetails = async () => {
         if (isAuthenticated && customerEmail) {
             try {
+                setLoading(true);
                 const response = await axios.get(`http://localhost:9000/customer-email/${customerEmail}`);
                 if (response.status === 200) {
                     setCustomerDetails(response.data);
-                    console.log("Customer Name: ", response.data.customerName); 
+                    console.log("Customer Name: ", response.data.customerName);
                     console.log("Customer Email: ", response.data.customerEmail);
                 } else {
                     console.log("Error fetching customer details");
                 }
             } catch (error) {
                 console.error("Error fetching customer details:", error);
+            } finally {
+                setLoading(false);
             }
         }
     };
@@ -61,12 +69,19 @@ export const Header = () => {
         sessionStorage.setItem("cartCount", cartCount.toString());
     }, [cartCount]);
 
+    useEffect(() => {
+        setLoading(true);
+        const timer = setTimeout(() => setLoading(false), 1000);
+
+        return () => clearTimeout(timer);
+    }, [setLoading]);
+
     const handleSearchClick = () => {
         alert("Search Button Clicked");
     };
 
     const handleCart = () => {
-        if(!isAuthenticated){
+        if (!isAuthenticated) {
             setShowModal(true);
             return;
         }
@@ -107,7 +122,7 @@ export const Header = () => {
                     <div className="navbar-container">
                         <div className="navbar-left">
                             <img
-                                src="https://bitsinfotech.in/ecommerce/fmcg_upload/logo/060622034612bits.png"
+                                src={companyLogo}
                                 alt="Company Logo"
                                 title="Bits Infotech"
                                 className="company-logo"
@@ -136,10 +151,16 @@ export const Header = () => {
                                 <span>Login/Sign Up</span>
                             </div>
                         ) : (
-                            <div className="icon-container">
-                                <AccountCircleIcon />
-                                <span><b>Hi</b> {customerDetails.customerName || 'Loading...'}</span>
-                                <button onClick={handleLogout} className="logout-button">Logout</button>
+                            <div className="icon-container"
+                                onClick={() => {
+                                    navigate("/ecommerce/my-profile");
+                                    window.location.reload();
+                                }}
+                            >
+                                <AccountCircleIcon style={{ color: "#133365" }} />
+                                <span
+                                    style={{ color: "#133365" }}
+                                ><b>Hi</b> {customerDetails.customerName || 'Loading...'}</span>
                             </div>
                         )}
                         <div className="icon-container cart-icon-container" onClick={handleCart}>
@@ -160,10 +181,13 @@ export const Header = () => {
                         <li><Link to={"/ecommerce/blog"}>Blog</Link></li>
                         <li><Link to={"/ecommerce/about-us"}>About Us</Link></li>
                         <li><Link to={"/ecommerce/contact-us"}>Contact Us</Link></li>
+                        {isAuthenticated ? (
+                            <li onClick={handleLogout}><Link to={"/ecommerce"}>Logout</Link></li>
+                        ) : null}
                     </ul>
                 </div>
 
-                {showModal && <LoginSignUpModal closeModal={closeModal} flag={1}/>}
+                {showModal && <LoginSignUpModal closeModal={closeModal} flag={1} />}
             </header>
         </>
     );

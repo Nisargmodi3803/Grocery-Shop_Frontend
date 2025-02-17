@@ -1,8 +1,18 @@
 import React from 'react'
 import './ShippingReturnPolicy.css'
+import { useLoading } from '../Context/LoadingContext';
+import { useEffect } from 'react';
 
 export const ShippingReturnPolicy = () => {
+  const { setLoading } = useLoading();
 
+  useEffect(() => {
+    setLoading(true);
+    const timer = setTimeout(() => setLoading(false), 1000);
+
+    return () => clearTimeout(timer);
+  }, [setLoading]);
+  
   return (
     <div className='shipping-return-policy'>
       <section className='container-title'>

@@ -3,6 +3,7 @@ import './BrandCardSlider.css';
 import { useSwipeable } from "react-swipeable";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useLoading } from '../Context/LoadingContext';
 
 const importAll = (r) => {
     let images = {};
@@ -20,6 +21,7 @@ export const BrandCardSlider = () => {
     const [isPaused, setIsPaused] = useState(false);
     const [brand, setBrand] = useState([]);
     const navigate = useNavigate();
+    const {setLoading} = useLoading();
 
     const handleNext = () => {
         direction.current = "normal";
@@ -34,6 +36,7 @@ export const BrandCardSlider = () => {
     };
 
     const fetchBrands = async () => {
+        setLoading(true);
         try {
             const response = await axios.get('http://localhost:9000/brand');
             if (response.status === 200) {
@@ -46,6 +49,8 @@ export const BrandCardSlider = () => {
                 console.error(error);
                 alert("Something went wrong. Please try again!");
             }
+        }finally{
+            setLoading(false);
         }
     };
 
@@ -61,6 +66,13 @@ export const BrandCardSlider = () => {
             return () => clearTimeout(timer);
         }
     }, [currentIndex, isPaused]);
+
+    useEffect(() => {
+        setLoading(true);
+        const timer = setTimeout(() => setLoading(false), 1000);
+    
+        return () => clearTimeout(timer);
+      }, [setLoading]);
 
     const swipeHandlers = useSwipeable({
         onSwipedLeft: handleNext,

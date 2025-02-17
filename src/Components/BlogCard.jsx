@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { FaCalendarDay } from "react-icons/fa";
 import "./BlogCard.css";
 import axios from "axios";
+import { useLoading } from "../Context/LoadingContext";
+import { useNavigate } from "react-router-dom";
 
 const importAll = (r) => {
     let images = {};
@@ -14,49 +16,73 @@ const importAll = (r) => {
 const imageMap = importAll(require.context("../assets/Blog", false, /\.(png|jpe?g|svg)$/));
 
 export default function BlogCard() {
+    const { loading, setLoading } = useLoading(); // Use the loading context
     const [blogs, setBlogs] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchBlogs = async () => {
+            setLoading(true); // Start loading before fetching
             try {
                 const response = await axios.get("http://localhost:9000/blogs");
-                setBlogs(response.data);
+                if (response.status === 200) {
+                    setBlogs(response.data);
+                }
             } catch (error) {
-                console.error("Error fetching blogs:", error);
-                setError("Failed to load blogs. Please try again later.");
+                if (error.response.status === 404) {
+                    console.log("No Blogs Found");
+                } else {
+                    console.error("Error fetching blogs:", error);
+                    setError("Failed to load blogs. Please try again later.");
+                }
             } finally {
-                setLoading(false);
+                setLoading(false); // Stop loading after fetching
             }
         };
         fetchBlogs();
-    }, []);
+    }, [setLoading]);
 
-    if (loading) return <p className="loading">Loading blogs...</p>;
     if (error) return <p className="error">{error}</p>;
 
     return (
         <div className="blog-container">
-            {blogs.length > 0 ? (
+            {loading ? (
+                <div className="loading-overlay">
+                    <div className="spinner"></div>
+                </div>
+            ) : blogs.length > 0 ? (
                 blogs.map((blog) => {
-                    // Get image source from imageMap, fallback to default
                     const imageSrc = imageMap[blog.image_url] || imageMap["default.png"];
-
                     return (
                         <div className="blog-card" key={blog.id}>
                             <div className="blog-image">
-                                <img 
-                                    src={imageSrc} 
-                                    alt={blog.title} 
+                                <img
+                                    src={imageSrc}
+                                    alt={blog.title}
                                     loading="lazy"
+                                    onClick={() => {
+                                        navigate(`/ecommerce/blog/${blog.slug_title}`);
+                                        window.location.reload();
+                                    }}
                                 />
                             </div>
                             <div className="blog-content">
-                                <div className="blog-title">
+                                <div
+                                    className="blog-title"
+                                    onClick={() => {
+                                        navigate(`/ecommerce/blog/${blog.slug_title}`);
+                                        window.location.reload();
+                                    }}
+                                >
                                     <h3>{blog.title}</h3>
                                 </div>
-                                <div className="blog-date">
+                                <div
+                                    className="blog-date"
+                                    onClick={() => {
+                                        navigate(`/ecommerce/blog/${blog.slug_title}`);
+                                        window.location.reload();
+                                    }}>
                                     <span>
                                         <FaCalendarDay /> {blog.date}
                                     </span>
@@ -65,7 +91,12 @@ export default function BlogCard() {
                                     <p>{blog.description}</p>
                                 </div>
                                 <div className="blog-readmore">
-                                    <span>READ MORE {'>'}</span>
+                                    <span
+                                        onClick={() => {
+                                            navigate(`/ecommerce/blog/${blog.slug_title}`);
+                                            window.location.reload();
+                                        }}
+                                    >READ MORE {'>'}</span>
                                 </div>
                             </div>
                         </div>
