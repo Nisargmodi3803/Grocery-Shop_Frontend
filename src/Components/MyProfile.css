@@ -9,7 +9,6 @@
     text-decoration: none;
 }
 
-/* Profile Section */
 .profile-section {
     display: flex;
     width: 85%;
@@ -19,9 +18,9 @@
     margin: 20px;
 }
 
-/* Left Navigation */
+
 .profile-nav-section {
-    width: 30%; /* Increased width for the left navigation */
+    width: 30%;
     color: #133365;
     padding: 20px;
     border-right: 1px solid #ddd;
@@ -36,12 +35,13 @@
 }
 
 .profile-nav-section .nav-list li {
-    padding: 12px 20px;
+    padding: 17px 20px;
     cursor: pointer;
     border: 1px solid #ddd;
     font-size: 16px;
     transition: background-color 0.3s ease;
     text-decoration: none;
+    text-align: left;
 }
 
 .profile-nav-section .nav-list li:hover {
@@ -75,6 +75,7 @@
     margin: 0 auto;
     position: relative;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
 }
 
 .profile-image img {
@@ -84,11 +85,10 @@
     object-fit: cover;
 }
 
-/* Image Options */
 .image-options {
     position: absolute;
-    bottom: -15px;
-    right: 25px;
+    bottom: -17px;
+    right: 35px;
     display: flex;
     gap: 10px;
 }
@@ -98,11 +98,11 @@
     padding: 6px 12px;
     border: none;
     cursor: pointer;
-    background: #2f4362;
+    background: #133365;
     color: white;
     font-weight: bold;
     border-radius: 5px;
-    font-size: 14px;
+    font-size: 16px;
     transition: background-color 0.3s ease;
 }
 
@@ -116,9 +116,8 @@
     background: #1d2e47;
 }
 
-/* Profile Section Content */
 .my-profile-section {
-    width: 70%; /* Adjusted for more space */
+    width: 70%;
     padding: 30px;
     background: #fff;
 }
@@ -151,5 +150,209 @@
     .profile-image {
         width: 120px;
         height: 120px;
+    }
+}
+
+.my-profile-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #f4f7fc;
+    padding: 30px;
+    border-radius: 10px;
+}
+
+.my-profile-section-header h1 {
+    font-size: 26px;
+    color: #133365;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #e0e4e7;
+    padding-bottom: 10px;
+    font-weight: bold;
+}
+
+.my-profile-section-body {
+    width: 100%;
+    padding-top: 20px;
+}
+
+.profile-detail {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #ffffff;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.profile-detail h3 {
+    font-size: 16px;
+    color: #133365;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+}
+
+.profile-detail p,
+.profile-detail input {
+    font-size: 16px;
+    color: #666;
+    padding: 10px;
+    text-align: left;
+    border: 2px solid #ddd;
+    font-weight: 500;
+    margin-bottom: 27px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.profile-detail span.edit,
+.profile-detail span.delete {
+    margin-left: 10px;
+}
+
+.profile-detail input {
+    width: 90%;
+}
+
+.profile-detail h3 svg {
+    margin-right: 10px;
+}
+
+.profile-detail p span {
+    font-weight: 700;
+}
+
+.edit {
+    display: inline-block;
+    cursor: pointer;
+    color: green;
+    font-size: 18px;
+    margin-left: 10px;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.edit:hover {
+    color: #5a5b5b;
+    transform: scale(1.1);
+}
+
+
+.edit-part {
+    display: flex;
+    align-items: center;
+    border: 2px solid #ddd;
+    font-size: 16px;
+    font-weight: 500;
+    color: #666;
+    border-radius: 5px;
+    background-color: #fff;
+    padding: 5px 10px;
+    height: max-content;
+}
+
+.edit-part input {
+    border: none;
+    outline: none;
+    font-size: 16px;
+    padding: 15px;
+    color: #333;
+    width: 100%;
+    margin: -5px;
+}
+
+.delete {
+    margin-left: 10px;
+    cursor: pointer;
+    font-size: 20px;
+    color: red;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.delete:hover {
+    color: darkred;
+    transform: scale(1.1);
+}
+
+.gender-container {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.gender-container label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: 2px solid #ddd;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s ease-in-out;
+}
+
+.gender-container input[type="radio"] {
+    display: none;
+    /* Hide default radio button */
+}
+
+.gender-container label:hover {
+    background-color: #f1f1f1;
+}
+
+.gender-container input[type="radio"]:checked+label {
+    background-color: #133365;
+    color: #fff;
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.4);
+}
+
+.gender-container label svg {
+    font-size: 20px;
+}
+
+.save-btn {
+    background-color: #133365;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px; 
+    cursor: pointer; 
+    /* display: flex; */
+}
+
+.save-btn:hover {
+    background-color: #0d244a;
+}
+
+.save-btn:active {
+    transform: scale(0.95);
+    background-color: #091b33;
+}
+
+.save-btn:disabled {
+    background-color: #cccccc; /* Gray background when disabled */
+    cursor: not-allowed; /* Disable cursor when button is disabled */
+}
+
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .my-profile-section {
+        padding: 20px;
+        max-width: 100%;
+    }
+
+    .my-profile-section-header h1 {
+        font-size: 22px;
+    }
+
+    .profile-detail h3 {
+        font-size: 16px;
+    }
+
+    .profile-detail p {
+        font-size: 14px;
     }
 }

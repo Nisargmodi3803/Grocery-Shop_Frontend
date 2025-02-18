@@ -8,7 +8,6 @@ import { useNavigate } from 'react-router-dom';
 import "./LoginSignUpModal.css";
 import { useLoading } from '../Context/LoadingContext';
 
-// 1 => navigate to Home page, 2 => navigate to Product page, 3 => navigate to Brand page and 4 => navigate to SubCategory page
 
 export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle, subcategorySlugTitle }) => {
     const navigate = useNavigate();
@@ -158,7 +157,6 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
                 const timer = setTimeout(() => {
                     window.location.reload();
                     closeModal();
-                    window.location.reload();
                 }, 3000);
             }
             else {
@@ -348,6 +346,59 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
         }
     };
 
+    const handleVerifyAndLogin = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        try {
+            console.log(OTP);
+            const response = await axios.post('http://localhost:9000/verify-otp', {
+                email: formData.email,
+                otp: OTP
+            });
+
+            // If OTP is valid
+            if (response.status === 200) {
+                sessionStorage.setItem("isAuthenticated", "true");
+                sessionStorage.setItem("customerEmail", formData.email);
+                setIsAuthenticated(true);
+                setVerified(true);
+                setOtpResponse("✅ OTP is valid");
+                const timer = setTimeout(() => {
+                    window.location.reload();
+                    closeModal();
+                }, 3000);
+            }
+
+        } catch (error) {
+            if (error.response) {
+                // Handle specific errors from the backend
+                switch (error.response.status) {
+                    case 400:
+                        setOtpResponse("❌ Invalid OTP. Please try again.");
+                        break;
+                    case 404:
+                        setOtpResponse("❌ OTP not found. Please request a new one.");
+                        break;
+                    case 409:
+                        setOtpResponse("❌ OTP expired. Please request a new one.");
+                        break;
+                    default:
+                        setOtpResponse(`Please Enter Valid OTP`);
+                        break;
+                }
+            } else if (error.request) {
+                // Request was made but no response received
+                setOtpResponse("❌ No response from server. Please check your internet connection.");
+            } else {
+                // Other unexpected errors
+                setOtpResponse(`❌ Unexpected Error: ${error.message}`);
+            }
+            setVerified(false);
+        }finally{
+            setLoading(false);
+        }
+    }
+
     const handleForgotPasswordSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -384,17 +435,6 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
         }
     };
 
-    const handleLoginWithOTPSubmit = (e) => {
-        e.preventDefault();
-
-        sessionStorage.setItem("isAuthenticated", "true");
-        sessionStorage.setItem("customerEmail", formData.email);
-        setIsAuthenticated(true);
-        const timer = setTimeout(() => {
-            closeModal();
-            window.location.reload();
-        }, 3000);
-    };
 
     const validateField = (name, value) => {
         const validationErrors = { ...errors };
@@ -572,7 +612,7 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
 
                         </form>
                     ) : loginWithOTP ? (
-                        <form onSubmit={handleLoginWithOTPSubmit}>
+                        <form onSubmit={handleVerifyAndLogin}>
                             <h2>Login to your account</h2>
                             <label>Enter Email <span className="required">*</span></label>
                             <input
@@ -613,9 +653,8 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
                                     {otpSent == true ? <span className="otp-success-message">✅ OTP Send Successfully to {loginWithOTPData.email}!</span> : otpSent == false ? <span className="otp-error-message">❌ Email not found. Please register or use a different email.</span> : ""}
                                     {otpSent && (
                                         <button
-                                            type="button"
-                                            className="btn-otp"
-                                            onClick={handleVerify}>
+                                            type="submit"
+                                            className="btn-otp">
                                             Verify OTP
                                         </button>
                                     )}
@@ -623,18 +662,6 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
                                         <span className="otp-success-message">{otpResponse}</span>
                                         : verified == false ? <span className="otp-error-message">{otpResponse}</span> : ""
                                     }
-
-                                    {verified == true && (
-                                        <button type="submit" className="btn btn-primary">
-                                            Enter to your Account
-                                        </button>
-                                    )}
-
-                                    {isAuthenticated === true ? (
-                                        <span className="otp-success-message">✅ Login Successful!</span>
-                                    ) : isAuthenticated === false ? (
-                                        <span className="otp-error-message">❌ Email or Password Incorrect</span>
-                                    ) : null}
                                 </>
                             )}
                         </form>

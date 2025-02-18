@@ -52,7 +52,7 @@ export const NavRouters = () => {
         <Route path='/ecommerce/my-orders' element={<MyOrderList/>}/>
         <Route path='/ecommerce/refer-and-earn' element={<ReferAndEarn/>}/>
         <Route path='/ecommerce/coupon-code' element={<CouponCode />}/>
-        <Route path='/ecommerce/my-points' element={<MyPoints/>}/>
+        <Route path='/ecommerce/my-ecommerce' element={<MyPoints/>}/>
       </Routes>
       <Footer />
     </>
