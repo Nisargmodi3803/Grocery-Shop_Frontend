@@ -2,9 +2,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import './SubCategory.css'
 import { IoMdHome } from "react-icons/io";
 import { useNavigate, useParams } from 'react-router-dom';
+import axios from 'axios';
 import { MdOutlineStarPurple500, MdOutlineShoppingCart, MdRemoveShoppingCart } from "react-icons/md";
 import { FaRegHeart, FaHeart } from "react-icons/fa";
-import axios from 'axios';
 import { MdAccessTime, MdOutlineChatBubbleOutline } from "react-icons/md";
 import { InquiryNow } from './InquiryNow';
 import { LoginSignUpModal } from './LoginSignUpModal';
@@ -82,7 +82,7 @@ export const SubCategory = () => {
                 setProducts([]);
                 alert("Something went wrong. Please try again!");
             }
-        }finally {
+        } finally {
             setLoading(false);
         }
     };
@@ -104,7 +104,7 @@ export const SubCategory = () => {
                 console.error("Error fetching product:", error);
                 alert("Something went wrong. Please try again!");
             }
-        }finally {
+        } finally {
             setLoading(false);
         }
     };
@@ -123,7 +123,7 @@ export const SubCategory = () => {
                 console.error("Error fetching product:", error);
                 alert("Something went wrong. Please try again!");
             }
-        }finally {
+        } finally {
             setLoading(false);
         }
     }
@@ -142,7 +142,7 @@ export const SubCategory = () => {
                 console.error("Error fetching product:", error);
                 alert("Something went wrong. Please try again!");
             }
-        }finally {
+        } finally {
             setLoading(false);
         }
     }
@@ -192,7 +192,7 @@ export const SubCategory = () => {
                 setProducts([]);
                 alert("Something went wrong. Please try again!");
             }
-        }finally {
+        } finally {
             setLoading(false);
         }
     };
@@ -211,16 +211,67 @@ export const SubCategory = () => {
     }, [sortOption]);
 
 
-    const toggleLike = (productId) => {
+    useEffect(() => {
+        const fetchLikedProducts = async () => {
+            if (!isAuthenticated) return;
+
+            try {
+                const response = await axios.get(`http://localhost:9000/wishlist/${sessionStorage.getItem("customerEmail")}`);
+
+                if (response.status === 200) {
+                    const likedIds = response.data.map(item => item.product.id);
+                    const likedState = likedIds.reduce((acc, id) => {
+                        acc[id] = true;
+                        return acc;
+                    }, {});
+                    setLikedProducts(likedState);
+                }
+            } catch (error) {
+                if (error.response?.status === 404) {
+                    console.log("Customer not found");
+                } else {
+                    console.error("Error fetching liked products:", error);
+                    alert("Something went wrong in fetching Liked Products. Please try again!");
+                }
+            }
+        };
+
+        fetchLikedProducts();
+    }, [isAuthenticated]);
+
+    const toggleLike = async (productId) => {
         if (!isAuthenticated) {
             setShowLoginModal(true);
             return;
         }
-        setLikedProducts((prev) => ({
-            ...prev,
-            [productId]: !prev[productId],
-        }));
-    };
+
+        const isLiked = likedProducts[productId]; // Check if the product is already liked
+
+        try {
+            let response;
+
+            if (isLiked) {
+                response = await axios.patch(`http://localhost:9000/remove-wishlist?customerEmail=${sessionStorage.getItem("customerEmail")}&productId=${productId}`);
+            } else {
+                response = await axios.post(`http://localhost:9000/add-wishlist?customerEmail=${sessionStorage.getItem("customerEmail")}&productId=${productId}`);
+            }
+
+            if (response.status === 200) {
+                console.log(`Product ${isLiked ? "disliked" : "liked"} successfully`);
+                setLikedProducts((prev) => ({
+                    ...prev,
+                    [productId]: !isLiked,
+                }));
+            }
+        } catch (error) {
+            if (error.response?.status === 404) {
+                console.log("Customer not found");
+            } else {
+                console.error(`Error ${isLiked ? "disliking" : "liking"} product:`, error);
+                alert(`Something went wrong in ${isLiked ? "disliking" : "liking"} the product. Please try again!`);
+            }
+        }
+    };;
 
     const toggleCartState = (productId) => {
         if (!isAuthenticated) {

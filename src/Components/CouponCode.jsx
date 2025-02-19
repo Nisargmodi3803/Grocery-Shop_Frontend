@@ -14,6 +14,7 @@ import { MdCurrencyRupee } from "react-icons/md";
 import { RiCouponLine } from "react-icons/ri";
 import { BsCreditCard2Back } from "react-icons/bs";
 import { MdLock } from "react-icons/md";
+import Swal from 'sweetalert2';
 
 const importAll = (r) => {
   let images = {};
@@ -110,22 +111,38 @@ export const CouponCode = () => {
     }
   };
 
+  const deleteProfileImageAlert = async () => {
+    return await Swal.fire({
+      title: "Are you sure you want to delete this Profile Image?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+      cancelButtonText: "No",
+      confirmButtonColor: "green",
+      cancelButtonColor: "red",
+    });
+  };
+
   const handleDeleteClick = async () => {
-    // setLoading(true);
-    console.log("Handle Delete Click Call");
-    if (image !== 'default.png') {
-      try {
-        const response = await axios.patch(`http://localhost:9000/delete-profile-image/${sessionStorage.getItem("customerEmail")}`);
-        if (response.status === 200) {
-          console.log('Image deleted successfully:', response.data);
-          setImage('default.png');  // Update the image if successful
-        }
-      } catch (error) {
-        if (error.response.status === 404) {
-          console.log("Customer not found");
-        } else {
-          console.error('Error deleting image:', error);
-          alert("Something went wrong with image deletion. Please try again!");
+    const result = await deleteProfileImageAlert(); // Await the user's response
+
+    if (result.isConfirmed) {
+      if (image !== 'default.png') {
+        try {
+          const response = await axios.patch(`http://localhost:9000/delete-profile-image/${sessionStorage.getItem("customerEmail")}`);
+          if (response.status === 200) {
+            console.log('Image deleted successfully:', response.data);
+            setImage('default.png'); // Update the image after deletion
+            Swal.fire("Deleted!", "Your profile image has been deleted.", "success");
+          }
+        } catch (error) {
+          if (error.response?.status === 404) {
+            console.log("Customer not found");
+            Swal.fire("Error", "Customer not found.", "error");
+          } else {
+            console.error('Error deleting image:', error);
+            Swal.fire("Error", "Something went wrong. Please try again!", "error");
+          }
         }
       }
     }
@@ -136,13 +153,29 @@ export const CouponCode = () => {
     document.getElementById("file-input").click(); // Trigger the file input on edit click
   };
 
-  const handleLogout = () => {
-    sessionStorage.removeItem("isAuthenticated");
-    sessionStorage.removeItem("customerEmail");
-    sessionStorage.removeItem("cartCount");
-    sessionStorage.removeItem("customerData");
-    navigate("/ecommerce/");
-    window.location.reload();
+  const logoutAlert = async () => {
+    return await Swal.fire({
+      title: "Are you sure you want to Logout?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+      cancelButtonText: "No",
+      confirmButtonColor: "green",
+      cancelButtonColor: "red",
+    });
+  };
+
+  const handleLogout = async () => {
+    const result = await logoutAlert();
+    if (result.isConfirmed) {
+      sessionStorage.removeItem("isAuthenticated");
+      sessionStorage.removeItem("customerEmail");
+      sessionStorage.removeItem("cartCount");
+      sessionStorage.removeItem("customerData");
+      await Swal.fire("Logged Out!", "You have been logged out.", "success");
+      navigate("/ecommerce/");
+      window.location.reload();
+    }
   };
 
   const closeModal = () => {

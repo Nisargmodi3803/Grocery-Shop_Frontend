@@ -76,8 +76,35 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
             [name]: value,
         }));
         // console.log(forgotPasswordData);
-        validateField(name, value);
+        validateForgotPassword(name, value);
     };
+
+    const validateForgotPassword = (name, value) => {
+        const validationErrors = { ...emailErrors };
+
+        if (name === "password") {
+            if (value.length < 4 || value.length > 15) {
+                validationErrors.password = "Password must be between 4 to 15 characters";
+            } else {
+                delete validationErrors.password;
+            }
+            if (forgotPasswordData.confirmPassword && value !== forgotPasswordData.confirmPassword) {
+                validationErrors.confirmPassword = "Passwords do not match";
+            } else {
+                delete validationErrors.confirmPassword;
+            }
+        }
+
+        if (name === "confirmPassword") {
+            if (value !== forgotPasswordData.password) {
+                validationErrors.confirmPassword = "Passwords do not match";
+            } else {
+                delete validationErrors.confirmPassword;
+            }
+        }
+
+        setErrors(validationErrors);
+    }
 
     const handleForgotPasswordEmailChange = (e) => {
         const { name, value } = e.target;

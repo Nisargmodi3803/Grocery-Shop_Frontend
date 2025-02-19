@@ -37,8 +37,8 @@ export const Brand = () => {
     const [brandName, setBrandName] = useState('');
     const [brands, setBrands] = useState([]);
     const [sortOption, setSortOption] = useState("");
-    const {setLoading} = useLoading();
-    
+    const { setLoading } = useLoading();
+
     const handleSortChange = (event) => {
         setSortOption(event.target.value);
     };
@@ -73,7 +73,7 @@ export const Brand = () => {
                 console.error("Error fetching product:", error);
                 alert("Something went wrong. Please try again!");
             }
-        }finally{
+        } finally {
             setLoading(false);
         }
     };
@@ -93,7 +93,7 @@ export const Brand = () => {
                 console.error("Error fetching product:", error);
                 alert("Something went wrong. Please try again!");
             }
-        }finally{
+        } finally {
             setLoading(false);
         }
     };
@@ -112,15 +112,15 @@ export const Brand = () => {
                 console.error(error);
                 alert("Something went wrong. Please try again!");
             }
-        }finally{
+        } finally {
             setLoading(false);
         }
     };
 
     const fetchSortedProducts = async () => {
         let api = "";
-    
-        switch(sortOption){
+
+        switch (sortOption) {
             case "Sort by: Recommended":
                 api = `http://localhost:9000/products-brand-title/${brandSlugTitle}`;
                 break;
@@ -159,11 +159,11 @@ export const Brand = () => {
                 console.error("Error fetching product:", error);
                 alert("Something went wrong. Please try again!");
             }
-        }finally{
+        } finally {
             setLoading(false);
         }
     };
-    
+
 
     const brandScrollRef = useRef(null);
 
@@ -185,28 +185,79 @@ export const Brand = () => {
     useEffect(() => {
         if (sortOption) {
             fetchSortedProducts();
-        }else{
+        } else {
             fetchProductsByBrand();
         }
     }, [sortOption]);
 
     useEffect(() => {
-        setLoading(true); 
-        const timer = setTimeout(() => setLoading(false), 1000); 
-    
+        setLoading(true);
+        const timer = setTimeout(() => setLoading(false), 1000);
+
         return () => clearTimeout(timer);
-      }, [setLoading]);
+    }, [setLoading]);
 
 
-    const toggleLike = (productId) => {
+    useEffect(() => {
+        const fetchLikedProducts = async () => {
+            if (!isAuthenticated) return;
+
+            try {
+                const response = await axios.get(`http://localhost:9000/wishlist/${sessionStorage.getItem("customerEmail")}`);
+
+                if (response.status === 200) {
+                    const likedIds = response.data.map(item => item.product.id);
+                    const likedState = likedIds.reduce((acc, id) => {
+                        acc[id] = true;
+                        return acc;
+                    }, {});
+                    setLikedProducts(likedState);
+                }
+            } catch (error) {
+                if (error.response?.status === 404) {
+                    console.log("Customer not found");
+                } else {
+                    console.error("Error fetching liked products:", error);
+                    alert("Something went wrong in fetching Liked Products. Please try again!");
+                }
+            }
+        };
+
+        fetchLikedProducts();
+    }, [isAuthenticated]);
+
+    const toggleLike = async (productId) => {
         if (!isAuthenticated) {
             setShowLoginModal(true);
             return;
         }
-        setLikedProducts((prev) => ({
-            ...prev,
-            [productId]: !prev[productId],
-        }));
+
+        const isLiked = likedProducts[productId]; // Check if the product is already liked
+
+        try {
+            let response;
+
+            if (isLiked) {
+                response = await axios.patch(`http://localhost:9000/remove-wishlist?customerEmail=${sessionStorage.getItem("customerEmail")}&productId=${productId}`);
+            } else {
+                response = await axios.post(`http://localhost:9000/add-wishlist?customerEmail=${sessionStorage.getItem("customerEmail")}&productId=${productId}`);
+            }
+
+            if (response.status === 200) {
+                console.log(`Product ${isLiked ? "disliked" : "liked"} successfully`);
+                setLikedProducts((prev) => ({
+                    ...prev,
+                    [productId]: !isLiked,
+                }));
+            }
+        } catch (error) {
+            if (error.response?.status === 404) {
+                console.log("Customer not found");
+            } else {
+                console.error(`Error ${isLiked ? "disliking" : "liking"} product:`, error);
+                alert(`Something went wrong in ${isLiked ? "disliking" : "liking"} the product. Please try again!`);
+            }
+        }
     };
 
     const toggleCartState = (productId) => {

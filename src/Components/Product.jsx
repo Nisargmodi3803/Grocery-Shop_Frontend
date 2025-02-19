@@ -71,7 +71,7 @@ export default function Product() {
                     console.error("Error fetching product:", error);
                     alert("Something went wrong. Please try again!");
                 }
-            }finally{
+            } finally {
                 setLoading(false);
             }
         };
@@ -93,7 +93,7 @@ export default function Product() {
                 }
             } catch (error) {
                 console.error("Error fetching related categories:", error);
-            }finally{
+            } finally {
                 setLoading(false);
             }
         };
@@ -117,6 +117,50 @@ export default function Product() {
         setInquiryProductId(null);
         setInquiryProductSlugTitle(null);
     };
+
+    useEffect(() => {
+        const fetchLikedStatus = async () => {
+            if (!isAuthenticated) return;
+
+            try {
+                const response = await axios.get(`http://localhost:9000/wishlist/${sessionStorage.getItem("customerEmail")}`);
+
+                if (response.status === 200) {
+                    const likedIds = response.data.map(item => item.product.id);
+                    setLikedProduct(likedIds.find(id => id===product.id));
+                }
+            } catch (error) {
+                console.error("Error fetching liked product status:", error);
+            }
+        };
+
+        fetchLikedStatus();
+    }, [isAuthenticated, product]);
+
+    const toggleLike = async (productId) => {
+        if (!isAuthenticated) {
+            setShowLoginModal(true);
+            return;
+        }
+
+        try {
+            let response;
+            if (likedProduct) {
+                response = await axios.patch(`http://localhost:9000/remove-wishlist?customerEmail=${sessionStorage.getItem("customerEmail")}&productId=${productId}`);
+            } else {
+                response = await axios.post(`http://localhost:9000/add-wishlist?customerEmail=${sessionStorage.getItem("customerEmail")}&productId=${productId}`);
+            }
+
+            if (response.status === 200) {
+                console.log(`Product ${likedProduct ? "disliked" : "liked"} successfully`);
+                setLikedProduct(!likedProduct); // Toggle state
+            }
+        } catch (error) {
+            console.error(`Error ${likedProduct ? "disliking" : "liking"} product:`, error);
+            alert(`Something went wrong in ${likedProduct ? "disliking" : "liking"} the product. Please try again!`);
+        }
+    };
+
 
     if (!product) {
         return (
@@ -163,9 +207,10 @@ export default function Product() {
             <section className='product-content-section'>
                 <div className='product-content-image-section'>
                     <img src={imageSrc} alt={product.name} loading='lazy' />
-                    <span className='product-content-likebtn' onClick={() => setLikedProduct(!likedProduct)}>
+                    <span className='product-content-likebtn' onClick={() => toggleLike(product.id)}>
                         {likedProduct ? <FaHeart color='red' /> : <FaHeart color='grey' />}
                     </span>
+
                 </div>
 
                 <div className='product-content-details-section'>

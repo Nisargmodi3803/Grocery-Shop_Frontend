@@ -1,4 +1,4 @@
-import './MyOrderList.css'
+import './ChangePassword.css'
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { ImageModal } from './ImageModal';
@@ -15,6 +15,12 @@ import { RiCouponLine } from "react-icons/ri";
 import { BsCreditCard2Back } from "react-icons/bs";
 import { MdLock } from "react-icons/md";
 import { MdOutlineMail } from "react-icons/md";
+import { PiPasswordBold } from "react-icons/pi";
+import { TbPasswordMobilePhone } from "react-icons/tb";
+import { GiConfirmed } from "react-icons/gi";
+import { FaEye } from "react-icons/fa";
+import { FaEyeSlash } from "react-icons/fa";
+import Swal from 'sweetalert2';
 
 const importAll = (r) => {
   let images = {};
@@ -36,6 +42,23 @@ export const ChangePassword = () => {
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
   const { setLoading } = useLoading();
+  const [showPassword, setShowPassword] = useState(false);
+  const [changePassword, setChangePassword] = useState({
+    oldPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [success, setSuccess] = useState();
+  const [message, setMessage] = useState('');
+  const [errors, setErrors] = useState({
+    oldPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   const fetchCustomerDetails = async () => {
     setLoading(true);
@@ -111,22 +134,38 @@ export const ChangePassword = () => {
     }
   };
 
+  const deleteProfileImageAlert = async () => {
+    return await Swal.fire({
+      title: "Are you sure you want to delete this Profile Image?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+      cancelButtonText: "No",
+      confirmButtonColor: "green",
+      cancelButtonColor: "red",
+    });
+  };
+
   const handleDeleteClick = async () => {
-    // setLoading(true);
-    console.log("Handle Delete Click Call");
-    if (image !== 'default.png') {
-      try {
-        const response = await axios.patch(`http://localhost:9000/delete-profile-image/${sessionStorage.getItem("customerEmail")}`);
-        if (response.status === 200) {
-          console.log('Image deleted successfully:', response.data);
-          setImage('default.png');  // Update the image if successful
-        }
-      } catch (error) {
-        if (error.response.status === 404) {
-          console.log("Customer not found");
-        } else {
-          console.error('Error deleting image:', error);
-          alert("Something went wrong with image deletion. Please try again!");
+    const result = await deleteProfileImageAlert(); // Await the user's response
+
+    if (result.isConfirmed) {
+      if (image !== 'default.png') {
+        try {
+          const response = await axios.patch(`http://localhost:9000/delete-profile-image/${sessionStorage.getItem("customerEmail")}`);
+          if (response.status === 200) {
+            console.log('Image deleted successfully:', response.data);
+            setImage('default.png'); // Update the image after deletion
+            Swal.fire("Deleted!", "Your profile image has been deleted.", "success");
+          }
+        } catch (error) {
+          if (error.response?.status === 404) {
+            console.log("Customer not found");
+            Swal.fire("Error", "Customer not found.", "error");
+          } else {
+            console.error('Error deleting image:', error);
+            Swal.fire("Error", "Something went wrong. Please try again!", "error");
+          }
         }
       }
     }
@@ -137,18 +176,109 @@ export const ChangePassword = () => {
     document.getElementById("file-input").click(); // Trigger the file input on edit click
   };
 
-  const handleLogout = () => {
-    sessionStorage.removeItem("isAuthenticated");
-    sessionStorage.removeItem("customerEmail");
-    sessionStorage.removeItem("cartCount");
-    sessionStorage.removeItem("customerData");
-    navigate("/ecommerce/");
-    window.location.reload();
+  const logoutAlert = async () => {
+    return await Swal.fire({
+      title: "Are you sure you want to Logout?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+      cancelButtonText: "No",
+      confirmButtonColor: "green",
+      cancelButtonColor: "red",
+    });
+  };
+
+  const handleLogout = async () => {
+    const result = await logoutAlert();
+    if (result.isConfirmed) {
+      sessionStorage.removeItem("isAuthenticated");
+      sessionStorage.removeItem("customerEmail");
+      sessionStorage.removeItem("cartCount");
+      sessionStorage.removeItem("customerData");
+      await Swal.fire("Logged Out!", "You have been logged out.", "success");
+      navigate("/ecommerce/");
+      window.location.reload();
+    }
   };
 
   const closeModal = () => {
     setShowModal(false);
   };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setChangePassword((prevData) => ({
+      ...prevData,
+      [name]: value
+    }));
+
+    verifyChange(name, value);
+  }
+
+  const verifyChange = (name, value) => {
+    const validationErrors = { ...errors };
+
+    if (name === "newPassword") {
+      if (changePassword.oldPassword) {
+        if (value.length < 4 || value.length > 15) {
+          validationErrors.password = "Password must be between 4 to 15 characters";
+        } else {
+          delete validationErrors.password;
+        }
+        if (changePassword.confirmPassword && value !== changePassword.confirmPassword) {
+          validationErrors.confirmPassword = "Passwords do not match";
+        } else {
+          delete validationErrors.confirmPassword;
+        }
+        if (changePassword.oldPassword && value === changePassword.oldPassword) {
+          validationErrors.oldPassword = "New Password cannot be same as Old Password";
+        } else {
+          delete validationErrors.oldPassword;
+        }
+      } else {
+        validationErrors.oldPassword = "Old Password is required";
+      }
+    }
+
+    if (name === "confirmPassword") {
+      if (value !== changePassword.newPassword) {
+        validationErrors.confirmPassword = "Passwords do not match";
+      } else {
+        delete validationErrors.confirmPassword;
+      }
+    }
+
+    setErrors(validationErrors);
+  }
+
+  const handeChangePassword = async () => {
+    try {
+      const response = await axios.patch(`http://localhost:9000/change-password/${sessionStorage.getItem("customerEmail")}`, {
+        oldPassword: changePassword.oldPassword,
+        newPassword: changePassword.newPassword
+      });
+
+      if (response.status === 200) {
+        setSuccess(true);
+        setMessage("Password Changed Successfully!");
+        setTimeout(() => {
+          window.location.reload();
+        }, 3000);
+      }
+    } catch (error) {
+      if (error.response.status === 401) {
+        setSuccess(false);
+        setMessage("Old Password is incorrect!");
+      } else if (error.response.status === 404) {
+        setSuccess(false);
+        setMessage("Customer not found!");
+      } else {
+        console.error("Error changing password:", error);
+        alert("Something went wrong in changing Password. Please try again!");
+      }
+    }
+  }
+
   return (
     <div className='my-wishlist'>
       <div className='profile-section'>
@@ -241,11 +371,70 @@ export const ChangePassword = () => {
             <h1>CHANGE PASSWORD</h1>
           </div>
           <div className='my-profile-section-body'>
-            <div className='profile-detail'> 
-              <h3><MdOutlineMail/> EMAIL ADDRESS</h3>
-              {/* <input 
+            <div className='profile-detail'>
+              <h3><MdOutlineMail /> EMAIL ADDRESS</h3>
+              <p>{customer.customerEmail}</p>
 
-              /> */}
+              <h3><PiPasswordBold /> OLD PASSWORD</h3>
+              <div className='password-container'>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder='ENTER YOUR OLD PASSWORD'
+                  className='input-field'
+                  name='oldPassword'
+                  onChange={(e) => handleInputChange(e)}
+                />
+                <button type="button" className="toggle-btn" onClick={togglePasswordVisibility}>
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
+              {errors.oldPassword && <span className='error'>{errors.oldPassword}</span>}
+
+              <h3><TbPasswordMobilePhone /> NEW PASSWORD</h3>
+              <div className='password-container'>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder='ENTER YOUR NEW PASSWORD'
+                  className='input-field'
+                  name='newPassword'
+                  onChange={(e) => handleInputChange(e)}
+                />
+                <button type="button" className="toggle-btn" onClick={togglePasswordVisibility}>
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
+              {errors.password && <span className='error'>{errors.password}</span>}
+
+
+              <h3><GiConfirmed /> CONFIRM PASSWORD</h3>
+              <div className='password-container'>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder='CONFIRM PASSWORD'
+                  className='input-field'
+                  name='confirmPassword'
+                  onChange={(e) => handleInputChange(e)}
+                />
+                <button type="button" className="toggle-btn" onClick={togglePasswordVisibility}>
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
+              {errors.confirmPassword && <span className='error'>{errors.confirmPassword}</span>}
+
+              {changePassword.oldPassword && changePassword.newPassword && changePassword.confirmPassword && !errors.oldPassword && !errors.password && !errors.confirmPassword
+                && <button
+                  className="save-btn"
+                  onClick={() => { handeChangePassword() }}
+                  >
+                  CHANGE PASSWORD
+                </button>
+              }
+
+              <div>
+                {success === true && <span className='otp-success-message'>✅ {message}</span>}
+                {success === false && <span className='otp-error-message'>❌ {message}</span>}
+              </div>
+
             </div>
           </div>
         </div>

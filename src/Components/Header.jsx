@@ -11,6 +11,7 @@ import axios from 'axios';
 import { useLoading } from '../Context/LoadingContext';
 import companyLogo from '../assets/Logo/060622034612bits.png';
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 export const Header = () => {
     const [showModal, setShowModal] = useState(false);
@@ -104,15 +105,32 @@ export const Header = () => {
         if (cartCount > 0) setCartCount(cartCount - 1);
     };
 
-    const handleLogout = () => {
-        sessionStorage.removeItem("isAuthenticated");
-        sessionStorage.removeItem("customerEmail");
-        sessionStorage.removeItem("cartCount");
-        sessionStorage.removeItem("customerData");
-        setIsAuthenticated(false);
-        setCustomerEmail("");
-        setCartCount(0);
-        window.location.reload();
+    const logoutAlert = async () => {
+        return await Swal.fire({
+            title: "Are you sure you want to Logout?",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: "Yes",
+            cancelButtonText: "No",
+            confirmButtonColor: "green",
+            cancelButtonColor: "red",
+        });
+    };
+
+    const handleLogout = async () => {
+        const result = await logoutAlert();
+        if (result.isConfirmed) {
+            sessionStorage.removeItem("isAuthenticated");
+            sessionStorage.removeItem("customerEmail");
+            sessionStorage.removeItem("cartCount");
+            sessionStorage.removeItem("customerData");
+            setIsAuthenticated(false);
+            setCustomerEmail("");
+            setCartCount(0);
+            await Swal.fire("Logged Out!", "You have been logged out.", "success");
+            navigate("/ecommerce/");
+            window.location.reload();
+        }
     };
 
     return (
