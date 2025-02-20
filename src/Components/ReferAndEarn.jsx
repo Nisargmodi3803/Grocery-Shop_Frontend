@@ -15,6 +15,7 @@ import { RiCouponLine } from "react-icons/ri";
 import { BsCreditCard2Back } from "react-icons/bs";
 import { MdLock } from "react-icons/md";
 import Swal from 'sweetalert2';
+import referEarnImage from "../assets/Logo/refer.png";
 
 const importAll = (r) => {
   let images = {};
@@ -36,11 +37,12 @@ export const ReferAndEarn = () => {
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
   const { setLoading } = useLoading();
+  const [copied, setCopied] = useState(false);
 
   const fetchCustomerDetails = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`http://localhost:9000/profile/${sessionStorage.getItem("customerEmail")}`);
+      const response = await axios.get(`http://localhost:9000/customer-email/${sessionStorage.getItem("customerEmail")}`);
       if (response.status === 200) {
         setCustomer(response.data);
         setImage(response.data.customerImage || 'default.png');
@@ -59,6 +61,12 @@ export const ReferAndEarn = () => {
 
   useEffect(() => {
     fetchCustomerDetails();
+  }, []);
+
+  useEffect(() => {
+    if (!sessionStorage.getItem("isAuthenticated")) {
+      navigate("/ecommerce/");
+    }
   }, []);
 
   const handleImageChange = async (event) => {
@@ -165,14 +173,6 @@ export const ReferAndEarn = () => {
     });
   };
 
-/*************  ✨ Codeium Command ⭐  *************/
-  /**
-   * Logs out the user from the application and redirects them to the root URL ('/ecommerce/').
-   * This function is called when the user clicks on the logout button.
-   * It shows a confirmation dialog to the user and if they confirm, it removes the authentication
-   * related session storage items and shows a success message before redirecting and reloading the page.
-   */
-/******  290630e0-e67f-458f-9e51-4127cca86561  *******/
   const handleLogout = async () => {
     const result = await logoutAlert();
     if (result.isConfirmed) {
@@ -189,6 +189,33 @@ export const ReferAndEarn = () => {
   const closeModal = () => {
     setShowModal(false);
   };
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(customer.customerReferralCode)
+      .then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 4000);
+      })
+      .catch((err) => console.error("Failed to copy:", err));
+  };
+
+  const shareText = `🎉 Join me on this amazing shopping platform! 🛍️\n\n
+Sign up using my referral code: *${customer.customerReferralCode}* to get exciting rewards. 💰\n\n
+Join now 👇\nhttp://localhost:3000/ecommerce/`;
+
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: "Join & Earn Rewards! 🎁",
+        text: shareText,
+      })
+        .then(() => console.log("Shared successfully"))
+        .catch((error) => console.error("Error sharing:", error));
+    } else {
+      alert("Sharing is not supported on this device.");
+    }
+  };
+
   return (
     <div className='my-wishlist'>
       <div className='profile-section'>
@@ -277,7 +304,36 @@ export const ReferAndEarn = () => {
         </div>
 
         <div className='my-profile-section'>
-          {/* Profile information can go here */}
+          <div className='my-profile-section-header'>
+            <h1>REFER A FRIEND & EARN ECOMMERCE POINTS</h1>
+          </div>
+          <div className='my-profile-section-body'>
+            <div className='profile-detail'>
+              <div className='refer-earn-image'>
+                <img
+                  src={referEarnImage}
+                  alt='refer-earn-image'
+                />
+              </div>
+
+              <h2>REFFER MORE TO EARN MORE</h2>
+              <div className='refer-earn-text'>
+                <label>
+                  You can earn more Ecommerce's Points by referring your friends to Ecommerce's App. Send them your referral code...
+                </label>
+              </div>
+
+              <div className='refer-code'>
+                <h1>{customer.customerReferralCode}</h1>
+              </div>
+
+              <button onClick={handleCopy} className="copy-btn">
+                {copied ? "COPIED!" : "COPY"}
+              </button>
+
+              <button onClick={handleShare} className='copy-btn'>SHARE</button>
+            </div>
+          </div>
         </div>
         <input
           id="file-input"

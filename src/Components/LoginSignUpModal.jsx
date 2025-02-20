@@ -7,6 +7,7 @@ import axios, { HttpStatusCode } from 'axios';
 import { useNavigate } from 'react-router-dom';
 import "./LoginSignUpModal.css";
 import { useLoading } from '../Context/LoadingContext';
+import Swal from 'sweetalert2';
 
 
 export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle, subcategorySlugTitle }) => {
@@ -44,6 +45,9 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
     const mobileRegex = /^[6-9]\d{9}$/;
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     const { setLoading } = useLoading();
+    const [registrationMessage, setRegistrationMessage] = useState("");
+    const [referralCodeExist, setReferralCodeExist] = useState();
+    const [customerPointConfirmation, setCustomerPointConfirmation] = useState(false);
 
     // useEffect(() => {
     //     setLoading(true);
@@ -198,7 +202,7 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
                 console.error(error);
                 alert('Login Failed');
             }
-        }finally{
+        } finally {
             setLoading(false);
         }
     };
@@ -219,20 +223,116 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
                 sessionStorage.setItem("isAuthenticated", "true");
                 sessionStorage.setItem("customerEmail", formData.email);
                 setIsAuthenticated(true);
+                setRegistrationMessage("✅ Registration Successful!");
+
+                try {
+                    await axios.get(`http://localhost:9000/customer-email/${formData.email}`);
+                } catch (error) {
+                    if (error.response?.status === 404) {
+                        console.error("Customer not found. Cannot assign points.");
+                        return;  // Stop execution if customer doesn't exist
+                    } else {
+                        console.error("Error checking customer existence:", error);
+                    }
+                }
+
+                if (formData.referralCode != "") {
+                    try {
+                        const response = await axios.post(`http://localhost:9000/customer-point/${formData.email}`, {
+                            points: 25.00,
+                            details: "Welcome Points : 25.00 Points",
+                            pointType: 1
+                        });
+
+                        if (response.status === 200) {
+                            setLoading(false);
+                            await Swal.fire({
+                                title: "Information",
+                                text: "Welcome Points: 25.00 Points Given",
+                                icon: "success",
+                                confirmButtonText: "OK"
+                            });
+                            setLoading(true);
+                        }
+                    } catch (error) {
+                        if (error.response.status === 404) {
+                            setCustomerPointConfirmation(false);
+                        } else {
+                            console.error(error);
+                            alert('something went wrong in customer points!!!');
+                        }
+                    }
+
+                    try {
+                        const response = await axios.get(`http://localhost:9000/customer-referral-code?referralCode=${formData.referralCode}`);
+                        if (response.status === 200) {
+                            const email = response.data.customerEmail;
+
+                            try {
+                                const response = await axios.post(`http://localhost:9000/customer-point/${email}`, {
+                                    points: 15.00,
+                                    details: "Referral Points : 15.00 Points",
+                                    pointType: 1
+                                });
+                            } catch (error) {
+                                if (error.response.status === 404) {
+                                    console.log(error.response.data);
+                                } else {
+                                    console.error(error);
+                                    alert('something went wrong in customer points!!!');
+                                }
+                            }
+                        }
+                    } catch (error) {
+                        if (error.response.status === 404) {
+                            console.log("Customer not found fuck");
+                        } else {
+                            console.error(error);
+                            alert('something went wrong in customer points!!!');
+                        }
+                    }
+                } else {
+                    try {
+                        const response = await axios.post(`http://localhost:9000/customer-point/${formData.email}`, {
+                            points: 25.00,
+                            details: "Welcome Points : 25.00 Points",
+                            pointType: 1
+                        });
+
+                        if (response.status === 200) {
+                            setLoading(false);
+                            await Swal.fire({
+                                title: "Information",
+                                text: "Welcome Points: 25.00 Points Given",
+                                icon: "success",
+                                confirmButtonText: "OK"
+                            });
+                            setLoading(true);
+                        }
+                    } catch (error) {
+                        if (error.response.status === 404) {
+                            setCustomerPointConfirmation(false);
+                            console.log(error.response.data);
+                        } else {
+                            console.error(error);
+                            alert('something went wrong in customer points!!!');
+                        }
+                    }
+                }
 
                 const timer = setTimeout(() => {
-                    window.location.reload();
                     closeModal();
                     window.location.reload();
                 }, 3000);
             }
             else {
                 setIsAuthenticated(false);
+                setRegistrationMessage("❌ Registration Failed!");
             }
         } catch (error) {
             console.error(error);
             alert('Registration Failed');
-        }finally{
+        } finally {
             setLoading(false);
         }
     };
@@ -262,39 +362,69 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
                     console.error(error);
                     alert('OTP sending failed due to network or server error');
                 }
-            }finally{
+            } finally {
                 setLoading(false);
             }
         }
         else { // Registration with OTP
             setLoading(true);
-            try {
-                const response = await axios.post('http://localhost:9000/send-email-registration', {
-                    email: formData.email,
-                    name: formData.name
-                });
 
-                if (response.status === 200) {
-                    setOtpSent(true);
-                } else {
-                    setOtpSent(false);
-                    alert('Something went wrong. Please try again!');
+            if (formData.referralCode != "") {
+                try {
+                    const referralResponse = await axios.get(
+                        `http://localhost:9000/check-referral-code?referralCode=${formData.referralCode}`
+                    );
+
+                    if (referralResponse.status === 200) {
+                        // Referral Code exists, proceed with email sending
+                        setReferralCodeExist(true);
+
+                        const response = await axios.post('http://localhost:9000/send-email-registration', {
+                            email: formData.email,
+                            name: formData.name
+                        });
+
+                        if (response.status === 200) {
+                            setOtpSent(true);
+                        } else {
+                            setOtpSent(false);
+                            alert('Something went wrong. Please try again!');
+                        }
+                    }
+                } catch (error) {
+                    if (error.response?.status === 404) {
+                        setReferralCodeExist(false);
+                        setRegistrationMessage("Referral Code does not exist");
+                    } else {
+                        console.error(error);
+                        alert('Something went wrong in referral Code. Please try again!');
+                    }
+                } finally {
+                    setLoading(false);
                 }
-            } catch (error) {
-                if (error.response) {
-                    if (error.response.status === 409) {
+            } else {
+                try {
+                    const response = await axios.post('http://localhost:9000/send-email-registration', {
+                        email: formData.email,
+                        name: formData.name
+                    });
+
+                    if (response.status === 200) {
+                        setOtpSent(true);
+                    } else {
+                        setOtpSent(false);
+                        alert('Something went wrong. Please try again!');
+                    }
+                } catch (error) {
+                    if (error.response?.status === 409) {
                         setOtpSent(false);
                     } else {
-                        alert(`Error: ${error.response.status}`);
+                        alert(`Error: ${error.response?.status || "Unknown error"}`);
                     }
-                } else {
-                    console.error(error);
-                    alert('OTP sending failed due to network or server error');
+                } finally {
+                    setLoading(false);
                 }
-            }finally{
-                setLoading(false);
             }
-
         }
     };
 
@@ -323,7 +453,7 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
                 console.error(error);
                 alert('OTP sending failed due to network or server error');
             }
-        }finally{
+        } finally {
             setLoading(false);
         }
     }
@@ -368,7 +498,7 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
                 setOtpResponse(`❌ Unexpected Error: ${error.message}`);
             }
             setVerified(false);
-        }finally{
+        } finally {
             setLoading(false);
         }
     };
@@ -421,7 +551,7 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
                 setOtpResponse(`❌ Unexpected Error: ${error.message}`);
             }
             setVerified(false);
-        }finally{
+        } finally {
             setLoading(false);
         }
     }
@@ -457,7 +587,7 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
                 console.error(error);
                 alert('Password Change Failed');
             }
-        }finally{
+        } finally {
             setLoading(false);
         }
     };
@@ -934,6 +1064,7 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
                                         value={OTP}
                                         onChange={(e) => setOTP(e.target.value)}
                                     />
+                                    {referralCodeExist === false && <span className='otp-error-message'>{registrationMessage}</span>}
                                     {otpSent == true ? <span className="otp-success-message">✅ OTP Send Successfully!</span> : ""}
                                     {otpSent == false ? <span className="otp-error-message">❌ Email already registered. Please login or use a different email. </span> : ""}
                                     {otpSent && (
@@ -966,9 +1097,9 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
                                         Create Your Account
                                     </button>
                                     {isAuthenticated === true && Object.keys(errors).length === 0 && formData.email && formData.password && formData.confirmPassword && formData.mobileNumber && OTP ? (
-                                        <span className="otp-success-message">✅ Registration Successful!</span>
+                                        <span className="otp-success-message">{registrationMessage}</span>
                                     ) : isAuthenticated === false ? (
-                                        <span className="otp-error-message">❌ Email Already Exist!</span>
+                                        <span className="otp-error-message">{registrationMessage}</span>
                                     ) : null}
                                 </div>
                             )}

@@ -22,6 +22,7 @@ export const Header = () => {
     const { setLoading } = useLoading();
     const navigate = useNavigate();
 
+    // Fetch customer details if authenticated
     const fetchCustomerDetails = async () => {
         if (isAuthenticated && customerEmail) {
             try {
@@ -29,10 +30,6 @@ export const Header = () => {
                 const response = await axios.get(`http://localhost:9000/customer-email/${customerEmail}`);
                 if (response.status === 200) {
                     setCustomerDetails(response.data);
-                    console.log("Customer Name: ", response.data.customerName);
-                    console.log("Customer Email: ", response.data.customerEmail);
-                } else {
-                    console.log("Error fetching customer details");
                 }
             } catch (error) {
                 console.error("Error fetching customer details:", error);
@@ -42,22 +39,20 @@ export const Header = () => {
         }
     };
 
+    // Load session storage data on mount
     useEffect(() => {
         const storedAuth = sessionStorage.getItem("isAuthenticated");
         const storedCustomerEmail = sessionStorage.getItem("customerEmail");
         const storedCartCount = sessionStorage.getItem("cartCount");
 
-        if (storedAuth === "true" && storedCustomerEmail != null) {
+        if (storedAuth === "true" && storedCustomerEmail) {
             setIsAuthenticated(true);
             setCustomerEmail(storedCustomerEmail);
         }
 
         if (storedCartCount) {
-            setCartCount(parseInt(storedCartCount, 10)); // Set cart count from sessionStorage
+            setCartCount(parseInt(storedCartCount, 10));
         }
-
-        console.log("Email : " + storedCustomerEmail);
-
     }, []);
 
     useEffect(() => {
@@ -66,20 +61,25 @@ export const Header = () => {
         }
     }, [isAuthenticated, customerEmail]);
 
+    // Sync cartCount state with sessionStorage when it changes
     useEffect(() => {
-        sessionStorage.setItem("cartCount", cartCount.toString());
-    }, [cartCount]);
+        const handleStorageChange = () => {
+            const storedCartCount = sessionStorage.getItem("cartCount");
+            setCartCount(storedCartCount ? parseInt(storedCartCount, 10) : 0);
+        };
 
-    useEffect(() => {
-        setLoading(true);
-        const timer = setTimeout(() => setLoading(false), 1000);
+        // Listen for changes in sessionStorage
+        window.addEventListener("storage", handleStorageChange);
 
-        return () => clearTimeout(timer);
-    }, [setLoading]);
+        // Run on component mount
+        handleStorageChange();
 
-    const handleSearchClick = () => {
-        alert("Search Button Clicked");
-    };
+        return () => {
+            window.removeEventListener("storage", handleStorageChange);
+        };
+    }, []);
+
+
 
     const handleCart = () => {
         if (!isAuthenticated) {
@@ -97,16 +97,8 @@ export const Header = () => {
         setShowModal(false);
     };
 
-    const addToCart = () => {
-        setCartCount(cartCount + 1);
-    };
-
-    const removeFromCart = () => {
-        if (cartCount > 0) setCartCount(cartCount - 1);
-    };
-
-    const logoutAlert = async () => {
-        return await Swal.fire({
+    const handleLogout = async () => {
+        const result = await Swal.fire({
             title: "Are you sure you want to Logout?",
             icon: "question",
             showCancelButton: true,
@@ -115,15 +107,9 @@ export const Header = () => {
             confirmButtonColor: "green",
             cancelButtonColor: "red",
         });
-    };
 
-    const handleLogout = async () => {
-        const result = await logoutAlert();
         if (result.isConfirmed) {
-            sessionStorage.removeItem("isAuthenticated");
-            sessionStorage.removeItem("customerEmail");
-            sessionStorage.removeItem("cartCount");
-            sessionStorage.removeItem("customerData");
+            sessionStorage.clear();
             setIsAuthenticated(false);
             setCustomerEmail("");
             setCartCount(0);
@@ -151,12 +137,8 @@ export const Header = () => {
 
                     <div className="navbar-center">
                         <SearchIcon />
-                        <input
-                            type="text"
-                            className="search-bar"
-                            placeholder="Search for Products"
-                        />
-                        <div className="search-button" onClick={handleSearchClick}>
+                        <input type="text" className="search-bar" placeholder="Search for Products" />
+                        <div className="search-button" onClick={() => alert("Search Button Clicked")}>
                             <RiFileSearchFill />
                             <span>SEARCH</span>
                         </div>
@@ -176,9 +158,9 @@ export const Header = () => {
                                 }}
                             >
                                 <AccountCircleIcon style={{ color: "#133365" }} />
-                                <span
-                                    style={{ color: "#133365" }}
-                                ><b>Hi</b> {customerDetails.customerName || 'Loading...'}</span>
+                                <span style={{ color: "#133365" }}>
+                                    <b>Hi</b> {customerDetails.customerName || 'Loading...'}
+                                </span>
                             </div>
                         )}
                         <div className="icon-container cart-icon-container" onClick={handleCart}>

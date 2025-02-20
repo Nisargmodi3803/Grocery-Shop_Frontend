@@ -24,6 +24,8 @@ export const ProductCard = () => {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { setLoading } = useLoading();
+  const [cartCount, setCartCount] = useState(0);
+
 
   useEffect(() => {
     setIsAuthenticated(sessionStorage.getItem("isAuthenticated") === "true");
@@ -109,6 +111,7 @@ export const ProductCard = () => {
     );
   };
 
+
   useEffect(() => {
     const fetchLikedProducts = async () => {
       if (!isAuthenticated) return;
@@ -125,13 +128,17 @@ export const ProductCard = () => {
           setLikedProducts(likedState);
         }
       } catch (error) {
-        console.error("Error fetching liked products:", error);
+        if (error.response?.status === 404) {
+          console.log("Customer not found");
+        } else {
+          console.error("Error fetching liked products:", error);
+          alert("Something went wrong in fetching Liked Products. Please try again!");
+        }
       }
     };
 
     fetchLikedProducts();
   }, [isAuthenticated]);
-
 
   const toggleLike = async (productId) => {
     if (!isAuthenticated) {
@@ -173,33 +180,48 @@ export const ProductCard = () => {
       setShowLoginModal(true);
       return;
     }
-    setCartState((prev) => ({
-      ...prev,
-      [productId]: {
-        ...prev[productId],
-        cartBtnClicked: !prev[productId]?.cartBtnClicked,
-        cartCount: prev[productId]?.cartCount || 1,
-      },
-    }));
+
+    setCartState((prev) => {
+      const isCurrentlyInCart = prev[productId]?.cartBtnClicked || false;
+      const newCartState = {
+        ...prev,
+        [productId]: {
+          ...prev[productId],
+          cartBtnClicked: !isCurrentlyInCart,
+          cartCount: isCurrentlyInCart ? 0 : (prev[productId]?.cartCount || 1),
+        },
+      };
+
+      // ✅ Update sessionStorage with total cart count
+      const totalCount = Object.values(newCartState).reduce((sum, item) => sum + (item.cartCount || 0), 0);
+      sessionStorage.setItem("cartCount", totalCount.toString());
+
+      return newCartState;
+    });
   };
 
   const updateCartCount = (productId, increment) => {
     setCartState((prev) => {
+      const newCount = Math.max((prev[productId]?.cartCount || 0) + increment, 0);
+
       const updatedCartState = {
         ...prev,
         [productId]: {
           ...prev[productId],
-          cartCount: Math.max((prev[productId]?.cartCount || 0) + increment, 0),
+          cartCount: newCount,
+          cartBtnClicked: newCount > 0,
         },
       };
 
-      if (updatedCartState[productId]?.cartCount === 0) {
-        updatedCartState[productId].cartBtnClicked = false;
-      }
+      // ✅ Update sessionStorage with total cart count
+      const totalCount = Object.values(updatedCartState).reduce((sum, item) => sum + (item.cartCount || 0), 0);
+      sessionStorage.setItem("cartCount", totalCount.toString());
 
       return updatedCartState;
     });
   };
+
+
 
   const navigateToProductPage = (productSlugTitle) => () => {
     navigate(`/ecommerce/product/${productSlugTitle}`);

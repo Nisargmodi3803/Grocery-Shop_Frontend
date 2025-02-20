@@ -61,6 +61,12 @@ export const MyOrderList = () => {
     fetchCustomerDetails();
   }, []);
 
+  useEffect(() => {
+    if (!sessionStorage.getItem("isAuthenticated")) {
+      navigate("/ecommerce/");
+    }
+  }, []);
+
   const handleImageChange = async (event) => {
     const selectedFile = event.target.files[0];
     console.log("Handle Image Change Call");
@@ -262,8 +268,16 @@ export const MyOrderList = () => {
         </div>
 
         <div className='my-profile-section'>
-          {/* Profile information can go here */}
+          <div className='my-profile-section-header'>
+            <h1>Order List</h1>
+          </div>
+          <div className='my-profile-section-body'>
+            <div className='profile-detail'>
+
+            </div>
+          </div>
         </div>
+        
         <input
           id="file-input"
           type="file"

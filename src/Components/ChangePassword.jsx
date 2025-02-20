@@ -60,6 +60,12 @@ export const ChangePassword = () => {
     setShowPassword(!showPassword);
   };
 
+  useEffect(() => {
+    if (!sessionStorage.getItem("isAuthenticated")) {
+      navigate("/ecommerce/");
+    }
+  }, []);
+
   const fetchCustomerDetails = async () => {
     setLoading(true);
     try {
@@ -425,7 +431,7 @@ export const ChangePassword = () => {
                 && <button
                   className="save-btn"
                   onClick={() => { handeChangePassword() }}
-                  >
+                >
                   CHANGE PASSWORD
                 </button>
               }

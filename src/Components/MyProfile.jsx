@@ -99,7 +99,7 @@ export const MyProfile = () => {
     }, [editMode]); // Runs whenever `editMode` changes
 
     useEffect(() => {
-        if (sessionStorage.getItem("isAuthenticated") === "false") {
+        if (!sessionStorage.getItem("isAuthenticated")) {
             navigate("/ecommerce/");
         }
     }, []);

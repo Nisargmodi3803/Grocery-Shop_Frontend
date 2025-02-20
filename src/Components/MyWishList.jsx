@@ -46,6 +46,7 @@ export const MyWishList = () => {
   const [discountMap, setDiscountMap] = useState([]);
   const [cartState, setCartState] = useState({});
   const [inquiryProductId, setInquiryProductId] = useState(null);
+  const [inquiryModalOpen, setInquiryModalOpen] = useState(false);
 
   const fetchCustomerDetails = async () => {
     setLoading(true);
@@ -210,6 +211,12 @@ export const MyWishList = () => {
     fetchWishListProducts();
   }, []);
 
+  useEffect(() => {
+    if (!sessionStorage.getItem("isAuthenticated")) {
+      navigate("/ecommerce/");
+    }
+  }, []);
+
   const calculateDiscountPercentage = (mrp, discountAmt) => {
     return mrp > 0 ? Math.round(((mrp - discountAmt) * 100) / mrp) : 0;
   };
@@ -259,7 +266,12 @@ export const MyWishList = () => {
 
   const handleInquiryClick = (productId) => {
     setInquiryProductId(productId);
-    setShowModal(true);
+    setInquiryModalOpen(true);
+  };
+
+  const closeInquiryModal = () => {
+    setInquiryModalOpen(false);
+    setInquiryProductId(null);
   };
 
   const toggleDislike = async (productId) => {
@@ -393,7 +405,7 @@ export const MyWishList = () => {
                               </span>
                             )}
                             <span className='like-icon2' onClick={() => toggleDislike(product.id)}>
-                              <MdCancelPresentation/>
+                              <MdCancelPresentation />
                             </span>
                             <div onClick={navigateToProductPage(product.slug_title)}>
                               <img className='product-image2' src={imageSrc} alt={product.name} loading='lazy' />
@@ -453,7 +465,7 @@ export const MyWishList = () => {
                   })}
                 </div>
               ) : (
-                <h1 style={{ fontSize: '1.5rem', color: '#133365' }}>
+                <h1 style={{ fontSize: '1.5rem', color: 'red' }}>
                   NO PRODUCT AVAILABLE ON YOUR WISHLIST!
                 </h1>
               )}
@@ -468,6 +480,8 @@ export const MyWishList = () => {
           />
         </div>
         {showModal && <ImageModal image={image} closeModal={closeModal} />}
+
+        {inquiryModalOpen && <InquiryNow closeModal={closeInquiryModal} productId={inquiryProductId} />}
       </div>
     </div>
   );

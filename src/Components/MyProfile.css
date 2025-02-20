@@ -206,6 +206,11 @@
     align-items: center;
 }
 
+.profile-detail input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+}
+
+
 .profile-detail span.edit,
 .profile-detail span.delete {
     margin-left: 10px;
