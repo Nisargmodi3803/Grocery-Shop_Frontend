@@ -16,7 +16,6 @@ export const ProductCard = () => {
   const direction = useRef("normal");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [likedProducts, setLikedProducts] = useState({});
-  const [cartState, setCartState] = useState({});
   const [productList, setProductList] = useState([]);
   const [discountMap, setDiscountMap] = useState({});
   const [showModal, setShowModal] = useState(false);
@@ -25,6 +24,10 @@ export const ProductCard = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { setLoading } = useLoading();
   const [cartCount, setCartCount] = useState(0);
+  const [cartState, setCartState] = useState(() => {
+    const storedCart = sessionStorage.getItem("cartState");
+    return storedCart ? JSON.parse(storedCart) : {};
+  });
 
 
   useEffect(() => {
@@ -111,33 +114,86 @@ export const ProductCard = () => {
     );
   };
 
+  const fetchLikedProducts = async () => {
+    if (!isAuthenticated) return;
+
+    try {
+      const response = await axios.get(`http://localhost:9000/wishlist/${sessionStorage.getItem("customerEmail")}`);
+
+      if (response.status === 200) {
+        const likedIds = response.data.map(item => item.product.id);
+        const likedState = likedIds.reduce((acc, id) => {
+          acc[id] = true;
+          return acc;
+        }, {});
+        setLikedProducts(likedState);
+      }
+    } catch (error) {
+      if (error.response.status === 404) {
+        // console.log("Customer not found");
+      } else {
+        console.error("Error fetching liked products:", error);
+        alert("Something went wrong in fetching Liked Products. Please try again!");
+      }
+    }
+  };
+
+  const fetchCart = async () => {
+    const customerEmail = sessionStorage.getItem("customerEmail");
+    if (!customerEmail) return;
+
+    try {
+      const response = await axios.get(`http://localhost:9000/cart/${customerEmail}`);
+      if (response.status === 200) {
+        const cartData = response.data || []; // Ensure it's an array
+
+        // ✅ Get current cart state from sessionStorage
+        const storedCartState = JSON.parse(sessionStorage.getItem("cartState") || "{}");
+
+        const updatedCartState = cartData.reduce((acc, item) => {
+          const productId = item.product?.id; // Ensure product exists
+          if (!productId) return acc; // Skip if productId is undefined
+
+          // ✅ Check if product already exists in sessionStorage
+          if (!storedCartState[productId]) {
+            acc[productId] = {
+              cartBtnClicked: true,
+              cartCount: item.productQuantity, // Assuming API returns `productQuantity`
+            };
+          } else {
+            // Keep existing state if already in sessionStorage
+            acc[productId] = storedCartState[productId];
+          }
+
+          return acc;
+        }, { ...storedCartState }); // Start with stored cart state
+
+        console.log("Updated Cart State:", updatedCartState);
+
+        // ✅ Update state & sessionStorage
+        setCartState(updatedCartState);
+        sessionStorage.setItem("cartState", JSON.stringify(updatedCartState));
+
+        // ✅ Update total cart count
+        const totalCount = Object.values(updatedCartState).reduce(
+          (sum, item) => sum + (item.cartCount || 0),
+          0
+        );
+        sessionStorage.setItem("cartCount", totalCount.toString());
+
+        // Notify other components
+        window.dispatchEvent(new Event("cartUpdated"));
+      }
+    } catch (error) {
+      console.error("Error fetching cart details:", error);
+    }
+  };
+
+
 
   useEffect(() => {
-    const fetchLikedProducts = async () => {
-      if (!isAuthenticated) return;
-
-      try {
-        const response = await axios.get(`http://localhost:9000/wishlist/${sessionStorage.getItem("customerEmail")}`);
-
-        if (response.status === 200) {
-          const likedIds = response.data.map(item => item.product.id);
-          const likedState = likedIds.reduce((acc, id) => {
-            acc[id] = true;
-            return acc;
-          }, {});
-          setLikedProducts(likedState);
-        }
-      } catch (error) {
-        if (error.response?.status === 404) {
-          console.log("Customer not found");
-        } else {
-          console.error("Error fetching liked products:", error);
-          alert("Something went wrong in fetching Liked Products. Please try again!");
-        }
-      }
-    };
-
     fetchLikedProducts();
+    fetchCart();
   }, [isAuthenticated]);
 
   const toggleLike = async (productId) => {
@@ -174,11 +230,35 @@ export const ProductCard = () => {
     }
   };
 
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const storedCart = sessionStorage.getItem("cartState");
+      setCartState(storedCart ? JSON.parse(storedCart) : {});
+    };
 
-  const toggleCartState = (productId) => {
+    window.addEventListener("cartUpdated", handleStorageChange);
+    return () => window.removeEventListener("cartUpdated", handleStorageChange);
+
+  }, []);
+
+  const toggleCartState = async (productId) => {
     if (!isAuthenticated) {
       setShowLoginModal(true);
       return;
+    }
+
+    try {
+      const response = await axios.post(`http://localhost:9000/add-cart?customerEmail=${sessionStorage.getItem("customerEmail")}&productId=${productId}`);
+      if (response.status === 200) {
+        console.log("Product added to cart successfully");
+      }
+    } catch (error) {
+      if (error.response.status === 404) {
+        console.log("Customer or Product not found");
+      } else {
+        console.error("Error adding product to cart:", error);
+        alert("Something went wrong in adding product to cart. Please try again!");
+      }
     }
 
     setCartState((prev) => {
@@ -192,35 +272,77 @@ export const ProductCard = () => {
         },
       };
 
-      // ✅ Update sessionStorage with total cart count
+      // ✅ Update sessionStorage with full cart state & total count
+      sessionStorage.setItem("cartState", JSON.stringify(newCartState));
       const totalCount = Object.values(newCartState).reduce((sum, item) => sum + (item.cartCount || 0), 0);
       sessionStorage.setItem("cartCount", totalCount.toString());
+
+      window.dispatchEvent(new Event("cartUpdated")); // 🔥 Dispatch event
 
       return newCartState;
     });
   };
 
-  const updateCartCount = (productId, increment) => {
+
+  const updateCartCount = async (productId, increment) => {
+
+    if (increment === 1) { // Increament by 1
+      try {
+        const response = await axios.patch(`http://localhost:9000/cart-increment?customerEmail=${sessionStorage.getItem("customerEmail")}&productId=${productId}`);
+
+        if (response.status === 200) {
+          console.log("Product Increament by 1!");
+        } else if (response.status === 404) {
+          console.log("Customer or Product not found");
+        }
+      } catch (error) {
+        console.error("Error adding product to cart:", error);
+        alert("Something went wrong in adding one product to cart. Please try again!");
+      }
+
+    } else {
+      try {
+        const response = await axios.patch(`http://localhost:9000/cart-decrement?customerEmail=${sessionStorage.getItem("customerEmail")}&productId=${productId}`);
+
+        if (response.status === 200) {
+          console.log("Product Decrement by 1!");
+        } else if (response.status === 404) {
+          console.log("Customer or Product not found");
+        }
+      } catch (error) {
+        console.error("Error adding product to cart:", error);
+        alert("Something went wrong in removing one product to cart. Please try again!");
+      }
+    }
+
     setCartState((prev) => {
+      let newCartState = { ...prev };
       const newCount = Math.max((prev[productId]?.cartCount || 0) + increment, 0);
 
-      const updatedCartState = {
-        ...prev,
-        [productId]: {
+      if (newCount === 0) {
+        delete newCartState[productId]; // ✅ Remove product from cartState when count is 0
+      } else {
+        newCartState[productId] = {
           ...prev[productId],
           cartCount: newCount,
-          cartBtnClicked: newCount > 0,
-        },
-      };
+          cartBtnClicked: true,
+        };
+      }
 
-      // ✅ Update sessionStorage with total cart count
-      const totalCount = Object.values(updatedCartState).reduce((sum, item) => sum + (item.cartCount || 0), 0);
+      // ✅ Update sessionStorage
+      sessionStorage.setItem("cartState", JSON.stringify(newCartState));
+
+      const totalCount = Object.values(newCartState).reduce(
+        (sum, item) => sum + (item.cartCount || 0),
+        0
+      );
       sessionStorage.setItem("cartCount", totalCount.toString());
 
-      return updatedCartState;
+      window.dispatchEvent(new Event("cartUpdated")); // 🔥 Notify other components
+
+      return newCartState;
     });
   };
-
 
 
   const navigateToProductPage = (productSlugTitle) => () => {

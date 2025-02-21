@@ -1,4 +1,4 @@
-.fixed-header{
+.fixed-header {
     position: fixed;
     top: 0;
     width: 100%;
@@ -13,12 +13,13 @@
     justify-content: space-between;
     padding: 10px 20px;
     background-color: #ffffff;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Stronger shadow for navbar */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    /* Stronger shadow for navbar */
     position: relative;
     z-index: 10;
     max-width: 100%;
     box-sizing: border-box;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1); 
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -33,6 +34,7 @@
 }
 
 .navbar-center {
+    margin-top: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -47,25 +49,40 @@
     white-space: nowrap;
 }
 
-.search-icon {
-    position: absolute;
-    left: 10px;
+.search-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 650px;
 }
-
 
 .search-bar {
     width: 100%;
-    max-width: 550px;
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 14px;
+    padding: 12px 40px;
+    border: 2px solid #ddd;
+    font-size: 16px;
     outline: none;
-    transition: border 0.3s ease;
+    color: #333;
+    background-color: #fff;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    border-radius: 0px;
 }
 
-.search-bar:focus {
-    border-color: #133365;
+.search-icon {
+    position: absolute;
+    left: 9px;
+    top: 35%;
+    transform: translateY(-50%);
+    color: #888;
+    font-size: 18px;
+    pointer-events: none;
+}
+
+.search-bar::placeholder {
+    color: #888;
+    font-size: 14px;
 }
 
 .search-button {
@@ -75,9 +92,8 @@
     background-color: #133365;
     color: #fff;
     padding: 8px 12px;
-    border-radius: 5px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 500;
     transition: background-color 0.3s ease;
     margin-bottom: 15px;
@@ -91,12 +107,15 @@
     display: flex;
     justify-content: center;
     padding: 16px 28px;
-    background-color: #f8f9fa; /* Light grey background */
+    background-color: #f8f9fa;
+    /* Light grey background */
     position: relative;
     z-index: 9;
     border-top: 1px solid rgba(0, 0, 0, 0.08);
-    box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.08); /* Lighter shadow to create a soft separation */
-    color: #666; /* Slightly darker for better readability */
+    box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.08);
+    /* Lighter shadow to create a soft separation */
+    color: #666;
+    /* Slightly darker for better readability */
     transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -150,6 +169,7 @@
     color: #133365;
 }
 
+
 .icon-container {
     display: flex;
     align-items: center;
@@ -176,23 +196,28 @@
     font-weight: 500;
     height: 30px;
     width: auto;
+    justify-content: center;
 }
 
 .cart-count {
     position: absolute;
-    top: -5px;
+    top: 4px;
+    right: 59px;
+    /* top : -5px;
     right: -5px;
+    background-color: #e0e4e7; */
     background-color: #ffffff;
     color: #133365;
     font-size: 12px;
     font-weight: bold;
     border-radius: 50%;
-    width: 20px;
-    height: 20px;
+    width: 17px;
+    height: 17px;
+    /* width: 20px;
+    height: 20px; */
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 /* .navbar {

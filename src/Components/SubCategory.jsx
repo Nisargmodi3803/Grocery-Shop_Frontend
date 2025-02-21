@@ -26,7 +26,6 @@ export const SubCategory = () => {
     const { subcategorySlugTitle } = useParams();
     const [products, setProducts] = useState([]);
     const [likedProducts, setLikedProducts] = useState({});
-    const [cartState, setCartState] = useState({});
     const [discountMap, setDiscountMap] = useState({});
     const [showModal, setShowModal] = useState(false);
     const [inquiryProductId, setInquiryProductId] = useState(null);
@@ -37,6 +36,10 @@ export const SubCategory = () => {
     const [sortOption, setSortOption] = useState("");
     const [subcategories, setSubCategories] = useState([]);
     const { setLoading } = useLoading();
+    const [cartState, setCartState] = useState(() => {
+        const storedCart = sessionStorage.getItem("cartState");
+        return storedCart ? JSON.parse(storedCart) : {};
+    });
 
     useEffect(() => {
         setLoading(true);
@@ -133,7 +136,7 @@ export const SubCategory = () => {
         try {
             const response = await axios.get(`http://localhost:9000/subcategory-title/${subcategorySlugTitle}`);
             if (response.status === 200) {
-                setCategoryName(response.data.name);
+                setCategoryName(response.data.category.name);
             }
         } catch (error) {
             if (error.response?.status === 404) {
@@ -273,36 +276,116 @@ export const SubCategory = () => {
         }
     };;
 
-    const toggleCartState = (productId) => {
+    useEffect(() => {
+        const handleStorageChange = () => {
+            const storedCart = sessionStorage.getItem("cartState");
+            setCartState(storedCart ? JSON.parse(storedCart) : {});
+        };
+
+        window.addEventListener("cartUpdated", handleStorageChange);
+        return () => window.removeEventListener("cartUpdated", handleStorageChange);
+    }, []);
+
+    const toggleCartState = async (productId) => {
         if (!isAuthenticated) {
             setShowLoginModal(true);
             return;
         }
-        setCartState((prev) => ({
-            ...prev,
-            [productId]: {
-                ...prev[productId],
-                cartBtnClicked: !prev[productId]?.cartBtnClicked,
-                cartCount: prev[productId]?.cartCount || 1,
-            },
-        }));
-    };
 
-    const updateCartCount = (productId, increment) => {
+        try {
+            const response = await axios.post(`http://localhost:9000/add-cart?customerEmail=${sessionStorage.getItem("customerEmail")}&productId=${productId}`);
+            if (response.status === 200) {
+                console.log("Product added to cart successfully");
+            }
+        } catch (error) {
+            if (error.response.status === 404) {
+                console.log("Customer or Product not found");
+            } else {
+                console.error("Error adding product to cart:", error);
+                alert("Something went wrong in adding product to cart. Please try again!");
+            }
+        }
+
         setCartState((prev) => {
-            const updatedCartState = {
+            const isCurrentlyInCart = prev[productId]?.cartBtnClicked || false;
+            const newCartState = {
                 ...prev,
                 [productId]: {
                     ...prev[productId],
-                    cartCount: Math.max((prev[productId]?.cartCount || 0) + increment, 0),
+                    cartBtnClicked: !isCurrentlyInCart,
+                    cartCount: isCurrentlyInCart ? 0 : (prev[productId]?.cartCount || 1),
                 },
             };
 
-            if (updatedCartState[productId]?.cartCount === 0) {
-                updatedCartState[productId].cartBtnClicked = false;
+            // ✅ Update sessionStorage with full cart state & total count
+            sessionStorage.setItem("cartState", JSON.stringify(newCartState));
+            const totalCount = Object.values(newCartState).reduce((sum, item) => sum + (item.cartCount || 0), 0);
+            sessionStorage.setItem("cartCount", totalCount.toString());
+
+            window.dispatchEvent(new Event("cartUpdated")); // 🔥 Dispatch event
+
+            return newCartState;
+        });
+    };
+
+
+    const updateCartCount = async (productId, increment) => {
+
+        if (increment === 1) { // Increament by 1
+            try {
+                const response = await axios.patch(`http://localhost:9000/cart-increment?customerEmail=${sessionStorage.getItem("customerEmail")}&productId=${productId}`);
+
+                if (response.status === 200) {
+                    console.log("Product Increament by 1!");
+                } else if (response.status === 404) {
+                    console.log("Customer or Product not found");
+                }
+            } catch (error) {
+                console.error("Error adding product to cart:", error);
+                alert("Something went wrong in adding one product to cart. Please try again!");
             }
 
-            return updatedCartState;
+        } else {
+            try {
+                const response = await axios.patch(`http://localhost:9000/cart-decrement?customerEmail=${sessionStorage.getItem("customerEmail")}&productId=${productId}`);
+
+                if (response.status === 200) {
+                    console.log("Product Decrement by 1!");
+                } else if (response.status === 404) {
+                    console.log("Customer or Product not found");
+                }
+            } catch (error) {
+                console.error("Error adding product to cart:", error);
+                alert("Something went wrong in removing one product to cart. Please try again!");
+            }
+        }
+
+        setCartState((prev) => {
+            let newCartState = { ...prev };
+            const newCount = Math.max((prev[productId]?.cartCount || 0) + increment, 0);
+
+            if (newCount === 0) {
+                delete newCartState[productId]; // ✅ Remove product from cartState when count is 0
+            } else {
+                newCartState[productId] = {
+                    ...prev[productId],
+                    cartCount: newCount,
+                    cartBtnClicked: true,
+                };
+            }
+
+            // ✅ Update sessionStorage
+            sessionStorage.setItem("cartState", JSON.stringify(newCartState));
+
+            const totalCount = Object.values(newCartState).reduce(
+                (sum, item) => sum + (item.cartCount || 0),
+                0
+            );
+            sessionStorage.setItem("cartCount", totalCount.toString());
+
+            window.dispatchEvent(new Event("cartUpdated")); // 🔥 Notify other components
+
+            return newCartState;
         });
     };
 

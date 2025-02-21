@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { RiFileSearchFill } from "react-icons/ri";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import ShoppingCartRoundedIcon from '@mui/icons-material/ShoppingCartRounded';
@@ -9,9 +9,8 @@ import { LoginSignUpModal } from './LoginSignUpModal';
 import "./Header.css";
 import axios from 'axios';
 import { useLoading } from '../Context/LoadingContext';
-import companyLogo from '../assets/Logo/060622034612bits.png';
-import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import companyLogo from '../assets/Logo/060622034612bits.png';
 
 export const Header = () => {
     const [showModal, setShowModal] = useState(false);
@@ -22,7 +21,6 @@ export const Header = () => {
     const { setLoading } = useLoading();
     const navigate = useNavigate();
 
-    // Fetch customer details if authenticated
     const fetchCustomerDetails = async () => {
         if (isAuthenticated && customerEmail) {
             try {
@@ -39,7 +37,6 @@ export const Header = () => {
         }
     };
 
-    // Load session storage data on mount
     useEffect(() => {
         const storedAuth = sessionStorage.getItem("isAuthenticated");
         const storedCustomerEmail = sessionStorage.getItem("customerEmail");
@@ -61,32 +58,39 @@ export const Header = () => {
         }
     }, [isAuthenticated, customerEmail]);
 
-    // Sync cartCount state with sessionStorage when it changes
     useEffect(() => {
-        const handleStorageChange = () => {
+        const updateCartCount = () => {
             const storedCartCount = sessionStorage.getItem("cartCount");
             setCartCount(storedCartCount ? parseInt(storedCartCount, 10) : 0);
         };
 
-        // Listen for changes in sessionStorage
-        window.addEventListener("storage", handleStorageChange);
-
-        // Run on component mount
-        handleStorageChange();
+        window.addEventListener("cartUpdated", updateCartCount);
+        updateCartCount();
 
         return () => {
-            window.removeEventListener("storage", handleStorageChange);
+            window.removeEventListener("cartUpdated", updateCartCount);
         };
     }, []);
 
-
+    const updateCart = (newCount) => {
+        sessionStorage.setItem("cartCount", newCount);
+        setCartCount(newCount);
+        window.dispatchEvent(new Event("cartUpdated"));
+    };
 
     const handleCart = () => {
         if (!isAuthenticated) {
             setShowModal(true);
             return;
         }
-        alert("Cart Clicked");
+
+        if(cartCount === 0){
+            window.location.reload();
+            return;
+        }
+
+        navigate('/ecommerce/checkout');
+        window.location.reload();
     };
 
     const handleLoginSignUp = () => {
@@ -113,6 +117,7 @@ export const Header = () => {
             setIsAuthenticated(false);
             setCustomerEmail("");
             setCartCount(0);
+            window.dispatchEvent(new Event("cartUpdated"));
             await Swal.fire("Logged Out!", "You have been logged out.", "success");
             navigate("/ecommerce/");
             window.location.reload();
@@ -136,8 +141,14 @@ export const Header = () => {
                     </div>
 
                     <div className="navbar-center">
-                        <SearchIcon />
-                        <input type="text" className="search-bar" placeholder="Search for Products" />
+                        <div className="search-container">
+                            <SearchIcon className="search-icon" />
+                            <input
+                                type="text"
+                                className="search-bar"
+                                placeholder="Search for Products"
+                            />
+                        </div>
                         <div className="search-button" onClick={() => alert("Search Button Clicked")}>
                             <RiFileSearchFill />
                             <span>SEARCH</span>

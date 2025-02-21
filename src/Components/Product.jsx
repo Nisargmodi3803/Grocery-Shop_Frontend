@@ -21,7 +21,6 @@ export default function Product() {
     const [product, setProduct] = useState(null);
     const [likedProduct, setLikedProduct] = useState(false);
     const [cartCount, setCartCount] = useState(0);
-    const [cartBtnClicked, setCartBtnClicked] = useState(false);
     const [relatedCategories, setRelatedCategories] = useState([]);
     const { productSlugTitle } = useParams();
     const navigate = useNavigate();
@@ -32,6 +31,10 @@ export default function Product() {
     const [inquiryProductSlugTitle, setInquiryProductSlugTitle] = useState(null);
     const greater = '>';
     const { setLoading } = useLoading();
+    const [cartState, setCartState] = useState(() => {
+        const storedCart = sessionStorage.getItem("cartState");
+        return storedCart ? JSON.parse(storedCart) : {};
+    });
 
     useEffect(() => {
         const authStatus = sessionStorage.getItem("isAuthenticated") === "true";
@@ -127,7 +130,7 @@ export default function Product() {
 
                 if (response.status === 200) {
                     const likedIds = response.data.map(item => item.product.id);
-                    setLikedProduct(likedIds.find(id => id===product.id));
+                    setLikedProduct(likedIds.find(id => id === product.id));
                 }
             } catch (error) {
                 console.error("Error fetching liked product status:", error);
@@ -159,6 +162,118 @@ export default function Product() {
             console.error(`Error ${likedProduct ? "disliking" : "liking"} product:`, error);
             alert(`Something went wrong in ${likedProduct ? "disliking" : "liking"} the product. Please try again!`);
         }
+    };
+
+    useEffect(() => {
+        const handleStorageChange = () => {
+            const storedCart = sessionStorage.getItem("cartState");
+            setCartState(storedCart ? JSON.parse(storedCart) : {});
+        };
+
+        window.addEventListener("cartUpdated", handleStorageChange);
+        return () => window.removeEventListener("cartUpdated", handleStorageChange);
+    }, []);
+
+    const toggleCartState = async (productId) => {
+        if (!isAuthenticated) {
+            setShowLoginModal(true);
+            return;
+        }
+
+        try {
+            const response = await axios.post(`http://localhost:9000/add-cart?customerEmail=${sessionStorage.getItem("customerEmail")}&productId=${productId}`);
+            if (response.status === 200) {
+                console.log("Product added to cart successfully");
+            }
+        } catch (error) {
+            if (error.response.status === 404) {
+                console.log("Customer or Product not found");
+            } else {
+                console.error("Error adding product to cart:", error);
+                alert("Something went wrong in adding product to cart. Please try again!");
+            }
+        }
+
+        setCartState((prev) => {
+            const isCurrentlyInCart = prev[productId]?.cartBtnClicked || false;
+            const newCartState = {
+                ...prev,
+                [productId]: {
+                    ...prev[productId],
+                    cartBtnClicked: !isCurrentlyInCart,
+                    cartCount: isCurrentlyInCart ? 0 : (prev[productId]?.cartCount || 1),
+                },
+            };
+
+            // ✅ Update sessionStorage with full cart state & total count
+            sessionStorage.setItem("cartState", JSON.stringify(newCartState));
+            const totalCount = Object.values(newCartState).reduce((sum, item) => sum + (item.cartCount || 0), 0);
+            sessionStorage.setItem("cartCount", totalCount.toString());
+            window.dispatchEvent(new Event("cartUpdated")); // 🔥 Dispatch event
+
+            return newCartState;
+        });
+    };
+
+
+    const updateCartCount = async (productId, increment) => {
+
+        if (increment === 1) { // Increament by 1
+            try {
+                const response = await axios.patch(`http://localhost:9000/cart-increment?customerEmail=${sessionStorage.getItem("customerEmail")}&productId=${productId}`);
+
+                if (response.status === 200) {
+                    console.log("Product Increament by 1!");
+                } else if (response.status === 404) {
+                    console.log("Customer or Product not found");
+                }
+            } catch (error) {
+                console.error("Error adding product to cart:", error);
+                alert("Something went wrong in adding one product to cart. Please try again!");
+            }
+
+        } else {
+            try {
+                const response = await axios.patch(`http://localhost:9000/cart-decrement?customerEmail=${sessionStorage.getItem("customerEmail")}&productId=${productId}`);
+
+                if (response.status === 200) {
+                    console.log("Product Decrement by 1!");
+                } else if (response.status === 404) {
+                    console.log("Customer or Product not found");
+                }
+            } catch (error) {
+                console.error("Error adding product to cart:", error);
+                alert("Something went wrong in removing one product to cart. Please try again!");
+            }
+        }
+
+        setCartState((prev) => {
+            let newCartState = { ...prev };
+            const newCount = Math.max((prev[productId]?.cartCount || 0) + increment, 0);
+
+            if (newCount === 0) {
+                delete newCartState[productId]; // ✅ Remove product from cartState when count is 0
+            } else {
+                newCartState[productId] = {
+                    ...prev[productId],
+                    cartCount: newCount,
+                    cartBtnClicked: true,
+                };
+            }
+
+            // ✅ Update sessionStorage
+            sessionStorage.setItem("cartState", JSON.stringify(newCartState));
+
+            const totalCount = Object.values(newCartState).reduce(
+                (sum, item) => sum + (item.cartCount || 0),
+                0
+            );
+            sessionStorage.setItem("cartCount", totalCount.toString());
+
+            window.dispatchEvent(new Event("cartUpdated")); // 🔥 Notify other components
+
+            return newCartState;
+        });
     };
 
 
@@ -198,9 +313,15 @@ export default function Product() {
                         <b><IoMdHome /> Home</b>
                     </a>
                     <span> {greater} </span>
-                    <a href=''>{product.cat?.name || "Category"}</a>
+                    <a onClick={() => {
+                        navigate(`/ecommerce/shop-by-category`);
+                        window.location.reload();
+                    }}>{product.cat?.name || "Category"}</a>
                     <span> {greater} </span>
-                    <a href=''>{product.subcat?.name || "Subcategory"}</a>
+                    <a onClick={() => {
+                        navigate(`/ecommerce/sub-category/${product.subcat?.slug_title}`);
+                        window.location.reload();
+                    }}>{product.subcat?.name || "Subcategory"}</a>
                 </span>
             </section>
 
@@ -306,38 +427,18 @@ export default function Product() {
 
 
 
-                    {cartBtnClicked ? (
+                    {cartState[product.id]?.cartBtnClicked ? (
                         <div className='product-content-add-to-cart-quantity'>
-                            <button
-                                onClick={() => {
-                                    if (cartCount > 1) {
-                                        setCartCount(cartCount - 1);
-                                    } else {
-                                        setCartCount(0);
-                                        setCartBtnClicked(false);
-                                    }
-                                }}
-                            >
-                                -
-                            </button>
-                            <span>{cartCount}</span>
-                            <button onClick={() => setCartCount(cartCount + 1)}>
-                                +
-                            </button>
+                            <button onClick={() => updateCartCount(product.id, -1)}>-</button>
+                            <span>{cartState[product.id]?.cartCount || 0}</span>
+                            <button onClick={() => updateCartCount(product.id, 1)}>+</button>
                         </div>
                     ) : (
                         <>
                             {product.productIsActive === 1 ? (
                                 <button
                                     className='product-content-add-to-cart'
-                                    onClick={() => {
-                                        if (!isAuthenticated) {
-                                            setShowLoginModal(true);
-                                            return;
-                                        }
-                                        setCartCount(1);
-                                        setCartBtnClicked(true);
-                                    }}
+                                    onClick={() => toggleCartState(product.id)}
                                 >
                                     <MdOutlineShoppingCart /> ADD TO CART
                                 </button>

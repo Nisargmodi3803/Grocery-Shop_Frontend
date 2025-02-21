@@ -183,6 +183,8 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
             if (response.status == 200) {
                 sessionStorage.setItem("isAuthenticated", "true");
                 sessionStorage.setItem("customerEmail", formData.email);
+                sessionStorage.setItem("cartCount",0);
+                sessionStorage.setItem("cartState", JSON.stringify({}));
                 setIsAuthenticated(true);
                 // console.log("Slug title : "+productSlugTitle);
                 const timer = setTimeout(() => {
@@ -517,6 +519,8 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
             if (response.status === 200) {
                 sessionStorage.setItem("isAuthenticated", "true");
                 sessionStorage.setItem("customerEmail", formData.email);
+                sessionStorage.setItem("cartCount",0);
+                sessionStorage.setItem("cartState", JSON.stringify({}));
                 setIsAuthenticated(true);
                 setVerified(true);
                 setOtpResponse("✅ OTP is valid");
