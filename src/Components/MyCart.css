@@ -8,23 +8,22 @@
 .my-cart-section {
     display: flex;
     justify-content: center;
-    flex-wrap: wrap;
-    text-decoration: none;
+    /* flex-direction: column; */
 }
 
-.cart-section{
+.cart-section {
     display: flex;
-    width: 85%;
+    width: 90%;
     background: white;
     overflow: hidden;
     border: 1px solid #ddd;
     margin: 20px;
 }
 
-.cart-nav-section{
+.cart-nav-section {
     width: 30%;
     color: #133365;
-    padding: 20px;
+    /* padding: 20px; */
     border-right: 1px solid #ddd;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
 }
@@ -48,46 +47,452 @@
 }
 
 .cart-info-header-upper h3 {
-    font-size: 20px;
+    font-size: 22px;
     font-weight: bold;
-    color: #333;
+    color: #133365;
 }
 
 .cart-info-header-upper p {
-    font-size: 16px;
-    color: #555;
+    font-size: 20px;
+    color: #275237BF;
+    font-weight: bold;
 }
 
 .cart-info-header-lower {
     font-size: 14px;
-    color: #888;
-    margin-top: 5px;
+    color: #133365;
+    text-align: left;
 }
 
 .cart-info-body {
-    padding: 15px;
     max-height: 400px;
     overflow-y: auto;
+    background-color: #fafafa;
 }
 
 .cart-info-body-card {
     display: flex;
     align-items: center;
     background: #fff;
-    border-radius: 8px;
     padding: 10px;
-    margin-bottom: 10px;
+    padding-top: 3px;
+    border-bottom: 1px solid #e0e0e0;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .cart-info-body-card-image img {
-    width: 60px;
-    height: 60px;
-    object-fit: cover;
-    border-radius: 8px;
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
     margin-right: 10px;
+}
+
+.cart-info-card-details {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.product-offer-price3 {
+    margin-top: -5px;
+}
+
+.product-regular-price3 {
+    text-decoration: line-through;
+    color: #999;
+    font-size: 0.9rem;
+}
+
+.product-discount-price3 {
+    color: #133365;
+    font-weight: bold;
+    font-size: 1rem;
+    margin-left: 5px;
+}
+
+.add-to-cart-quantity3 {
+    background-color: #c9d7e3;
+    color: #133365;
+    border: none;
+    border-radius: 75px;
+    padding: 4px 8px;
+    font-size: 0.8rem;
+    font-family: 'Maven Pro', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 93px;
+    height: 24px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.add-to-cart-quantity3 button {
+    background-color: #ffffff;
+    color: #133365;
+    border: none;
+    border-radius: 50%;
+    width: 23px;
+    height: 23px;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .cart-info-card-details {
     flex: 1;
 }
+
+.cart-info-payment {
+    background: white;
+    padding: 15px;
+    /* border-radius: 10px; */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    font-family: 'Arial', sans-serif;
+    border-top: 1px solid #ddd;
+}
+
+.cart-info-payment-discount {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.cart-info-payment-discount-code {
+    display: flex;
+    gap: 10px;
+}
+
+.cart-info-payment-discount-code input {
+    flex: 1;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+.cart-info-payment-discount-code button {
+    background-color: #133365;
+    color: white;
+    border: none;
+    padding: 3px 10px;
+    cursor: pointer;
+    font-size: 14px;
+    width: 70px;
+    height: 33px;
+}
+
+.cart-info-payment-discount-code button:active {
+    transform: scale(0.95);
+    background-color: #091b33;
+}
+
+.cart-info-payment-show-offer {
+    font-size: 14px;
+    color: #0d1f46;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: left;
+    margin-top: -15px;
+}
+
+.cart-info-payment-bill {
+    border-top: 2px solid #ddd;
+    padding-top: 10px;
+}
+
+.cart-info-payment-bill-total {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    font-size: 14px;
+}
+
+.cart-mrp-total, .cart-discount-total, .cart-net-total, .cart-points-used, .cart-delivery-charge {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 2px;
+    padding-right: 2px;
+    /* border-bottom: 1px solid #ddd; */
+}
+
+.cart-mrp-total {
+    margin-top: -15px;
+}
+
+.cart-mrp-total span {
+    color: #888888;
+    font-size: 15px;
+}
+
+.cart-mrp-total p {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.cart-discount-total span {
+    color: #888888;
+}
+
+.cart-discount-total p {
+    font-weight: bold;
+}
+
+.cart-discount-total {
+    margin-top: -25px;
+    border-bottom: 2px solid #ddd;
+}
+
+.cart-net-total p {
+    font-weight: bold;
+    color: #888888;
+    font-size: 14px;
+}
+
+.cart-net-total span {
+    font-weight: bold;
+}
+
+.cart-delivery-charge span {
+    color: red;
+    font-weight: bold;
+}
+
+.cart-points-used p {
+    color: #888888;
+    font-size: 15px;
+}
+
+.cart-points-used span {
+    font-weight: bold;
+}
+
+.cart-delivery-charge p {
+    color: #888888;
+    font-size: 15px;
+}
+
+.cart-delivery-charge {
+    margin-top: -20px;
+}
+
+.cart-points-used {
+    margin-top: -20px;
+}
+
+.cart-info-payment-bill-total-payable {
+    border-top: 2px solid #ddd;
+    padding-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cart-info-payment-bill-total-payable h3 {
+    font-size: 18px;
+    color: #0d1f46;
+}
+
+.cart-info-payment-bill-total-payable span {
+    font-size: 18px;
+    color: #133365;
+    font-weight: bold;
+}
+
+.my-delivery-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px;
+    border-radius: 10px;
+    width: 67%;
+}
+
+.my-delivery-section-header {
+    background-color: #f4f7fc;
+}
+
+.my-delivery-section-header h1 {
+    font-size: 26px;
+    color: #133365;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #e0e4e7;
+    padding-bottom: 10px;
+    font-weight: bold;
+}
+
+.my-delivery-section-body {
+    width: 100%;
+    padding-top: 20px;
+    /* max-height: ; */
+}
+
+.delivery-detail {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #ffffff;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.delivery-detail h3 {
+    font-size: 16px;
+    color: #133365;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+}
+
+.delivery-detail p,
+.delivery-detail input {
+    font-size: 16px;
+    color: #666;
+    padding: 10px;
+    text-align: left;
+    border: 2px solid #ddd;
+    font-weight: 500;
+    margin-bottom: 27px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.delivery-detail input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+}
+
+
+.delivery-detail span.edit1,
+.delivery-detail span.delete1 {
+    margin-left: 10px;
+}
+
+.delivery-detail input {
+    width: 90%;
+}
+
+.delivery-detail h3 svg {
+    margin-right: 10px;
+}
+
+.delivery-detail p span {
+    font-weight: 700;
+}
+
+.edit1 {
+    display: inline-block;
+    cursor: pointer;
+    color: green;
+    font-size: 18px;
+    margin-left: 10px;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.edit1:hover {
+    color: #5a5b5b;
+    transform: scale(1.1);
+}
+
+
+.edit1-part {
+    display: flex;
+    align-items: center;
+    border: 2px solid #133365;
+    font-size: 16px;
+    font-weight: 500;
+    color: #666;
+    border-radius: 5px;
+    background-color: #fff;
+    padding: 5px 10px;
+    height: max-content;
+}
+
+.edit1-part input {
+    border: none;
+    outline: none;
+    font-size: 16px;
+    padding: 15px;
+    color: #333;
+    width: 100%;
+    margin: -5px;
+}
+
+.delete1 {
+    margin-left: 10px;
+    cursor: pointer;
+    font-size: 20px;
+    color: red;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.delete1:hover {
+    color: darkred;
+    transform: scale(1.1);
+}
+
+.gender1-container {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.gender1-container label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: 2px solid #ddd;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s ease-in-out;
+}
+
+.gender-container input[type="radio"] {
+    display: none;
+    /* Hide default radio button */
+}
+
+.gender-container label:hover {
+    background-color: #f1f1f1;
+}
+
+.gender-container input[type="radio"]:checked+label {
+    background-color: #133365;
+    color: #fff;
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.4);
+}
+
+.gender-container label svg {
+    font-size: 20px;
+}
+
+.save-btn {
+    background-color: #133365;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px; 
+    cursor: pointer; 
+    /* display: flex; */
+}
+
+.save-btn:hover {
+    background-color: #0d244a;
+}
+
+.save-btn:active {
+    transform: scale(0.95);
+    background-color: #091b33;
+}
+
+.save-btn:disabled {
+    background-color: #cccccc; /* Gray background when disabled */
+    cursor: not-allowed; /* Disable cursor when button is disabled */
+}
+

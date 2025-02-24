@@ -377,3 +377,18 @@ body.modal-open {
 form button {
     margin-top: 20px;
 }
+
+.toggle-password-icon {
+    position: absolute;
+    right: -35px;
+    top: 40%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 19px;
+    transition: color 0.3s ease;
+    color: #666;
+}
+
+.toggle-password-icon:hover {
+    color: black;
+}

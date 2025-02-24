@@ -13,7 +13,19 @@
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     padding-bottom: 20px;
+    max-height: 850px;
+    overflow-y: auto; /* Enables vertical scroll */
+    overflow-x: hidden; /* Prevents horizontal scroll */
+    background-color: #f4f4f4;
+    max-width: 100%;
 }
+
+.card-section-lower2 > * {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+
 
 .product2 {
     width: 200px;
@@ -26,6 +38,7 @@
     background: #fff;
     border: 1px solid #e0e0e0;
     margin-bottom: 20px;
+    /* margin: 20px; */
 }
 
 .product-header2 {

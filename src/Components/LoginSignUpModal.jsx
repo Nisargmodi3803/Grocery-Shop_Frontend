@@ -8,6 +8,8 @@ import { useNavigate } from 'react-router-dom';
 import "./LoginSignUpModal.css";
 import { useLoading } from '../Context/LoadingContext';
 import Swal from 'sweetalert2';
+import { FaEye } from "react-icons/fa";
+import { FaEyeSlash } from "react-icons/fa";
 
 
 export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle, subcategorySlugTitle }) => {
@@ -55,6 +57,16 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
 
     //     return () => clearTimeout(timer);
     // }, [setLoading]);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showForgotPassword, setShowForgotPassword] = useState(false);
+
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
+
+    const togglePasswordVisibilityforgot = () => {
+        setShowForgotPassword(!showForgotPassword);
+    };
 
     useEffect(() => {
         const storedAuth = sessionStorage.getItem("isAuthenticated");
@@ -183,7 +195,7 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
             if (response.status == 200) {
                 sessionStorage.setItem("isAuthenticated", "true");
                 sessionStorage.setItem("customerEmail", formData.email);
-                sessionStorage.setItem("cartCount",0);
+                sessionStorage.setItem("cartCount", 0);
                 sessionStorage.setItem("cartState", JSON.stringify({}));
                 setIsAuthenticated(true);
                 // console.log("Slug title : "+productSlugTitle);
@@ -519,7 +531,7 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
             if (response.status === 200) {
                 sessionStorage.setItem("isAuthenticated", "true");
                 sessionStorage.setItem("customerEmail", formData.email);
-                sessionStorage.setItem("cartCount",0);
+                sessionStorage.setItem("cartCount", 0);
                 sessionStorage.setItem("cartState", JSON.stringify({}));
                 setIsAuthenticated(true);
                 setVerified(true);
@@ -730,25 +742,37 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
                                     {verified === true && (
                                         <>
                                             <label>Enter New Password <span className="required">*</span></label>
-                                            <input
-                                                type="password"
-                                                name="password"
-                                                placeholder="New Password"
-                                                required
-                                                onChange={handleForgotPasswordChange}
-                                                value={forgotPasswordData.password}
-                                            />
+                                            <div style={{ position: "relative", width: "93%" }}>
+                                                <input
+                                                    type={showPassword ? "text" : "password"}
+                                                    name="password"
+                                                    placeholder="New Password"
+                                                    required
+                                                    value={forgotPasswordData.password}
+                                                    onChange={handleForgotPasswordChange}
+                                                    style={{ width: "100%", paddingRight: "40px" }} // Ensure space for icon
+                                                />
+                                                <span className="toggle-password-icon" onClick={togglePasswordVisibility}>
+                                                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                                </span>
+                                            </div>
                                             {errors.password && <div className="error">{errors.password}</div>}
 
                                             <label>Confirm New Password <span className="required">*</span></label>
-                                            <input
-                                                type="password"
-                                                name="confirmPassword"
-                                                placeholder="Confirm New Password"
-                                                required
-                                                onChange={handleForgotPasswordChange}
-                                                value={forgotPasswordData.confirmPassword}
-                                            />
+                                            <div style={{ position: "relative", width: "93%" }}>
+                                                <input
+                                                    type={showPassword ? "text" : "password"}
+                                                    name="confirmPassword"
+                                                    placeholder="Confirm New Password"
+                                                    required
+                                                    value={forgotPasswordData.confirmPassword}
+                                                    onChange={handleForgotPasswordChange}
+                                                    style={{ width: "100%", paddingRight: "40px" }} // Ensure space for icon
+                                                />
+                                                <span className="toggle-password-icon" onClick={togglePasswordVisibilityforgot}>
+                                                    {showForgotPassword ? <FaEyeSlash /> : <FaEye />}
+                                                </span>
+                                            </div>
                                             {errors.confirmPassword && <div className="error">{errors.confirmPassword}</div>}
 
                                             {/* Submit button should be disabled if required fields are missing */}
@@ -842,15 +866,21 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
                             {errors.email && <div className="error">{errors.email}</div>}
 
                             <label>Enter Password <span className="required">*</span></label>
-                            <input
-                                type="password"
-                                name="password"
-                                placeholder="Password"
-                                required
-                                value={formData.password}
-                                onChange={handleInputChange}
-                                disabled={otpSent}
-                            />
+                            <div style={{ position: "relative", width: "93%" }}>
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    name="password"
+                                    placeholder="Password"
+                                    required
+                                    value={formData.password}
+                                    onChange={handleInputChange}
+                                    disabled={otpSent}
+                                    style={{ width: "100%", paddingRight: "40px" }} // Ensure space for icon
+                                />
+                                <span className="toggle-password-icon" onClick={togglePasswordVisibility}>
+                                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                </span>
+                            </div>
                             <button type="submit" className="btn btn-primary">
                                 Login
                             </button>
@@ -928,27 +958,40 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
                                     {verified === true && (
                                         <>
                                             <label>Enter New Password <span className="required">*</span></label>
-                                            <input
-                                                type="password"
-                                                name="password"
-                                                placeholder="New Password"
-                                                required
-                                                onChange={handleForgotPasswordChange}
-                                                value={forgotPasswordData.password}
-                                            />
+                                            <div style={{ position: "relative", width: "93%" }}>
+                                                <input
+                                                    type={showPassword ? "text" : "password"}
+                                                    name="password"
+                                                    placeholder="New Password"
+                                                    required
+                                                    value={forgotPasswordData.password}
+                                                    onChange={handleForgotPasswordChange}
+                                                    style={{ width: "100%", paddingRight: "40px" }} // Ensure space for icon
+                                                />
+                                                <span className="toggle-password-icon" onClick={togglePasswordVisibility}>
+                                                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                                </span>
+                                            </div>
                                             {errors.password && <div className="error">{errors.password}</div>}
 
                                             <label>Confirm New Password <span className="required">*</span></label>
-                                            <input
-                                                type="password"
-                                                name="confirmPassword"
-                                                placeholder="Confirm New Password"
-                                                required
-                                                onChange={handleForgotPasswordChange}
-                                                value={forgotPasswordData.confirmPassword}
-                                            />
+                                            <div style={{ position: "relative", width: "93%" }}>
+                                                <input
+                                                    type={showPassword ? "text" : "password"}
+                                                    name="confirmPassword"
+                                                    placeholder="Confirm New Password"
+                                                    required
+                                                    value={forgotPasswordData.confirmPassword}
+                                                    onChange={handleForgotPasswordChange}
+                                                    style={{ width: "100%", paddingRight: "40px" }} // Ensure space for icon
+                                                />
+                                                <span className="toggle-password-icon" onClick={togglePasswordVisibilityforgot}>
+                                                    {showForgotPassword ? <FaEyeSlash /> : <FaEye />}
+                                                </span>
+                                            </div>
                                             {errors.confirmPassword && <div className="error">{errors.confirmPassword}</div>}
 
+                                            {/* Submit button should be disabled if required fields are missing */}
                                             {Object.keys(errors).length === 0 &&
                                                 forgotPasswordData.email &&
                                                 forgotPasswordData.password &&
@@ -1009,29 +1052,41 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
                             {errors.email && <div className="error">{errors.email}</div>}
 
                             <label>Create Password <span className="required">*</span></label>
-                            <input
-                                type="password"
-                                name="password"
-                                placeholder="Password"
-                                required
-                                value={formData.password}
-                                onChange={handleInputChange}
-                                disabled={otpSent}
-                            />
+                            <div style={{ position: "relative", width: "93%" }}>
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    name="password"
+                                    placeholder="Password"
+                                    required
+                                    value={formData.password}
+                                    onChange={handleInputChange}
+                                    disabled={otpSent}
+                                    style={{ width: "100%", paddingRight: "40px" }} // Ensure space for icon
+                                />
+                                <span className="toggle-password-icon" onClick={togglePasswordVisibility}>
+                                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                </span>
+                            </div>
                             {errors.password && <div className="error">{errors.password}</div>}
 
                             <label className="password-info">Password must be 4 to 15 characters</label>
 
                             <label>Confirm Password <span className="required">*</span></label>
-                            <input
-                                type="password"
-                                name="confirmPassword"
-                                placeholder="Confirm Password"
-                                required
-                                value={formData.confirmPassword}
-                                onChange={handleInputChange}
-                                disabled={otpSent}
-                            />
+                            <div style={{ position: "relative", width: "93%" }}>
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    name="confirmPassword"
+                                    placeholder="Confirm Password"
+                                    required
+                                    value={formData.confirmPassword}
+                                    onChange={handleInputChange}
+                                    disabled={otpSent}
+                                    style={{ width: "100%", paddingRight: "40px" }} // Ensure space for icon
+                                />
+                                <span className="toggle-password-icon" onClick={togglePasswordVisibilityforgot}>
+                                    {showForgotPassword ? <FaEyeSlash /> : <FaEye />}
+                                </span>
+                            </div>
                             {errors.confirmPassword && <div className="error">{errors.confirmPassword}</div>}
 
                             <label>Enter Referral Code <span className="required">(Optional)</span></label>

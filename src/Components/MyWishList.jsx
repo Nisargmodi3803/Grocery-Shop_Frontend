@@ -19,7 +19,7 @@ import { FaRegHeart, FaHeart } from "react-icons/fa";
 import { MdAccessTime, MdOutlineChatBubbleOutline } from "react-icons/md";
 import { MdCancelPresentation } from "react-icons/md";
 import { InquiryNow } from './InquiryNow';
-import { LoginSignUpModal } from './LoginSignUpModal';
+import { use } from 'react';
 
 const importAll = (r) => {
   let images = {};
@@ -50,6 +50,7 @@ export const MyWishList = () => {
     const storedCart = sessionStorage.getItem("cartState");
     return storedCart ? JSON.parse(storedCart) : {};
   });
+  const [productNotFound, setProductNotFound] = useState(false);
 
   const fetchCustomerDetails = async () => {
     setLoading(true);
@@ -138,6 +139,7 @@ export const MyWishList = () => {
   };
 
   const handleDeleteClick = async () => {
+    setLoading(true);
     const result = await deleteProfileImageAlert(); // Await the user's response
 
     if (result.isConfirmed) {
@@ -157,6 +159,8 @@ export const MyWishList = () => {
             console.error('Error deleting image:', error);
             Swal.fire("Error", "Something went wrong. Please try again!", "error");
           }
+        } finally {
+          setLoading(false);
         }
       }
     }
@@ -185,6 +189,7 @@ export const MyWishList = () => {
       sessionStorage.removeItem("customerEmail");
       sessionStorage.removeItem("cartCount");
       sessionStorage.removeItem("customerData");
+      sessionStorage.removeItem("cartState");
       await Swal.fire("Logged Out!", "You have been logged out.", "success");
       navigate("/ecommerce/");
       window.location.reload();
@@ -196,6 +201,7 @@ export const MyWishList = () => {
   };
 
   const fetchWishListProducts = async () => {
+    setLoading(true);
     try {
       const response = await axios.get(`http://localhost:9000/wishlist/${sessionStorage.getItem("customerEmail")}`);
       if (response.status === 200) {
@@ -207,6 +213,10 @@ export const MyWishList = () => {
       } else {
         console.error("Error fetching wish list:", error);
       }
+    } finally {
+      const timer = setTimeout(() => {
+        setLoading(false);
+      }, 1000);
     }
   }
 
@@ -358,6 +368,7 @@ export const MyWishList = () => {
   };
 
   const toggleDislike = async (productId) => {
+    setLoading(true);
     try {
       const response = await axios.patch(`http://localhost:9000/remove-wishlist?customerEmail=${sessionStorage.getItem("customerEmail")}&productId=${productId}`);
 
@@ -372,6 +383,10 @@ export const MyWishList = () => {
         console.error(`Error disliking product:`, error);
         alert("Something went wrong in disliking the product. Please try again!");
       }
+    } finally {
+      const timer = setTimeout(() => {
+        setLoading(false);
+      }, 1000);
     }
   }
 
@@ -600,9 +615,11 @@ export const MyWishList = () => {
                   })}
                 </div>
               ) : (
-                <h1 style={{ fontSize: '1.5rem', color: 'red' }}>
-                  NO PRODUCT AVAILABLE ON YOUR WISHLIST!
-                </h1>
+                { productNotFound } ? (
+                  <h1 style={{ fontSize: '1.5rem', color: 'red' }}>
+                    NO PRODUCT AVAILABLE ON YOUR WISHLIST!
+                  </h1>
+                ) : null
               )}
             </div>
           </div>

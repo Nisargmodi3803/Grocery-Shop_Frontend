@@ -214,31 +214,85 @@ export const SubCategory = () => {
     }, [sortOption]);
 
 
-    useEffect(() => {
-        const fetchLikedProducts = async () => {
-            if (!isAuthenticated) return;
+    const fetchLikedProducts = async () => {
+        if (!isAuthenticated) return;
 
-            try {
-                const response = await axios.get(`http://localhost:9000/wishlist/${sessionStorage.getItem("customerEmail")}`);
+        try {
+            const response = await axios.get(`http://localhost:9000/wishlist/${sessionStorage.getItem("customerEmail")}`);
 
-                if (response.status === 200) {
-                    const likedIds = response.data.map(item => item.product.id);
-                    const likedState = likedIds.reduce((acc, id) => {
-                        acc[id] = true;
-                        return acc;
-                    }, {});
-                    setLikedProducts(likedState);
-                }
-            } catch (error) {
-                if (error.response?.status === 404) {
-                    console.log("Customer not found");
-                } else {
-                    console.error("Error fetching liked products:", error);
-                    alert("Something went wrong in fetching Liked Products. Please try again!");
-                }
+            if (response.status === 200) {
+                const likedIds = response.data.map(item => item.product.id);
+                const likedState = likedIds.reduce((acc, id) => {
+                    acc[id] = true;
+                    return acc;
+                }, {});
+                setLikedProducts(likedState);
             }
-        };
+        } catch (error) {
+            if (error.response?.status === 404) {
+                console.log("Customer not found");
+            } else {
+                console.error("Error fetching liked products:", error);
+                alert("Something went wrong in fetching Liked Products. Please try again!");
+            }
+        }
+    };
 
+    const fetchCart = async () => {
+        const customerEmail = sessionStorage.getItem("customerEmail");
+        if (!customerEmail) return;
+
+        try {
+            const response = await axios.get(`http://localhost:9000/cart/${customerEmail}`);
+            if (response.status === 200) {
+                const cartData = response.data || []; // Ensure it's an array
+
+                // ✅ Get current cart state from sessionStorage
+                const storedCartState = JSON.parse(sessionStorage.getItem("cartState") || "{}");
+
+                const updatedCartState = cartData.reduce((acc, item) => {
+                    const productId = item.product?.id; // Ensure product exists
+                    if (!productId) return acc; // Skip if productId is undefined
+
+                    // ✅ Check if product already exists in sessionStorage
+                    if (!storedCartState[productId]) {
+                        acc[productId] = {
+                            cartBtnClicked: true,
+                            cartCount: item.productQuantity, // Assuming API returns `productQuantity`
+                        };
+                    } else {
+                        // Keep existing state if already in sessionStorage
+                        acc[productId] = storedCartState[productId];
+                    }
+
+                    return acc;
+                }, { ...storedCartState }); // Start with stored cart state
+
+                console.log("Updated Cart State:", updatedCartState);
+
+                // ✅ Update state & sessionStorage
+                setCartState(updatedCartState);
+                sessionStorage.setItem("cartState", JSON.stringify(updatedCartState));
+
+                // ✅ Update total cart count
+                const totalCount = Object.values(updatedCartState).reduce(
+                    (sum, item) => sum + (item.cartCount || 0),
+                    0
+                );
+                sessionStorage.setItem("cartCount", totalCount.toString());
+
+                // Notify other components
+                window.dispatchEvent(new Event("cartUpdated"));
+            }
+        } catch (error) {
+            console.error("Error fetching cart details:", error);
+        }
+    };
+
+
+
+    useEffect(() => {
+        fetchCart();
         fetchLikedProducts();
     }, [isAuthenticated]);
 
