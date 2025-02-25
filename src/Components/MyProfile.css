@@ -65,6 +65,9 @@
     margin-top: 25px;
     font-size: 22px;
     color: #133365;
+    /* margin-left: 45px;
+    gap: 5px; */
+    justify-content: center;
 }
 
 .profile-image {

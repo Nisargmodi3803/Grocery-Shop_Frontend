@@ -7,6 +7,10 @@ import { useLoading } from '../Context/LoadingContext';
 import { HiMiniMinusSmall } from "react-icons/hi2";
 import { FaRegEdit } from "react-icons/fa";
 import { ImCancelCircle } from "react-icons/im";
+import { FaArrowRightLong } from "react-icons/fa6";
+import { MdCancelPresentation } from "react-icons/md";
+import Swal from 'sweetalert2';
+import { FaUser, FaPhone, FaEnvelope, FaCity, FaMapMarkerAlt, FaClipboardList, FaClock } from "react-icons/fa";
 
 const importAll = (r) => {
   let images = {};
@@ -32,33 +36,182 @@ export const MyCart = () => {
 
   const [cities, setCities] = useState([]);
   const [deliveryTime, setDeliveryTime] = useState([]);
-  const [editMode, setEditMode] = useState({
-    name: false,
-    mobile: false,
-    city: false,
-    pincode: false,
-    address: false,
-    instructions: false,
-    deliveryTime: false,
-  });
+  const [showDeliveryAddress, setDeliveryAddress] = useState(true);
+  const [showPaymentMethod, setPaymentMethod] = useState(true);
+
+  const [couponCode, setCouponCode] = useState({}); // For Coupon Code
 
   const [updateDelivery, setUpdateDelivery] = useState({
-    customerName: "Shubham Bhatt",
-    customerMobile: "8320099260",
-    customerEmail: "shubham@bitsinfotech.in",
-    customerCity: "1",
-    customerPincode: "380051",
-    customerAddress: "A-605, Siddhi Vinayak Towers, Ahmedabad",
+    customerName: "",
+    customerMobile: "",
+    customerEmail: "",
+    customerCity: 0,
+    customerPincode: "",
+    customerAddress: "",
     specialInstructions: "",
-    deliveryTime: "",
+    deliveryTime: 0,
+    paymentMethod: 1
   });
 
-  const handleEditClick = (field) => {
-    setEditMode({ ...editMode, [field]: true });
+  // Use useEffect to update state when customer data is available
+  useEffect(() => {
+    if (customer) {
+      setUpdateDelivery((prev) => ({
+        ...prev,
+        customerName: customer.customerName || "",
+        customerMobile: customer.customerMobile || "",
+        customerEmail: customer.customerEmail || "",
+        customerAddress: customer.customerAddress || "",
+        customerPincode: customer.customerPincode || "",
+        customerCity: customer.customerCity || 0
+      }));
+    }
+  }, [customer]);
+
+  const [errors, setErrors] = useState({});
+
+  // Validation function
+  const validateField = (name, value) => {
+    let error = { ...errors };
+
+    if (name === "customerName"){
+      if (!value.trim()) error.customerName = "Full Name is required!";
+      else error.customerName = "";
+    }
+    if (name === "customerMobile") {
+      if (!value.trim()) error.customerMobile = "Phone number is required!";
+      else if (!/^\d{10}$/.test(value)) error.customerMobile = "Invalid phone number! Must be 10 digits.";
+      else error.customerMobile = "";
+    }
+    if (name === "customerCity"){
+      if (!value || value === 0) error.customerCity = "Please select a city!";
+      else error.customerCity = "";
+    }
+    if (name === "customerAddress"){
+      if (!value.trim()) error.customerAddress = "Address is required!";
+      else error.customerAddress = "";
+    }
+    if (name === "customerPincode") {
+      if (!value.trim()) error.customerPincode = "Pincode is required!";
+      else if (!/^\d{6}$/.test(String(value))) error.customerPincode = "Invalid Pincode! Must be 6 digits.";
+      else error.customerPincode = "";
+    }
+    if (name === "deliveryTime"){
+      if (!value || value === 0) error.deliveryTime = "Please select a delivery time!";
+      else error.deliveryTime = "";
+    }
+
+    setErrors(error);
   };
 
-  const handleCancelClick = (field) => {
-    setEditMode({ ...editMode, [field]: false });
+  // Handle change in input
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setUpdateDelivery((prev) => ({ ...prev, [name]: value }));
+
+    console.log("update Delivery "+updateDelivery.customerName);
+    console.log("update Delivery "+updateDelivery.customerMobile);
+    console.log("update Delivery "+updateDelivery.customerEmail);
+    console.log("update Delivery city "+updateDelivery.customerCity);
+    console.log("update Delivery "+updateDelivery.customerPincode);
+    console.log("update Delivery "+updateDelivery.customerAddress);
+    console.log("update Delivery "+updateDelivery.specialInstructions);
+    console.log("update Delivery "+updateDelivery.paymentMethod);
+    console.log("update Delivery time"+updateDelivery.deliveryTime);
+
+    validateField(name, value);
+  };
+
+  const handleCheckBoxOption = (e) => {
+    const { name, value } = e.target;
+    setUpdateDelivery((prev) => ({ ...prev, [name]: Number(value) }));
+    validateField(name, Number(value));
+  };
+
+
+  const placeOrder = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.post(`http://localhost:9000/add-order/${sessionStorage.getItem("customerEmail")}`, {
+        name: updateDelivery.customerName,
+        mobile: updateDelivery.customerMobile,
+        email: updateDelivery.customerEmail,
+        cityId: updateDelivery.customerCity,
+        address: updateDelivery.customerAddress,
+        pincode: updateDelivery.customerPincode,
+        specialInstructions: updateDelivery.specialInstructions,
+        paymentMode: updateDelivery.paymentMethod,
+        totalAmount: calculateTotalPayable(),
+        deliveryTimeSlotId: updateDelivery.deliveryTime,
+        // couponId: ,
+        // couponDiscount: ,
+      })
+
+      if (response.status === 200) {
+        setLoading(false);
+        await Swal.fire({
+          title: "Order",
+          text: "Order Placed Successfully!",
+          icon: "success",
+          confirmButtonText: "OK"
+        });
+        setLoading(true);
+      }
+    } catch (error) {
+      if (error.response.status === 404) {
+        setLoading(false);
+        await Swal.fire({
+          title: "Order",
+          text: "Order Placed Failed!",
+          icon: "error",
+          confirmButtonText: "OK"
+        });
+        setLoading(true);
+      } else {
+        console.error("Error placing order:", error);
+        alert("Something went wrong in placing order. Please try again!");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateCustomer = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.patch(`http://localhost:9000/update-customer/${sessionStorage.getItem("customerEmail")}`, {
+        cityId: updateDelivery.customerCity,
+        pincode: updateDelivery.customerPincode,
+        points: 0.00
+      });
+
+      if (response.status === 200) {
+        console.log("Customer Updated Successfully!");
+      }
+    } catch (error) {
+      if (error.response.status === 404) {
+        console.log("Customer not found");
+      } else {
+        console.error("Error updating customer:", error);
+        alert("Something went wrong in updating customer. Please try again!");
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const handlePlaceOrder = (e) => {
+    e.preventDefault();
+
+    // Validate all fields before submitting
+    Object.keys(updateDelivery).forEach((key) => validateField(key, updateDelivery[key]));
+
+    if (Object.values(errors).some((err) => err)) return; // Stop submission if any error exists
+
+    if (updateDelivery.paymentMethod === 1) {
+      placeOrder();
+      updateCustomer();
+    }
   };
 
 
@@ -118,6 +271,46 @@ export const MyCart = () => {
     fetchCart();
   }, [cartState, cartItems]);
 
+  const removeFromCart = async (productId) => {
+    setLoading(true);
+    try {
+      const response = await axios.patch(`http://localhost:9000/remove-cart?customerEmail=${sessionStorage.getItem("customerEmail")}&productId=${productId}`);
+
+      if (response.status === 200) {
+        setCartState((prev) => {
+          let newCartState = { ...prev };
+          delete newCartState[productId]; // Remove item
+
+          sessionStorage.setItem("cartState", JSON.stringify(newCartState));
+
+          // ✅ Update total cart count
+          const totalCount = Object.values(newCartState).reduce(
+            (sum, item) => sum + (item.cartCount || 0),
+            0
+          );
+
+          if (totalCount === 0) {
+            sessionStorage.removeItem("cartState");
+            sessionStorage.setItem("cartCount", "0");
+            window.dispatchEvent(new Event("cartUpdated"));
+            navigate('/ecommerce/');
+            window.location.reload();
+          } else {
+            sessionStorage.setItem("cartCount", totalCount.toString());
+            window.dispatchEvent(new Event("cartUpdated"));
+          }
+
+          return newCartState;
+        });
+      }
+    } catch (error) {
+      console.error("Error removing product from cart:", error);
+      alert("Something went wrong in removing product from cart. Please try again!");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   const updateCartCount = async (productId, increment) => {
 
     if (increment === 1) { // Increament by 1
@@ -151,42 +344,49 @@ export const MyCart = () => {
 
     setCartState((prev) => {
       let newCartState = { ...prev };
-      const newCount = Math.max((prev[productId]?.cartCount || 0) + increment, 0);
+      const prevCount = prev[productId]?.cartCount || 0; // Previous quantity
+      const newCount = Math.max(prevCount + increment, 0); // Updated quantity
+
+      let cartCount = parseInt(sessionStorage.getItem("cartCount") || "0", 10);
 
       if (newCount === 0) {
         console.log("Product removed from cart:", productId);
-        delete newCartState[productId]; // ✅ Remove product from cartState when count is 0
+        delete newCartState[productId]; // ✅ Remove from cartState
+        cartCount -= 1; // ✅ Remove 1 unique item from cart count
       } else {
         newCartState[productId] = {
           ...prev[productId],
           cartCount: newCount,
           cartBtnClicked: true,
         };
+
+        if (prevCount === 0) {
+          cartCount += 1; // ✅ Add 1 to cart count when a new item is added
+        }
       }
 
-      // ✅ Update sessionStorage
+      // ✅ Ensure cartCount is never negative
+      cartCount = Math.max(cartCount, 0);
+
       setTimeout(() => {
         sessionStorage.setItem("cartState", JSON.stringify(newCartState));
 
-        const totalCount = Object.values(newCartState).reduce(
-          (sum, item) => sum + (item.cartCount || 0),
-          0
-        );
-
-        if (totalCount === 0) {
+        if (cartCount === 0) {
           sessionStorage.removeItem("cartState");
           sessionStorage.setItem("cartCount", "0");
           window.dispatchEvent(new Event("cartUpdated"));
           navigate('/ecommerce/');
           window.location.reload();
         } else {
-          sessionStorage.setItem("cartCount", totalCount.toString());
+          sessionStorage.setItem("cartCount", cartCount.toString());
           window.dispatchEvent(new Event("cartUpdated"));
         }
-      }, 100); // Small delay to ensure state updates first
+      }, 100);
 
       return newCartState;
     });
+
+
   };
 
 
@@ -246,6 +446,10 @@ export const MyCart = () => {
   }
 
   useEffect(() => {
+    if (!sessionStorage.getItem("isAuthenticated")) {
+      navigate('/ecommerce/');
+    }
+
     fetchCart();
     fetchCustomerDetails();
   }, [])
@@ -291,9 +495,9 @@ export const MyCart = () => {
     }
   }
 
-  const fetchDeliveryTimes = () => {
+  const fetchDeliveryTimes = async () => {
     try {
-      const response = axios.get(`http://localhost:9000/time-slot`);
+      const response = await axios.get(`http://localhost:9000/time-slot`);
 
       if (response.status === 200) {
         setDeliveryTime(response.data);
@@ -367,6 +571,9 @@ export const MyCart = () => {
                         )}
 
                       </div>
+                      <div className='like-icon3' onClick={() => removeFromCart(item.product.id)}>
+                        <MdCancelPresentation />
+                      </div>
                     </div>
                   )
                 })}
@@ -420,207 +627,177 @@ export const MyCart = () => {
                     <h3>TOTAL PAYABLE</h3>
                     <span>₹{calculateTotalPayable()}</span>
                   </div>
+                  {calculateTotalPayable() < 500 && <span style={{ color: '#133365', display: 'flex' }}>Shop for ₹{500 - calculateTotalPayable()} more for free shipping.</span>}
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="my-delivery-section">
+          <div className="my-delivery-section"
+            onClick={(e) => {
+              e.stopPropagation();
+              setDeliveryAddress(!showDeliveryAddress);
+            }}>
             <div className="my-delivery-section-header">
-              <span>1</span>
+              <div className={showDeliveryAddress ? "orange" : "green"}>1</div>
               <h1>DELIVERY ADDRESS</h1>
             </div>
-            <div className="my-delivery-section-body">
-              <div className="delivery-detail">
-                {/* Full Name */}
-                <h3>👤 FULL NAME</h3>
-                {editMode.name ? (
-                  <div className="edit-part1">
+            {showDeliveryAddress && <div className="my-delivery-section-body"
+              onClick={(e) => e.stopPropagation()}>
+              <div className="delivery-form">
+                <div className="form-group">
+                  <h3><FaUser /> FULL NAME *</h3>
+                  <input
+                    type="text"
+                    name='customerName'
+                    value={updateDelivery.customerName || ""}
+                    onChange={handleChange}
+                  />
+                  {errors.customerName && <span className="error">{errors.customerName}</span>}
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <h3><FaPhone /> PHONE *</h3>
                     <input
                       type="text"
-                      value={updateDelivery.customerName}
-                      onChange={(e) =>
-                        setUpdateDelivery({ ...updateDelivery, customerName: e.target.value })
-                      }
+                      name='customerMobile'
+                      value={updateDelivery.customerMobile || ""}
+                      onChange={handleChange}
+                      style={{ width: "95%" }}
                     />
-                    <span className="delete1" onClick={() => handleCancelClick("name")}>
-                      <ImCancelCircle />
-                    </span>
+                    {errors.customerMobile && <span className="error">{errors.customerMobile}</span>}
                   </div>
-                ) : (
-                  <p>
-                    {updateDelivery.customerName}
-                    <span className="edit1" onClick={() => handleEditClick("name")}>
-                      <FaRegEdit />
-                    </span>
-                  </p>
-                )}
 
-                {/* Mobile Number */}
-                <h3>📞 PHONE</h3>
-                {editMode.mobile ? (
-                  <div className="edit-part1">
-                    <input
-                      type="text"
-                      value={updateDelivery.customerMobile}
-                      onChange={(e) =>
-                        setUpdateDelivery({ ...updateDelivery, customerMobile: e.target.value })
-                      }
-                    />
-                    <span className="delete1" onClick={() => handleCancelClick("mobile")}>
-                      <ImCancelCircle />
-                    </span>
+                  <div className="form-group" style={{ marginLeft: "10px" }}>
+                    <h3><FaEnvelope /> EMAIL ADDRESS</h3>
+                    <input type="text" value={updateDelivery.customerEmail || ""} disabled />
                   </div>
-                ) : (
-                  <p>
-                    {updateDelivery.customerMobile}
-                    <span className="edit1" onClick={() => handleEditClick("mobile")}>
-                      <FaRegEdit />
-                    </span>
-                  </p>
-                )}
+                </div>
 
-                {/* Email Address (Non-Editable) */}
-                <h3>✉️ EMAIL ADDRESS</h3>
-                <p>{updateDelivery.customerEmail}</p>
-
-                {/* City Selection */}
-                <h3>🏙️ CITY</h3>
-                {editMode.city ? (
-                  <div className="edit-part1">
+                <div className="form-row">
+                  <div className="form-group">
+                    <h3><FaCity /> CITY *</h3>
                     <select
-                      className="sort-dropdown"
-                      value={updateDelivery.customerCity}
-                      onChange={(e) => setUpdateDelivery({ ...updateDelivery, customerCity: e.target.value })}
+                      value={updateDelivery.customerCity || ""}
+                      onChange={handleCheckBoxOption}
+                      name='customerCity'
                     >
-                      <option value="0">Select City</option>
-                      {
-                        cities.map((city) => (
-                          <option key={city.id} value={city.id}>{city.cityName}</option>
-                        ))
-                      }
-                    </select>
-                    <span className="delete1" onClick={() => handleCancelClick("city")}>
-                      <ImCancelCircle />
-                    </span>
-                  </div>
-                ) : (
-                  <p>
-                    Not Selected
-                    <span className="edit1" onClick={() => handleEditClick("city")}>
-                      <FaRegEdit />
-                    </span>
-                  </p>
-                )}
-
-                {/* Pincode */}
-                <h3>🔢 PINCODE</h3>
-                {editMode.pincode ? (
-                  <div className="edit-part1">
-                    <input
-                      type="text"
-                      value={updateDelivery.customerPincode}
-                      onChange={(e) =>
-                        setUpdateDelivery({ ...updateDelivery, customerPincode: e.target.value })
-                      }
-                    />
-                    <span className="delete1" onClick={() => handleCancelClick("pincode")}>
-                      <ImCancelCircle />
-                    </span>
-                  </div>
-                ) : (
-                  <p>
-                    {updateDelivery.customerPincode}
-                    <span className="edit1" onClick={() => handleEditClick("pincode")}>
-                      <FaRegEdit />
-                    </span>
-                  </p>
-                )}
-
-                {/* Address */}
-                <h3>📍 SHIPPING ADDRESS</h3>
-                {editMode.address ? (
-                  <div className="edit-part1">
-                    <input
-                      type="text"
-                      value={updateDelivery.customerAddress}
-                      onChange={(e) =>
-                        setUpdateDelivery({ ...updateDelivery, customerAddress: e.target.value })
-                      }
-                    />
-                    <span className="delete1" onClick={() => handleCancelClick("address")}>
-                      <ImCancelCircle />
-                    </span>
-                  </div>
-                ) : (
-                  <p>
-                    {updateDelivery.customerAddress || "Not Specified Yet"}
-                    <span className="edit1" onClick={() => handleEditClick("address")}>
-                      <FaRegEdit />
-                    </span>
-                  </p>
-                )}
-
-                {/* Special Instructions */}
-                <h3>📝 SPECIAL INSTRUCTIONS</h3>
-                {editMode.instructions ? (
-                  <div className="edit-part1">
-                    <textarea
-                      value={updateDelivery.specialInstructions}
-                      onChange={(e) =>
-                        setUpdateDelivery({ ...updateDelivery, specialInstructions: e.target.value })
-                      }
-                    ></textarea>
-                    <span className="delete1" onClick={() => handleCancelClick("instructions")}>
-                      <ImCancelCircle />
-                    </span>
-                  </div>
-                ) : (
-                  <p>
-                    {updateDelivery.specialInstructions || "No Special Instructions"}
-                    <span className="edit1" onClick={() => handleEditClick("instructions")}>
-                      <FaRegEdit />
-                    </span>
-                  </p>
-                )}
-
-                {/* Delivery Time Slot */}
-                <h3>⏰ SELECT DELIVERY TIME</h3>
-                {editMode.deliveryTime ? (
-                  <div className="edit-part1">
-                    <select
-                      className="sort-dropdown"
-                      value={updateDelivery.deliveryTime}
-                      onChange={(e) => setUpdateDelivery({ ...updateDelivery, deliveryTime: e.target.value })}
-                    >
-                      <option value="">Select Time Slot</option>
-                      {deliveryTime.map((time) => (
-                        <option key={time.deliveryTimeSlotId} value={time.deliveryTime}>{time.deliveryTime}</option>
+                      <option value={0}>Select City</option>
+                      {cities.map((city) => (
+                        <option key={city.cityId} value={city.cityId}>
+                          {city.cityName}
+                        </option>
                       ))}
                     </select>
-                    <span className="delete1" onClick={() => handleCancelClick("deliveryTime")}>
-                      <ImCancelCircle />
-                    </span>
+                    {errors.customerCity && <span className="error">{errors.customerCity}</span>}
                   </div>
-                ) : (
-                  <p>
-                    {updateDelivery.deliveryTime || "Not Selected"}
-                    <span className="edit1" onClick={() => handleEditClick("deliveryTime")}>
-                      <FaRegEdit />
-                    </span>
-                  </p>
-                )}
-              </div>
-            </div>
-            {/* <div className='my-cart-header'>
-              
-              <h3></h3>
-            </div>
 
-            <div className='my-cart-header'>
-              <span>2</span>
-              <h3>PAYMENT</h3>
-            </div> */}
+                  <div className="form-group">
+                    <h3><FaMapMarkerAlt /> PINCODE *</h3>
+                    <input
+                      type="text"
+                      name='customerPincode'
+                      value={updateDelivery.customerPincode || ""}
+                      onChange={handleChange}
+                    />
+                    {errors.customerPincode && <span className="error">{errors.customerPincode}</span>}
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <h3><FaMapMarkerAlt /> SHIPPING ADDRESS *</h3>
+                  <textarea
+                    value={updateDelivery.customerAddress || ""}
+                    onChange={handleChange}
+                    name='customerAddress'
+                  ></textarea>
+                </div>
+
+                <div className="form-group">
+                  <h3><FaClipboardList /> SPECIAL INSTRUCTIONS</h3>
+                  <textarea
+                    value={updateDelivery.specialInstructions || ""}
+                    onChange={handleChange}
+                    name='specialInstructions'
+                  ></textarea>
+                </div>
+
+                <div className="form-group">
+                  <h3><FaClock /> SELECT DELIVERY TIME *</h3>
+                  <select
+                    value={updateDelivery.deliveryTime || ""}
+                    onChange={handleCheckBoxOption}
+                    style={{ width: "50%" }}
+                    name='deliveryTime'
+                  >
+                    <option value={0}>Select Delivery Time</option>
+                    {deliveryTime.map((time) => (
+                      <option key={time.deliveryTimeSlotId} value={time.deliveryTimeSlotId}>
+                        {time.deliveryTime}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.deliveryTime && <span className="error">{errors.deliveryTime}</span>}
+                </div>
+              </div>
+            </div>}
+
+
+            <div className="my-delivery-section-header"
+              onClick={(e) => {
+                e.stopPropagation();
+                setPaymentMethod(!showPaymentMethod);
+              }}>
+              <div className={showPaymentMethod ? "orange" : "green"}>2</div>
+              <h1>PAYMENT</h1>
+            </div>
+            {showPaymentMethod && <div className='my-delivery-section-body'
+              onClick={(e) => e.stopPropagation()}>
+              <div className="my-payment-section">
+                <input
+                  type="radio"
+                  id="cash"
+                  name="paymentMethod"
+                  value={1}
+                  checked={updateDelivery.paymentMethod === 1}
+                  onChange={handleCheckBoxOption}
+                />
+                <label htmlFor="cash">CASH ON DELIVERY</label>
+
+                <input
+                  type="radio"
+                  id="online"
+                  name="paymentMethod"
+                  value={2}
+                  checked={updateDelivery.paymentMethod === 2}
+                  onChange={handleCheckBoxOption}
+                />
+                <label htmlFor="online">PAY ONLINE</label>
+
+              </div>
+
+              <div className='my-payment-section-button'>
+                {Object.keys(errors).length === 0 &&
+                  updateDelivery.customerName &&
+                  updateDelivery.customerMobile &&
+                  updateDelivery.customerCity != 0 &&
+                  updateDelivery.customerPincode &&
+                  updateDelivery.customerAddress &&
+                  updateDelivery.deliveryTime != 0 &&
+                  (updateDelivery.paymentMethod === 1 ? (   
+                    <button className="btn-otp" onClick={handlePlaceOrder}>
+                      PLACE ORDER <FaArrowRightLong />
+                    </button>
+                  ) : updateDelivery.paymentMethod === 2 ? (
+                    <button className="btn-otp">
+                      PROCEED TO PAY <FaArrowRightLong />
+                    </button>
+                  ) : null)}
+              </div>
+
+            </div>}
+
 
           </div>
         </div>

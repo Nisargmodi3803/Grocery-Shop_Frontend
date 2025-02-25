@@ -8,16 +8,18 @@
 .my-cart-section {
     display: flex;
     justify-content: center;
-    /* flex-direction: column; */
+    flex-direction: column;
+    margin-left: 50px;
 }
 
 .cart-section {
     display: flex;
-    width: 90%;
+    width: 95%;
     background: white;
     overflow: hidden;
     border: 1px solid #ddd;
     margin: 20px;
+    height: max-content;
 }
 
 .cart-nav-section {
@@ -31,6 +33,7 @@
 .cart-info {
     width: 100%;
     margin: 0px;
+    max-height: max-content;
 }
 
 .cart-info-header {
@@ -78,6 +81,18 @@
     padding-top: 3px;
     border-bottom: 1px solid #e0e0e0;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.like-icon3{
+    margin-bottom: 70px;
+    margin-right: -2px;
+    font-size: 26px;
+    cursor: pointer;
+    color: red;
+}
+
+.like-icon3:hover {
+    transform: scale(1.1);
 }
 
 .cart-info-body-card-image img {
@@ -196,7 +211,7 @@
     font-weight: bold;
     cursor: pointer;
     text-align: left;
-    margin-top: -15px;
+    margin-top: 0px;
 }
 
 .cart-info-payment-bill {
@@ -307,38 +322,78 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 30px;
-    border-radius: 10px;
-    width: 67%;
+    padding-top: 0px;
+    padding-left: 34px;
+    width: 66%;
+    padding-right: 0px;
 }
 
 .my-delivery-section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: Arial, sans-serif;
     background-color: #f4f7fc;
+    width: 100%;
+    padding: 20px;
+    padding-right: 40px;
+    padding-left: 25px;
+    margin-bottom: 1px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    height: 71px;
+    cursor: pointer;
+}
+
+.my-delivery-section-header .orange, .my-delivery-section-header .green{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.my-delivery-section-header .orange{
+    color: #e96a1a;
+    border: 2px solid #e96a1a;
+}
+
+.my-delivery-section-header .green{
+    color: green;
+    border: 2px solid green;
 }
 
 .my-delivery-section-header h1 {
-    font-size: 26px;
+    font-size: 22px;
     color: #133365;
-    margin-bottom: 20px;
-    border-bottom: 2px solid #e0e4e7;
-    padding-bottom: 10px;
     font-weight: bold;
 }
 
+
 .my-delivery-section-body {
     width: 100%;
-    padding-top: 20px;
-    /* max-height: ; */
+    display: flex;
+    flex-direction: column;
+    margin-top: 0px;
+    padding: 20px;
+    padding-right: 40px;
+    padding-left: 25px;
+    background: #fff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-top: none;
 }
 
-.delivery-detail {
-    margin-bottom: 20px;
-    padding: 15px;
-    background-color: #ffffff;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+.delivery-form {
+    padding-right: 20px;
 }
 
-.delivery-detail h3 {
+.form-group {
+    margin-bottom: 15px;
+}
+
+.my-delivery-section-body h3 {
     font-size: 16px;
     color: #133365;
     margin-bottom: 8px;
@@ -347,152 +402,98 @@
     font-weight: 600;
 }
 
-.delivery-detail p,
-.delivery-detail input {
-    font-size: 16px;
-    color: #666;
+.my-delivery-section-body h3 svg {
+    margin-right: 8px;
+    color: #133365;
+}
+
+.my-delivery-section-body input,
+.my-delivery-section-body select,
+.my-delivery-section-body textarea {
+    width: 100%;
     padding: 10px;
-    text-align: left;
-    border: 2px solid #ddd;
-    font-weight: 500;
-    margin-bottom: 27px;
+    border: 1px solid #ccc;
+    border-radius: 0px;
+    font-size: 14px;
+    background: #fff;
+    transition: border 0.3s ease-in-out;
+    margin-bottom: 0px;
+    display: flex;
+}
+
+.my-delivery-section-body input:focus,
+.my-delivery-section-body select:focus,
+.my-delivery-section-body textarea:focus {
+    border-color: black;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+}
+
+.my-delivery-section-body textarea {
+    resize: vertical;
+    height: 20px;
+}
+
+.form-row {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    gap: 15px;
 }
 
-.delivery-detail input[type="date"]::-webkit-calendar-picker-indicator {
-    cursor: pointer;
+.form-row .form-group {
+    flex: 1;
 }
 
-
-.delivery-detail span.edit1,
-.delivery-detail span.delete1 {
-    margin-left: 10px;
+input[disabled] {
+    background-color: #f0f0f0;
+    color: #888;
+    cursor: not-allowed;
 }
 
-.delivery-detail input {
-    width: 90%;
+@media (max-width: 600px) {
+    .form-row {
+        flex-direction: column;
+    }
 }
 
-.delivery-detail h3 svg {
-    margin-right: 10px;
-}
-
-.delivery-detail p span {
-    font-weight: 700;
-}
-
-.edit1 {
-    display: inline-block;
-    cursor: pointer;
-    color: green;
-    font-size: 18px;
-    margin-left: 10px;
-    transition: color 0.3s ease, transform 0.3s ease;
-}
-
-.edit1:hover {
-    color: #5a5b5b;
-    transform: scale(1.1);
-}
-
-
-.edit1-part {
-    display: flex;
-    align-items: center;
-    border: 2px solid #133365;
-    font-size: 16px;
-    font-weight: 500;
-    color: #666;
-    border-radius: 5px;
-    background-color: #fff;
-    padding: 5px 10px;
-    height: max-content;
-}
-
-.edit1-part input {
-    border: none;
-    outline: none;
-    font-size: 16px;
-    padding: 15px;
-    color: #333;
-    width: 100%;
-    margin: -5px;
-}
-
-.delete1 {
-    margin-left: 10px;
-    cursor: pointer;
-    font-size: 20px;
-    color: red;
-    transition: color 0.3s ease, transform 0.3s ease;
-}
-
-.delete1:hover {
-    color: darkred;
-    transform: scale(1.1);
-}
-
-.gender1-container {
+.my-payment-section{
     display: flex;
     gap: 15px;
     align-items: center;
 }
 
-.gender1-container label {
+.my-payment-section label{
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 16px;
-    border: 2px solid #ddd;
-    border-radius: 20px;
+    padding: 14px 22px;
+    border: 2px solid #133365;
     cursor: pointer;
     font-size: 16px;
     font-weight: 500;
     transition: all 0.3s ease-in-out;
+    color: #133365;
+    font-weight: bold;
+    border-radius: 5px;
 }
 
-.gender-container input[type="radio"] {
+.my-payment-section input[type="radio"] {
     display: none;
-    /* Hide default radio button */
 }
-
-.gender-container label:hover {
+ 
+.my-payment-section label:hover {
     background-color: #f1f1f1;
 }
 
-.gender-container input[type="radio"]:checked+label {
+.my-payment-section input[type="radio"]:checked+label {
     background-color: #133365;
     color: #fff;
-    box-shadow: 0 0 10px rgba(0, 123, 255, 0.4);
 }
 
-.gender-container label svg {
-    font-size: 20px;
+.my-payment-section-button{
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    margin-top: 15px;
+    justify-content: flex-end;
 }
-
-.save-btn {
-    background-color: #133365;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    font-size: 16px; 
-    cursor: pointer; 
-    /* display: flex; */
-}
-
-.save-btn:hover {
-    background-color: #0d244a;
-}
-
-.save-btn:active {
-    transform: scale(0.95);
-    background-color: #091b33;
-}
-
-.save-btn:disabled {
-    background-color: #cccccc; /* Gray background when disabled */
-    cursor: not-allowed; /* Disable cursor when button is disabled */
-}
-
