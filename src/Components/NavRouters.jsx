@@ -24,6 +24,8 @@ import { MyOrderList } from './MyOrderList';
 import { ReferAndEarn } from './ReferAndEarn';
 import { CouponCode } from './CouponCode';
 import { MyPoints } from './MyPoints';
+import { Offers } from './Offers';
+import { OffersNewYear } from './OffersNewYear';
 
 export const NavRouters = () => {
 
@@ -53,6 +55,8 @@ export const NavRouters = () => {
         <Route path='/ecommerce/refer-and-earn' element={<ReferAndEarn/>}/>
         <Route path='/ecommerce/coupon-code' element={<CouponCode />}/>
         <Route path='/ecommerce/my-ecommerce' element={<MyPoints/>}/>
+        <Route path='/ecommerce/offers/best-of-veg-fruits' element={<Offers/>}/>
+        <Route path='/ecommerce/offers/new-year' element={<OffersNewYear/>}/>
       </Routes>
       <Footer />
     </>

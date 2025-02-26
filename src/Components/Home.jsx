@@ -10,6 +10,7 @@ import { ProductCard } from './ProductCard';
 import axios from 'axios';
 import { BrandCardSlider } from './BrandCardSlider';
 import { useLoading } from '../Context/LoadingContext';
+import { NewYearProductCard } from './NewYearProductCard';
 
 const Slides =
     [
@@ -196,6 +197,9 @@ export const Home = () => {
 
             <section>
                 <ProductCard />
+            </section>
+            <section>
+                <NewYearProductCard />
             </section>
             <section>
                 <BrandCardSlider />

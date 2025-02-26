@@ -49,6 +49,7 @@ export const MyCart = () => {
     customerPincode: "",
     customerAddress: "",
     specialInstructions: "",
+    customerPoints: 0,
     deliveryTime: 0,
     paymentMethod: 1
   });
@@ -63,7 +64,8 @@ export const MyCart = () => {
         customerEmail: customer.customerEmail || "",
         customerAddress: customer.customerAddress || "",
         customerPincode: customer.customerPincode || "",
-        customerCity: customer.customerCity || 0
+        customerCity: customer.customerCity?.cityId || 0,
+        customerPoints: customer.customerPoints || 0
       }));
     }
   }, [customer]);
@@ -72,52 +74,45 @@ export const MyCart = () => {
 
   // Validation function
   const validateField = (name, value) => {
-    let error = { ...errors };
+    setErrors((prevErrors) => {
+      const updatedErrors = { ...prevErrors };
 
-    if (name === "customerName"){
-      if (!value.trim()) error.customerName = "Full Name is required!";
-      else error.customerName = "";
-    }
-    if (name === "customerMobile") {
-      if (!value.trim()) error.customerMobile = "Phone number is required!";
-      else if (!/^\d{10}$/.test(value)) error.customerMobile = "Invalid phone number! Must be 10 digits.";
-      else error.customerMobile = "";
-    }
-    if (name === "customerCity"){
-      if (!value || value === 0) error.customerCity = "Please select a city!";
-      else error.customerCity = "";
-    }
-    if (name === "customerAddress"){
-      if (!value.trim()) error.customerAddress = "Address is required!";
-      else error.customerAddress = "";
-    }
-    if (name === "customerPincode") {
-      if (!value.trim()) error.customerPincode = "Pincode is required!";
-      else if (!/^\d{6}$/.test(String(value))) error.customerPincode = "Invalid Pincode! Must be 6 digits.";
-      else error.customerPincode = "";
-    }
-    if (name === "deliveryTime"){
-      if (!value || value === 0) error.deliveryTime = "Please select a delivery time!";
-      else error.deliveryTime = "";
-    }
+      if (name === "customerName") {
+        if (!value.trim()) updatedErrors.customerName = "Full Name is required!";
+        else delete updatedErrors.customerName; // ✅ Remove key instead of setting empty string
+      }
+      if (name === "customerMobile") {
+        if (!value.trim()) updatedErrors.customerMobile = "Phone number is required!";
+        else if (!/^\d{10}$/.test(value)) updatedErrors.customerMobile = "Invalid phone number! Must be 10 digits.";
+        else delete updatedErrors.customerMobile;
+      }
+      if (name === "customerCity") {
+        if (!value || value === 0) updatedErrors.customerCity = "Please select a city!";
+        else delete updatedErrors.customerCity;
+      }
+      if (name === "customerAddress") {
+        if (!value.trim()) updatedErrors.customerAddress = "Address is required!";
+        else delete updatedErrors.customerAddress;
+      }
+      if (name === "customerPincode") {
+        if (!value.trim()) updatedErrors.customerPincode = "Pincode is required!";
+        else if (!/^\d{6}$/.test(String(value))) updatedErrors.customerPincode = "Invalid Pincode! Must be 6 digits.";
+        else delete updatedErrors.customerPincode;
+      }
+      if (name === "deliveryTime") {
+        if (!value || value === 0) updatedErrors.deliveryTime = "Please select a delivery time!";
+        else delete updatedErrors.deliveryTime;
+      }
 
-    setErrors(error);
+      return updatedErrors; // ✅ Return the new updated object
+    });
   };
+
 
   // Handle change in input
   const handleChange = (e) => {
     const { name, value } = e.target;
     setUpdateDelivery((prev) => ({ ...prev, [name]: value }));
-
-    console.log("update Delivery "+updateDelivery.customerName);
-    console.log("update Delivery "+updateDelivery.customerMobile);
-    console.log("update Delivery "+updateDelivery.customerEmail);
-    console.log("update Delivery city "+updateDelivery.customerCity);
-    console.log("update Delivery "+updateDelivery.customerPincode);
-    console.log("update Delivery "+updateDelivery.customerAddress);
-    console.log("update Delivery "+updateDelivery.specialInstructions);
-    console.log("update Delivery "+updateDelivery.paymentMethod);
-    console.log("update Delivery time"+updateDelivery.deliveryTime);
 
     validateField(name, value);
   };
@@ -143,6 +138,7 @@ export const MyCart = () => {
         paymentMode: updateDelivery.paymentMethod,
         totalAmount: calculateTotalPayable(),
         deliveryTimeSlotId: updateDelivery.deliveryTime,
+        carts: cartItems
         // couponId: ,
         // couponDiscount: ,
       })
@@ -179,11 +175,21 @@ export const MyCart = () => {
   const updateCustomer = async () => {
     setLoading(true);
     try {
-      const response = await axios.patch(`http://localhost:9000/update-customer/${sessionStorage.getItem("customerEmail")}`, {
-        cityId: updateDelivery.customerCity,
-        pincode: updateDelivery.customerPincode,
-        points: 0.00
-      });
+      let response;
+      if (customer.customerPoint > 0) {
+        console.log("Customer Points:", customer.customerPoints);
+        response = await axios.patch(`http://localhost:9000/customer-update/${sessionStorage.getItem("customerEmail")}`, {
+          cityId: updateDelivery.customerCity,
+          pincode: updateDelivery.customerPincode,
+          points: customer.customerPoint
+        });
+      } else {
+        console.log("Hello");
+        response = await axios.patch(`http://localhost:9000/customer-update/${sessionStorage.getItem("customerEmail")}`, {
+          cityId: updateDelivery.customerCity,
+          pincode: updateDelivery.customerPincode
+        });
+      }
 
       if (response.status === 200) {
         console.log("Customer Updated Successfully!");
@@ -191,6 +197,7 @@ export const MyCart = () => {
     } catch (error) {
       if (error.response.status === 404) {
         console.log("Customer not found");
+        alert("Customer not found");
       } else {
         console.error("Error updating customer:", error);
         alert("Something went wrong in updating customer. Please try again!");
@@ -200,22 +207,28 @@ export const MyCart = () => {
     }
   }
 
-  const handlePlaceOrder = (e) => {
+
+
+  const handlePlaceOrder = async (e) => {
     e.preventDefault();
 
-    // Validate all fields before submitting
-    Object.keys(updateDelivery).forEach((key) => validateField(key, updateDelivery[key]));
-
-    if (Object.values(errors).some((err) => err)) return; // Stop submission if any error exists
-
     if (updateDelivery.paymentMethod === 1) {
-      placeOrder();
-      updateCustomer();
+      try {
+        await placeOrder();
+
+        await updateCustomer();
+
+        sessionStorage.removeItem("cartState");
+        sessionStorage.removeItem("cartCount");
+        window.dispatchEvent(new Event("cartUpdated"));
+
+        navigate('/ecommerce/');
+        window.location.reload();
+      } catch (error) {
+        console.error("Error during order placement process:", error);
+      }
     }
   };
-
-
-
 
   const fetchCart = async () => {
     const customerEmail = sessionStorage.getItem("customerEmail");
@@ -231,36 +244,29 @@ export const MyCart = () => {
         const storedCartState = JSON.parse(sessionStorage.getItem("cartState") || "{}");
 
         const updatedCartState = cartData.reduce((acc, item) => {
-          const productId = item.product?.id; // Ensure product exists
-          if (!productId) return acc; // Skip if productId is undefined
+          const productId = item.product?.id;
+          if (!productId) return acc;
 
-          // ✅ Check if product already exists in sessionStorage
-          if (!storedCartState[productId]) {
-            acc[productId] = {
-              cartBtnClicked: true,
-              cartCount: item.productQuantity, // Assuming API returns `productQuantity`
-            };
-          } else {
-            // Keep existing state if already in sessionStorage
-            acc[productId] = storedCartState[productId];
-          }
+          acc[productId] = {
+            cartBtnClicked: true,
+            cartCount: item.productQuantity, // Use API `productQuantity`
+          };
 
           return acc;
-        }, { ...storedCartState }); // Start with stored cart state
+        }, {}); // Do NOT merge with storedCartState
 
         // ✅ Update state & sessionStorage
         setCartState(updatedCartState);
         sessionStorage.setItem("cartState", JSON.stringify(updatedCartState));
 
-        // ✅ Update total cart count
-        const totalCount = Object.values(updatedCartState).reduce(
-          (sum, item) => sum + (item.cartCount || 0),
-          0
-        );
-        sessionStorage.setItem("cartCount", totalCount.toString());
+        // ✅ Count unique products, NOT total quantity
+        const uniqueItemCount = Object.keys(updatedCartState).length;
+        const previousCartCount = parseInt(sessionStorage.getItem("cartCount"), 10) || 0;
 
-        // Notify other components
-        window.dispatchEvent(new Event("cartUpdated"));
+        if (uniqueItemCount !== previousCartCount) {
+          sessionStorage.setItem("cartCount", uniqueItemCount.toString());
+          window.dispatchEvent(new Event("cartUpdated")); // 🔥 Notify only if cartCount changed
+        }
       }
     } catch (error) {
       console.error("Error fetching cart details:", error);
@@ -360,9 +366,9 @@ export const MyCart = () => {
           cartBtnClicked: true,
         };
 
-        if (prevCount === 0) {
-          cartCount += 1; // ✅ Add 1 to cart count when a new item is added
-        }
+        // if (prevCount === 0) {
+        //   cartCount += 1; // ✅ Add 1 to cart count when a new item is added
+        // }
       }
 
       // ✅ Ensure cartCount is never negative
@@ -627,7 +633,7 @@ export const MyCart = () => {
                     <h3>TOTAL PAYABLE</h3>
                     <span>₹{calculateTotalPayable()}</span>
                   </div>
-                  {calculateTotalPayable() < 500 && <span style={{ color: '#133365', display: 'flex' }}>Shop for ₹{500 - calculateTotalPayable()} more for free shipping.</span>}
+                  {calculateNetAmount() < 500 && <span style={{ color: '#133365', display: 'flex' }}>Shop for ₹{500 - calculateNetAmount()} more for free shipping.</span>}
                 </div>
               </div>
             </div>
@@ -682,6 +688,7 @@ export const MyCart = () => {
                       value={updateDelivery.customerCity || ""}
                       onChange={handleCheckBoxOption}
                       name='customerCity'
+                      required
                     >
                       <option value={0}>Select City</option>
                       {cities.map((city) => (
@@ -700,6 +707,7 @@ export const MyCart = () => {
                       name='customerPincode'
                       value={updateDelivery.customerPincode || ""}
                       onChange={handleChange}
+                      required
                     />
                     {errors.customerPincode && <span className="error">{errors.customerPincode}</span>}
                   </div>
@@ -711,6 +719,7 @@ export const MyCart = () => {
                     value={updateDelivery.customerAddress || ""}
                     onChange={handleChange}
                     name='customerAddress'
+                    required
                   ></textarea>
                 </div>
 
@@ -730,6 +739,7 @@ export const MyCart = () => {
                     onChange={handleCheckBoxOption}
                     style={{ width: "50%" }}
                     name='deliveryTime'
+                    required
                   >
                     <option value={0}>Select Delivery Time</option>
                     {deliveryTime.map((time) => (
@@ -778,14 +788,14 @@ export const MyCart = () => {
               </div>
 
               <div className='my-payment-section-button'>
-                {Object.keys(errors).length === 0 &&
+                {Object.keys(errors).length === 0 && // ✅ Proper check for an empty object
                   updateDelivery.customerName &&
                   updateDelivery.customerMobile &&
-                  updateDelivery.customerCity != 0 &&
+                  updateDelivery.customerCity !== 0 &&
                   updateDelivery.customerPincode &&
                   updateDelivery.customerAddress &&
-                  updateDelivery.deliveryTime != 0 &&
-                  (updateDelivery.paymentMethod === 1 ? (   
+                  updateDelivery.deliveryTime !== 0 &&
+                  (updateDelivery.paymentMethod === 1 ? (
                     <button className="btn-otp" onClick={handlePlaceOrder}>
                       PLACE ORDER <FaArrowRightLong />
                     </button>
@@ -795,6 +805,7 @@ export const MyCart = () => {
                     </button>
                   ) : null)}
               </div>
+
 
             </div>}
 

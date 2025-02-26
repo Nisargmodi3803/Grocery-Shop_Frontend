@@ -1,14 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
-import './Brand.css';
+import './SubCategory.css'
 import { IoMdHome } from "react-icons/io";
 import { useNavigate, useParams } from 'react-router-dom';
+import axios from 'axios';
 import { MdOutlineStarPurple500, MdOutlineShoppingCart, MdRemoveShoppingCart } from "react-icons/md";
 import { FaRegHeart, FaHeart } from "react-icons/fa";
-import axios from 'axios';
 import { MdAccessTime, MdOutlineChatBubbleOutline } from "react-icons/md";
 import { InquiryNow } from './InquiryNow';
 import { LoginSignUpModal } from './LoginSignUpModal';
-import BrandSelector from './BrandSelector';
 import { useLoading } from '../Context/LoadingContext';
 
 const importAll = (r) => {
@@ -20,12 +19,11 @@ const importAll = (r) => {
 };
 
 const imageMap = importAll(require.context("../assets/Product", false, /\.(png|jpeg|svg|jpg|JPEG)$/));
-const imageMap1 = importAll(require.context("../assets/Brand", false, /\.(png|jpeg|svg|jpg|JPEG)$/));
 
-export const Brand = () => {
+export const Offers = () => {
     const greater = '>';
     const navigate = useNavigate();
-    const { brandSlugTitle } = useParams();
+    const { subcategorySlugTitle } = useParams();
     const [products, setProducts] = useState([]);
     const [likedProducts, setLikedProducts] = useState({});
     const [discountMap, setDiscountMap] = useState({});
@@ -33,14 +31,23 @@ export const Brand = () => {
     const [inquiryProductId, setInquiryProductId] = useState(null);
     const [showLoginModal, setShowLoginModal] = useState(false);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [brandName, setBrandName] = useState('');
-    const [brands, setBrands] = useState([]);
+    const [subcategoryName, setsubCategoryName] = useState('');
+    const [categoryName, setCategoryName] = useState('');
     const [sortOption, setSortOption] = useState("");
+    const [subcategories, setSubCategories] = useState([]);
+    const [subcategoriesIds, setSubcategoriesIds] = useState([]);
     const { setLoading } = useLoading();
     const [cartState, setCartState] = useState(() => {
         const storedCart = sessionStorage.getItem("cartState");
         return storedCart ? JSON.parse(storedCart) : {};
     });
+
+    useEffect(() => {
+        setLoading(true);
+        const timer = setTimeout(() => setLoading(false), 1000);
+
+        return () => clearTimeout(timer);
+    }, [setLoading]);
 
     const handleSortChange = (event) => {
         setSortOption(event.target.value);
@@ -50,103 +57,105 @@ export const Brand = () => {
         setIsAuthenticated(sessionStorage.getItem("isAuthenticated") === "true");
     }, []);
 
-    const fetchProductsByBrand = async () => {
+    // Fetch Subcategory IDs
+    const fetchSubCategoriesIds = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(`http://localhost:9000/products-brand-title/${brandSlugTitle}`);
+            const response = await axios.get("http://localhost:9000/offer-slug-title/best-of-veg-fruits");
 
-            if (response.status === 200) {
-                const productData = response.data;
-                setProducts(productData);
+            if (response.status === 200 && response.data.offerProductIds) {
+                const subcategoriesIds = response.data.offerProductIds;
 
-                // Calculate discounts
-                const discountData = {};
-                productData.forEach((product) => {
-                    const mrp = product.mrp || 0;
-                    const discountAmt = product.discount_amt || 0;
-                    discountData[product.id] = mrp > 0 ? Math.round(((mrp - discountAmt) * 100) / mrp) : 0;
-                });
-                setDiscountMap(discountData);
+                if (!subcategoriesIds) {
+                    console.error("offerProductIds is missing in response");
+                    return;
+                }
+
+                const ids = subcategoriesIds
+                    .split(",")
+                    .map((id) => id.trim()) // Trim whitespace
+                    .filter((id) => id) // Remove empty values
+                    .map(Number); // Convert to numbers
+
+                setSubcategoriesIds(ids); // Update state with valid IDs
             }
         } catch (error) {
             if (error.response?.status === 404) {
-                console.log("No Product Found");
-                // alert("No Product Found");
+                console.log("No Products Found");
             } else {
-                console.error("Error fetching product:", error);
-                alert("Something went wrong. Please try again!");
+                console.error("Error fetching subcategories:", error);
+                alert("Something went wrong in fetching subcategories. Please try again!");
             }
         } finally {
             setLoading(false);
         }
     };
 
-    const fetchBrandName = async () => {
+    // Fetch Products only when subcategoriesIds are updated
+    const fetchProducts = async () => {
+        if (subcategoriesIds.length === 0) return; // Prevent API calls with empty IDs
+
         setLoading(true);
+        console.log("Fetching products for IDs:", subcategoriesIds);
         try {
-            const response = await axios.get(`http://localhost:9000/brand-slug/${brandSlugTitle}`);
-            if (response.status === 200) {
-                setBrandName(response.data.name);
-                // window.location.reload();
-            }
+            const productRequests = subcategoriesIds.map((id) =>
+                axios.get(`http://localhost:9000/products-subcategory/${id}`)
+            );
+
+            const responses = await Promise.all(productRequests);
+            const allProducts = responses.flatMap((res) => res.data);
+            setProducts(allProducts);
         } catch (error) {
             if (error.response?.status === 404) {
-                console.log("No Brand Found");
+                console.log("No Products Found");
             } else {
-                console.error("Error fetching product:", error);
-                alert("Something went wrong. Please try again!");
+                console.error("Error fetching products:", error);
+                alert("Something went wrong in fetching products. Please try again!");
             }
         } finally {
             setLoading(false);
         }
     };
 
-    const fetchBrands = async () => {
-        setLoading(true);
-        try {
-            const response = await axios.get('http://localhost:9000/brand');
-            if (response.status === 200) {
-                setBrands(response.data);
-            }
-        } catch (error) {
-            if (error.response?.status === 404) {
-                console.log("No Brands Found");
-            } else {
-                console.error(error);
-                alert("Something went wrong. Please try again!");
-            }
-        } finally {
-            setLoading(false);
+    // Fetch subcategories on mount
+    useEffect(() => {
+        fetchSubCategoriesIds();
+    }, []);
+
+    // Fetch products when subcategoriesIds update
+    useEffect(() => {
+        if (subcategoriesIds.length > 0) {
+            fetchProducts();
         }
-    };
+    }, [subcategoriesIds]);
 
     const fetchSortedProducts = async () => {
         let api = "";
 
         switch (sortOption) {
             case "Sort by: Recommended":
-                api = `http://localhost:9000/products-brand-title/${brandSlugTitle}`;
+                api = `http://localhost:9000/products-subcategory-title/${subcategorySlugTitle}`;
                 break;
             case "Sort by: Price (Low to High)":
-                api = `http://localhost:9000/product-ascending-brand-mrp/${brandSlugTitle}`;
+                api = `http://localhost:9000/product-ascending-sub-mrp/${subcategorySlugTitle}`;
                 break;
             case "Sort by: Price (High to Low)":
-                api = `http://localhost:9000/product-descending-brand-mrp/${brandSlugTitle}`;
+                api = `http://localhost:9000/product-descending-sub-mrp/${subcategorySlugTitle}`;
                 break;
             case "Sort by: Discount (High to Low)":
-                api = `http://localhost:9000/product-descending-brand-discount/${brandSlugTitle}`;
+                api = `http://localhost:9000/product-descending-sub-discount/${subcategorySlugTitle}`;
                 break;
             case "Sort by: Discount (Low to High)":
-                api = `http://localhost:9000/product-ascending-brand-discount/${brandSlugTitle}`;
+                api = `http://localhost:9000/product-ascending-sub-discount/${subcategorySlugTitle}`;
                 break;
             case "Sort by: Name (A to Z)":
-                api = `http://localhost:9000/product-ascending-brand-name/${brandSlugTitle}`;
+                api = `http://localhost:9000/product-ascending-sub-name/${subcategorySlugTitle}`;
                 break;
             case "Sort by: Name (Z to A)":
-                api = `http://localhost:9000/product-descending-brand-name/${brandSlugTitle}`;
+                api = `http://localhost:9000/product-descending-sub-name/${subcategorySlugTitle}`;
                 break;
             default:
-                api = `http://localhost:9000/products-brand-title/${brandSlugTitle}`;
+                api = `http://localhost:9000/products-subcategory-title/${subcategorySlugTitle}`;
                 break;
         }
         setLoading(true);
@@ -154,12 +163,15 @@ export const Brand = () => {
             const response = await axios.get(api);
             if (response.status === 200) {
                 setProducts(response.data);
+            } else {
+                setProducts([]);
             }
         } catch (error) {
             if (error.response?.status === 404) {
                 console.log("No Product Found");
             } else {
                 console.error("Error fetching product:", error);
+                setProducts([]);
                 alert("Something went wrong. Please try again!");
             }
         } finally {
@@ -167,38 +179,13 @@ export const Brand = () => {
         }
     };
 
-
-    const brandScrollRef = useRef(null);
-
-    const scrollToSelectedBrand = () => {
-        if (brandScrollRef.current) {
-            const selectedBrand = brandScrollRef.current.querySelector(".selected");
-            if (selectedBrand) {
-                selectedBrand.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
-            }
-        }
-    };
-
-    useEffect(() => {
-        fetchBrandName();
-        fetchBrands();
-        setTimeout(scrollToSelectedBrand, 300);
-    }, []);
-
     useEffect(() => {
         if (sortOption) {
             fetchSortedProducts();
         } else {
-            fetchProductsByBrand();
+            fetchProducts();
         }
     }, [sortOption]);
-
-    useEffect(() => {
-        setLoading(true);
-        const timer = setTimeout(() => setLoading(false), 1000);
-
-        return () => clearTimeout(timer);
-    }, [setLoading]);
 
 
     const fetchLikedProducts = async () => {
@@ -268,6 +255,7 @@ export const Brand = () => {
     };
 
 
+
     useEffect(() => {
         fetchCart();
         fetchLikedProducts();
@@ -305,7 +293,7 @@ export const Brand = () => {
                 alert(`Something went wrong in ${isLiked ? "disliking" : "liking"} the product. Please try again!`);
             }
         }
-    };
+    };;
 
     useEffect(() => {
         const handleStorageChange = () => {
@@ -316,7 +304,6 @@ export const Brand = () => {
         window.addEventListener("cartUpdated", handleStorageChange);
         return () => window.removeEventListener("cartUpdated", handleStorageChange);
     }, []);
-
 
     const toggleCartState = async (productId) => {
         if (!isAuthenticated) {
@@ -416,9 +403,6 @@ export const Brand = () => {
         }
     };
 
-
-
-
     const navigateToProductPage = (productSlugTitle) => () => {
         navigate(`/ecommerce/product/${productSlugTitle}`);
     };
@@ -447,55 +431,22 @@ export const Brand = () => {
                         </a>
                         <span> {greater} </span>
                         <a onClick={() => {
-                            navigate(`/ecommerce/shop-by-brand`);
                             window.location.reload();
                         }}
-                        >Brand</a>
+                        >Offers</a>
                         <span> {greater} </span>
-                        <a onClick={() => { window.location.reload() }}>{brandName || "Loading..."}</a>
+                        <a onClick={() => { window.location.reload() }}>Best Of Veg. & Fruits</a>
                     </span>
-                </section>
-                <section className='brand-main'>
-                    <div className="brand-selector-container">
-                        <div className="brand-scroll" ref={brandScrollRef}>
-                            {brands.map((brand) => {
-                                const imageSrc = imageMap1[brand.image_url] || imageMap["default.jpg"];
-                                return (
-                                    <div
-                                        key={brand.id}
-                                        className={`brand-item ${brand.slug_title === brandSlugTitle ? "selected" : ""}`}
-                                        onClick={() => {
-                                            navigate(`/ecommerce/brand/${brand.slug_title}`);
-                                            window.location.reload();
-                                        }}
-                                    >
-                                        <img src={imageSrc} alt={brand.name} />
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-
-                    <div className='brand-header'>
-                        <span className="brand-name">{brandName}</span>
-                        <select className="sort-dropdown" onChange={handleSortChange}>
-                            <option>Sort by: Recommended</option>
-                            <option>Sort by: Price (Low to High)</option>
-                            <option>Sort by: Price (High to Low)</option>
-                            <option>Sort by: Discount (High to Low)</option>
-                            <option>Sort by: Discount (Low to High)</option>
-                            <option>Sort by: Name (A to Z)</option>
-                            <option>Sort by: Name (Z to A)</option>
-                        </select>
-                    </div>
-                    <h1>No Products Found!</h1>
+                    <section className='brand-main'>
+                        <h1>No Products Found!</h1>
+                    </section>
                 </section>
             </div>
         );
     }
 
     return (
-        <div className='brand'>
+        <div className='subcategory'>
             <section className='product-navigate-section'>
                 <span className='navigate'>
                     <a onClick={() => navigate('/ecommerce/')}>
@@ -503,39 +454,17 @@ export const Brand = () => {
                     </a>
                     <span> {greater} </span>
                     <a onClick={() => {
-                        navigate(`/ecommerce/shop-by-brand`);
                         window.location.reload();
                     }}
-                    >Brand</a>
+                    >Offers</a>
                     <span> {greater} </span>
-                    <a onClick={() => { window.location.reload() }}>{brandName || "Loading..."}</a>
+                    <a onClick={() => { window.location.reload() }}>Best Of Veg. & Fruits</a>
                 </span>
             </section>
 
             <section className='brand-main'>
-
-                <div className="brand-selector-container">
-                    <div className="brand-scroll" ref={brandScrollRef}>
-                        {brands.map((brand) => {
-                            const imageSrc = imageMap1[brand.image_url] || imageMap["default.jpg"];
-                            return (
-                                <div
-                                    key={brand.id}
-                                    className={`brand-item ${brand.slug_title === brandSlugTitle ? "selected" : ""}`}
-                                    onClick={() => {
-                                        navigate(`/ecommerce/brand/${brand.slug_title}`);
-                                        window.location.reload();
-                                    }}
-                                >
-                                    <img src={imageSrc} alt={brand.name} />
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
-
                 <div className='brand-header'>
-                    <span class="brand-name">{brandName}</span>
+                    <span class="brand-name">Best Of Veg. & Fruits</span>
                     <select class="sort-dropdown" onChange={handleSortChange}>
                         <option>Sort by: Recommended</option>
                         <option>Sort by: Price (Low to High)</option>
@@ -625,10 +554,9 @@ export const Brand = () => {
                     })}
                 </div>
             </section>
-            {showModal && <InquiryNow closeModal={closeModal} productId={inquiryProductId} brandSlugTitle={brandSlugTitle} />}
+            {showModal && <InquiryNow closeModal={closeModal} productId={inquiryProductId} subcategorySlugTitle={subcategorySlugTitle} />}
 
-            {showLoginModal && <LoginSignUpModal closeModal={() => setShowLoginModal(false)} brandSlugTitle={brandSlugTitle} />}
+            {showLoginModal && <LoginSignUpModal closeModal={() => setShowLoginModal(false)} subcategorySlugTitle={subcategorySlugTitle} />}
         </div>
-    );
-};
-
+    )
+}

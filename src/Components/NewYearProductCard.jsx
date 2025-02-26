@@ -11,7 +11,7 @@ import { InquiryNow } from './InquiryNow';
 import { LoginSignUpModal } from './LoginSignUpModal';
 import { useLoading } from '../Context/LoadingContext';
 
-export const ProductCard = () => {
+export const NewYearProductCard = () => {
   const navigate = useNavigate();
   const direction = useRef("normal");
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -24,7 +24,7 @@ export const ProductCard = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { setLoading } = useLoading();
   const [cartCount, setCartCount] = useState(0);
-  const [subcategoriesIds, setSubcategoriesIds] = useState([]);
+  const [productsIds, setProductsIds] = useState([]);
   const [cartState, setCartState] = useState(() => {
     const storedCart = sessionStorage.getItem("cartState");
     return storedCart ? JSON.parse(storedCart) : {};
@@ -56,11 +56,11 @@ export const ProductCard = () => {
   const fetchSubCategoriesIds = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("http://localhost:9000/offer-slug-title/best-of-veg-fruits");
+      const response = await axios.get("http://localhost:9000/offer-slug-title/new-year");
       if (response.status === 200) {
-        const subcategoriesIds = response.data.offerProductIds;
-        const ids = subcategoriesIds.split(",").map(Number);
-        setSubcategoriesIds(ids);
+        const productIds = response.data.offerProductIds;
+        const ids = productIds.split(",").map(Number);
+        setProductsIds(ids);
       }
     } catch (error) {
       if (error.response?.status === 404) {
@@ -79,7 +79,7 @@ export const ProductCard = () => {
     setLoading(true);
     try {
       const productRequests = ids.map((id) =>
-        axios.get(`http://localhost:9000/products-subcategory/${id}`)
+        axios.get(`http://localhost:9000/product/${id}`)
       );
 
       const responses = await Promise.all(productRequests);
@@ -104,10 +104,10 @@ export const ProductCard = () => {
 
   // Fetch products only when subcategoriesIds are updated
   useEffect(() => {
-    if (subcategoriesIds.length > 0) {
-      fetchProducts(subcategoriesIds);
+    if (productsIds.length > 0) {
+      fetchProducts(productsIds);
     }
-  }, [subcategoriesIds]);
+  }, [productsIds]);
 
   const calculateDiscountPercentage = (mrp, discountAmt) => {
     return mrp > 0 ? Math.round(((mrp - discountAmt) * 100) / mrp) : 0;
@@ -379,8 +379,8 @@ export const ProductCard = () => {
     <>
       <section className='card-container'>
         <div className='card-section-header'>
-          <h5>Best Of Veg. & Fruits</h5>
-          <button onClick={()=>navigate('/ecommerce/offers/best-of-veg-fruits')}>View All</button>
+          <h5>New Year</h5>
+          <button onClick={()=>navigate("/ecommerce/offers/new-year")}>View All</button>
         </div>
         <div className="product-slider-arrow">
           <BsArrowLeftCircleFill className="arrow2 arrow-left" onClick={handlePrev} />

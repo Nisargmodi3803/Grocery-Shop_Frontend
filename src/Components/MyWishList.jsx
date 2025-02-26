@@ -256,12 +256,15 @@ export const MyWishList = () => {
 
   const toggleCartState = async (productId) => {
     try {
-      const response = await axios.post(`http://localhost:9000/add-cart?customerEmail=${sessionStorage.getItem("customerEmail")}&productId=${productId}`);
+      const response = await axios.post(
+        `http://localhost:9000/add-cart?customerEmail=${sessionStorage.getItem("customerEmail")}&productId=${productId}`
+      );
+
       if (response.status === 200) {
         console.log("Product added to cart successfully");
       }
     } catch (error) {
-      if (error.response.status === 404) {
+      if (error.response?.status === 404) {
         console.log("Customer or Product not found");
       } else {
         console.error("Error adding product to cart:", error);
@@ -271,85 +274,77 @@ export const MyWishList = () => {
 
     setCartState((prev) => {
       const isCurrentlyInCart = prev[productId]?.cartBtnClicked || false;
-      const newCartState = {
-        ...prev,
-        [productId]: {
-          ...prev[productId],
-          cartBtnClicked: !isCurrentlyInCart,
-          cartCount: isCurrentlyInCart ? 0 : (prev[productId]?.cartCount || 1),
-        },
-      };
+      let newCartState = { ...prev };
 
-      // ✅ Update sessionStorage with full cart state & total count
+      if (!isCurrentlyInCart) {
+        // ✅ If product is newly added, set quantity to 1
+        newCartState[productId] = {
+          cartBtnClicked: true,
+          cartCount: 1,
+        };
+      } else {
+        // ✅ If product is removed, delete from cart
+        delete newCartState[productId];
+      }
+
+      // ✅ Count only unique products
+      const uniqueItemCount = Object.keys(newCartState).length;
+
+      // ✅ Update sessionStorage
       sessionStorage.setItem("cartState", JSON.stringify(newCartState));
-      const totalCount = Object.values(newCartState).reduce((sum, item) => sum + (item.cartCount || 0), 0);
-      sessionStorage.setItem("cartCount", totalCount.toString());
+      sessionStorage.setItem("cartCount", uniqueItemCount.toString());
 
-      window.dispatchEvent(new Event("cartUpdated")); // 🔥 Dispatch event
+      window.dispatchEvent(new Event("cartUpdated")); // 🔥 Notify other components
 
       return newCartState;
     });
   };
 
 
+
   const updateCartCount = async (productId, increment) => {
+    try {
+      const customerEmail = sessionStorage.getItem("customerEmail");
+      const apiUrl =
+        increment === 1
+          ? `http://localhost:9000/cart-increment?customerEmail=${customerEmail}&productId=${productId}`
+          : `http://localhost:9000/cart-decrement?customerEmail=${customerEmail}&productId=${productId}`;
 
-    if (increment === 1) { // Increament by 1
-      try {
-        const response = await axios.patch(`http://localhost:9000/cart-increment?customerEmail=${sessionStorage.getItem("customerEmail")}&productId=${productId}`);
-
-        if (response.status === 200) {
-          console.log("Product Increament by 1!");
-        } else if (response.status === 404) {
-          console.log("Customer or Product not found");
-        }
-      } catch (error) {
-        console.error("Error adding product to cart:", error);
-        alert("Something went wrong in adding one product to cart. Please try again!");
+      const response = await axios.patch(apiUrl);
+      if (response.status !== 200) {
+        console.log("Customer or Product not found");
+        return;
       }
 
-    } else {
-      try {
-        const response = await axios.patch(`http://localhost:9000/cart-decrement?customerEmail=${sessionStorage.getItem("customerEmail")}&productId=${productId}`);
+      setCartState((prev) => {
+        let newCartState = { ...prev };
+        const prevCount = prev[productId]?.cartCount || 0;
+        const newCount = Math.max(prevCount + increment, 0); // Ensure no negative quantity
 
-        if (response.status === 200) {
-          console.log("Product Decrement by 1!");
-        } else if (response.status === 404) {
-          console.log("Customer or Product not found");
+        if (newCount === 0) {
+          delete newCartState[productId]; // ✅ Remove item when quantity reaches 0
+        } else {
+          newCartState[productId] = {
+            cartBtnClicked: true,
+            cartCount: newCount,
+          };
         }
-      } catch (error) {
-        console.error("Error adding product to cart:", error);
-        alert("Something went wrong in removing one product to cart. Please try again!");
-      }
+
+        // ✅ Count only unique products
+        const uniqueItemCount = Object.keys(newCartState).length;
+
+        // ✅ Update sessionStorage
+        sessionStorage.setItem("cartState", JSON.stringify(newCartState));
+        sessionStorage.setItem("cartCount", uniqueItemCount.toString());
+
+        window.dispatchEvent(new Event("cartUpdated")); // 🔥 Notify other components
+
+        return newCartState;
+      });
+    } catch (error) {
+      console.error("Error updating product in cart:", error);
+      alert("Something went wrong. Please try again!");
     }
-
-    setCartState((prev) => {
-      let newCartState = { ...prev };
-      const newCount = Math.max((prev[productId]?.cartCount || 0) + increment, 0);
-
-      if (newCount === 0) {
-        delete newCartState[productId]; // ✅ Remove product from cartState when count is 0
-      } else {
-        newCartState[productId] = {
-          ...prev[productId],
-          cartCount: newCount,
-          cartBtnClicked: true,
-        };
-      }
-
-      // ✅ Update sessionStorage
-      sessionStorage.setItem("cartState", JSON.stringify(newCartState));
-
-      const totalCount = Object.values(newCartState).reduce(
-        (sum, item) => sum + (item.cartCount || 0),
-        0
-      );
-      sessionStorage.setItem("cartCount", totalCount.toString());
-
-      window.dispatchEvent(new Event("cartUpdated")); // 🔥 Notify other components
-
-      return newCartState;
-    });
   };
 
 
@@ -391,47 +386,41 @@ export const MyWishList = () => {
   }
 
   const fetchCart = async () => {
+    const customerEmail = sessionStorage.getItem("customerEmail");
+    if (!customerEmail) return;
+
     try {
-      const response = await axios.get(`http://localhost:9000/cart/${sessionStorage.getItem("customerEmail")}`);
+      const response = await axios.get(`http://localhost:9000/cart/${customerEmail}`);
       if (response.status === 200) {
-        const cartData = response.data || []; // Ensure it's an array
+        const cartData = response.data || []; // Ensure array
 
         // ✅ Get current cart state from sessionStorage
         const storedCartState = JSON.parse(sessionStorage.getItem("cartState") || "{}");
 
         const updatedCartState = cartData.reduce((acc, item) => {
-          const productId = item.product?.id; // Ensure product exists
-          if (!productId) return acc; // Skip if productId is undefined
+          const productId = item.product?.id;
+          if (!productId) return acc;
 
-          // ✅ Check if product already exists in sessionStorage
-          if (!storedCartState[productId]) {
-            acc[productId] = {
-              cartBtnClicked: true,
-              cartCount: item.productQuantity, // Assuming API returns `productQuantity`
-            };
-          } else {
-            // Keep existing state if already in sessionStorage
-            acc[productId] = storedCartState[productId];
-          }
+          acc[productId] = {
+            cartBtnClicked: true,
+            cartCount: item.productQuantity, // Assuming API returns `productQuantity`
+          };
 
           return acc;
-        }, { ...storedCartState }); // Start with stored cart state
-
-        console.log("Updated Cart State:", updatedCartState);
+        }, {}); // Reset previous cart state
 
         // ✅ Update state & sessionStorage
         setCartState(updatedCartState);
         sessionStorage.setItem("cartState", JSON.stringify(updatedCartState));
 
-        // ✅ Update total cart count
-        const totalCount = Object.values(updatedCartState).reduce(
-          (sum, item) => sum + (item.cartCount || 0),
-          0
-        );
-        sessionStorage.setItem("cartCount", totalCount.toString());
+        // ✅ Calculate unique product count
+        const uniqueItemCount = Object.keys(updatedCartState).length;
+        const previousCartCount = parseInt(sessionStorage.getItem("cartCount"), 10) || 0;
 
-        // Notify other components
-        window.dispatchEvent(new Event("cartUpdated"));
+        if (uniqueItemCount !== previousCartCount) {
+          sessionStorage.setItem("cartCount", uniqueItemCount.toString());
+          window.dispatchEvent(new Event("cartUpdated")); // 🔥 Notify only if count changed
+        }
       }
     } catch (error) {
       console.error("Error fetching cart details:", error);
