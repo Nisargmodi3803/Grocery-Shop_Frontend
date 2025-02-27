@@ -124,89 +124,219 @@ export const MyCart = () => {
   };
 
 
-  const placeOrder = async () => {
-    setLoading(true);
+  const placeOrder = async (paymentId = null) => {
     try {
-      const response = await axios.post(`http://localhost:9000/add-order/${sessionStorage.getItem("customerEmail")}`, {
-        name: updateDelivery.customerName,
-        mobile: updateDelivery.customerMobile,
-        email: updateDelivery.customerEmail,
-        cityId: updateDelivery.customerCity,
-        address: updateDelivery.customerAddress,
-        pincode: updateDelivery.customerPincode,
-        specialInstructions: updateDelivery.specialInstructions,
-        paymentMode: updateDelivery.paymentMethod,
-        totalAmount: calculateTotalPayable(),
-        deliveryTimeSlotId: updateDelivery.deliveryTime,
-        carts: cartItems
-        // couponId: ,
-        // couponDiscount: ,
-      })
+      const response = await axios.post(
+        `http://localhost:9000/add-order/${sessionStorage.getItem("customerEmail")}`,
+        {
+          name: updateDelivery.customerName,
+          mobile: updateDelivery.customerMobile,
+          email: updateDelivery.customerEmail,
+          cityId: updateDelivery.customerCity,
+          address: updateDelivery.customerAddress,
+          pincode: updateDelivery.customerPincode,
+          specialInstructions: updateDelivery.specialInstructions,
+          paymentMode: updateDelivery.paymentMethod,
+          totalAmount: calculateTotalPayable(),
+          deliveryTimeSlotId: updateDelivery.deliveryTime,
+          carts: cartItems,
+          paymentId, // Razorpay payment ID (only for online payment)
+        }
+      );
 
       if (response.status === 200) {
-        setLoading(false);
         await Swal.fire({
           title: "Order",
           text: "Order Placed Successfully!",
           icon: "success",
-          confirmButtonText: "OK"
+          confirmButtonText: "OK",
         });
-        setLoading(true);
+        return response.data;
       }
     } catch (error) {
-      if (error.response.status === 404) {
-        setLoading(false);
-        await Swal.fire({
-          title: "Order",
-          text: "Order Placed Failed!",
-          icon: "error",
-          confirmButtonText: "OK"
-        });
-        setLoading(true);
-      } else {
-        console.error("Error placing order:", error);
-        alert("Something went wrong in placing order. Please try again!");
-      }
-    } finally {
-      setLoading(false);
+      console.error("Error placing order:", error);
+      Swal.fire({
+        title: "Order",
+        text: "Order Placement Failed!",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
     }
+    return null;
   };
 
+  // Function to update customer details
   const updateCustomer = async () => {
-    setLoading(true);
     try {
-      let response;
+      const customerData = {
+        cityId: updateDelivery.customerCity,
+        pincode: updateDelivery.customerPincode,
+      };
+
       if (customer.customerPoint > 0) {
-        console.log("Customer Points:", customer.customerPoints);
-        response = await axios.patch(`http://localhost:9000/customer-update/${sessionStorage.getItem("customerEmail")}`, {
-          cityId: updateDelivery.customerCity,
-          pincode: updateDelivery.customerPincode,
-          points: customer.customerPoint
-        });
-      } else {
-        console.log("Hello");
-        response = await axios.patch(`http://localhost:9000/customer-update/${sessionStorage.getItem("customerEmail")}`, {
-          cityId: updateDelivery.customerCity,
-          pincode: updateDelivery.customerPincode
-        });
+        customerData.points = customer.customerPoint;
       }
+
+      const response = await axios.patch(
+        `http://localhost:9000/customer-update/${sessionStorage.getItem("customerEmail")}`,
+        customerData
+      );
 
       if (response.status === 200) {
         console.log("Customer Updated Successfully!");
       }
     } catch (error) {
-      if (error.response.status === 404) {
-        console.log("Customer not found");
-        alert("Customer not found");
-      } else {
-        console.error("Error updating customer:", error);
-        alert("Something went wrong in updating customer. Please try again!");
-      }
-    } finally {
-      setLoading(false);
+      console.error("Error updating customer:", error);
+      alert("Something went wrong in updating customer. Please try again!");
     }
-  }
+  };
 
+  useEffect(() => {
+    if (!window.Razorpay) {
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.async = true;
+      script.onload = () => console.log("Razorpay SDK loaded successfully");
+      script.onerror = () => console.error("Failed to load Razorpay SDK");
+      document.body.appendChild(script);
+    }
+  }, []);
+
+  // Function to handle online payment
+  const handleOnlinePayment = async () => {
+    try {
+      console.log("Placing order to generate invoiceNum...");
+
+      // Step 1: Call `addOrder` to generate `invoiceNum`
+      const orderResponse = await axios.post(
+        `http://localhost:9000/add-order/${sessionStorage.getItem("customerEmail")}`,
+        {
+          name: updateDelivery.customerName,
+          mobile: updateDelivery.customerMobile,
+          email: updateDelivery.customerEmail,
+          cityId: updateDelivery.customerCity,
+          address: updateDelivery.customerAddress,
+          pincode: updateDelivery.customerPincode,
+          specialInstructions: updateDelivery.specialInstructions,
+          paymentMode: 2, // 2 = Online Payment
+          totalAmount: calculateTotalPayable(),
+          deliveryTimeSlotId: updateDelivery.deliveryTime,
+          carts: cartItems,
+        }
+      );
+
+      if (!orderResponse.data || !orderResponse.data.invoiceNum) {
+        throw new Error("Failed to generate invoice number.");
+      }
+
+      const invoiceNum = orderResponse.data.invoiceNum;
+      console.log("Generated Invoice Number:", invoiceNum);
+
+      // Step 2: Create Razorpay Order using invoiceNum
+      console.log("Initiating Razorpay Payment...");
+      const paymentResponse = await axios.post("http://localhost:9000/create-order", {
+        amount: calculateTotalPayable(),
+        currency: "INR",
+      });
+
+      console.log("Razorpay Order Response:", paymentResponse.data);
+
+      if (!paymentResponse.data || !paymentResponse.data.id) {
+        Swal.fire({
+          title: "Payment Error",
+          text: "Invalid response from payment gateway. Please try again later!",
+          icon: "error",
+          confirmButtonText: "OK",
+        });
+        return;
+      }
+
+      const { id: orderId, amount, currency } = paymentResponse.data;
+
+      if (!window.Razorpay) {
+        Swal.fire({
+          title: "Payment Error",
+          text: "Razorpay SDK failed to load. Please refresh the page!",
+          icon: "error",
+          confirmButtonText: "OK",
+        });
+        return;
+      }
+
+      // Step 3: Configure Razorpay Checkout
+      const options = {
+        key: "rzp_test_pWCWqEM13KbeBP",
+        amount: amount,
+        currency: currency,
+        name: "Bits Infotech",
+        description: "Transaction",
+        order_id: orderId,
+        handler: async function (response) {
+          console.log("Payment Success:", response);
+
+          try {
+            // Step 4: Verify Payment
+            const verifyResponse = await axios.post("http://localhost:9000/verify-payment", {
+              invoiceNum: invoiceNum,  // ✅ Ensure this is not undefined
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            });
+
+            console.log("Payment Verification Response:", verifyResponse.data);
+
+            if (verifyResponse.status === 200) {
+              await updateCustomer();
+              await Swal.fire({
+                title: "Order Confirmed!",
+                text: "Payment Successful & Order Confirmed!",
+                icon: "success",
+                confirmButtonText: "OK",
+              });
+              sessionStorage.removeItem("cartState");
+              sessionStorage.removeItem("cartCount");
+              window.dispatchEvent(new Event("cartUpdated"));
+              navigate("/ecommerce/");
+              window.location.reload();
+            } else {
+              Swal.fire({
+                title: "Payment Error",
+                text: "Payment verification failed. Please contact support.",
+                icon: "error",
+                confirmButtonText: "OK",
+              });
+            }
+          } catch (error) {
+            console.error("Payment Verification Error:", error);
+            Swal.fire({
+              title: "Payment Error",
+              text: "Payment verification failed. Please try again.",
+              icon: "error",
+              confirmButtonText: "OK",
+            });
+          }
+        },
+        prefill: {
+          name: updateDelivery.customerName,
+          email: updateDelivery.customerEmail,
+          contact: updateDelivery.customerMobile,
+        },
+        theme: { color: "#3399cc" },
+      };
+
+      console.log("Opening Razorpay Checkout...");
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch (error) {
+      console.error("Razorpay Error:", error);
+      Swal.fire({
+        title: "Payment",
+        text: "Failed to initiate online payment!",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+    }
+  };
 
 
   const handlePlaceOrder = async (e) => {
@@ -228,7 +358,12 @@ export const MyCart = () => {
         console.error("Error during order placement process:", error);
       }
     }
+    else if (updateDelivery.paymentMethod === 2) {
+      handleOnlinePayment();
+    }
   };
+
+
 
   const fetchCart = async () => {
     const customerEmail = sessionStorage.getItem("customerEmail");
@@ -671,6 +806,7 @@ export const MyCart = () => {
                       value={updateDelivery.customerMobile || ""}
                       onChange={handleChange}
                       style={{ width: "95%" }}
+                      disabled
                     />
                     {errors.customerMobile && <span className="error">{errors.customerMobile}</span>}
                   </div>
@@ -800,7 +936,7 @@ export const MyCart = () => {
                       PLACE ORDER <FaArrowRightLong />
                     </button>
                   ) : updateDelivery.paymentMethod === 2 ? (
-                    <button className="btn-otp">
+                    <button className="btn-otp" onClick={handlePlaceOrder}>
                       PROCEED TO PAY <FaArrowRightLong />
                     </button>
                   ) : null)}

@@ -295,283 +295,263 @@ export const MyProfile = () => {
         }
     };
 
-const closeModal = () => {
-    setShowModal(false);
-};
+    const closeModal = () => {
+        setShowModal(false);
+    };
 
-// Formate Date Function. Formate YYYY-MM-DD to DD-MM-YYYY
-function formatDate(dateStr) {
-    if (!dateStr) return "Not Specified Yet"; // Handle null or empty values
+    // Formate Date Function. Formate YYYY-MM-DD to DD-MM-YYYY
+    function formatDate(dateStr) {
+        if (!dateStr) return "Not Specified Yet"; // Handle null or empty values
 
-    try {
-        const date = parseISO(dateStr); // Convert 'YYYY-MM-DD' string to Date object
-        return format(date, "dd-MM-yyyy"); // Format to 'DD-MM-YYYY'
-    } catch (error) {
-        return "Invalid Date"; // Handle unexpected errors
+        try {
+            const date = parseISO(dateStr); // Convert 'YYYY-MM-DD' string to Date object
+            return format(date, "dd-MM-yyyy"); // Format to 'DD-MM-YYYY'
+        } catch (error) {
+            return "Invalid Date"; // Handle unexpected errors
+        }
     }
-}
-return (
-    <div className='my-profile'>
-        <div className='profile-section'>
-            <div className='profile-nav-section'>
-                <div className='profile-info'>
-                    <div
-                        className='profile-image'
-                        onMouseEnter={handleMouseEnter}
-                        onMouseLeave={handleMouseLeave}
-                    >
-                        <img
-                            src={image && image !== 'default.png' ? `http://localhost:9000/uploads/${image}` : imageMap[image] || image}
-                            alt="Profile"
-                            onClick={() => {
-                                handleViewClick();
-                            }}
-                            disabled={image === 'default.png'}
-                        />
-                        {hovered && (
-                            <div className="image-options">
-                                <button className="edit-btn" onClick={() => {
-                                    handleEditClick();
-                                    // window.location.reload();
-                                }}>
-                                    {/* <FaUserEdit/> Edit */}
-                                    <FaUserEdit />
-                                </button>
-                                <button
-                                    className={`view-btn ${image === 'default.png' ? 'disabled' : ''}`}
-                                    onClick={() => {
-                                        handleDeleteClick();
+    return (
+        <div className='my-profile'>
+            <div className='profile-section'>
+                <div className='profile-nav-section'>
+                    <div className='profile-info'>
+                        <div
+                            className='profile-image'
+                            onMouseEnter={handleMouseEnter}
+                            onMouseLeave={handleMouseLeave}
+                        >
+                            <img
+                                src={image && image !== 'default.png' ? `http://localhost:9000/uploads/${image}` : imageMap[image] || image}
+                                alt="Profile"
+                                onClick={() => {
+                                    handleViewClick();
+                                }}
+                                disabled={image === 'default.png'}
+                            />
+                            {hovered && (
+                                <div className="image-options">
+                                    <button className="edit-btn" onClick={() => {
+                                        handleEditClick();
                                         // window.location.reload();
-                                    }}
-                                    disabled={image === 'default.png'}
-                                >
-                                    {/* <MdDelete/> Delete */}
-                                    <MdDelete />
-                                </button>
-                            </div>
-                        )}
-                    </div>
-                    <h3>Hello {customer.customerName}</h3>
-                    <p>{customer.customerMobile}</p>
-                    <p className='ecommerce-points'>
-                        Ecommerce Points: <span>{customer.customerPoints ? customer.customerPoints.toFixed(2) : '0.00'}</span>
-                    </p>
-                </div>
-                <ul className='nav-list'>
-                    <li className='active'
-                        onClick={() => {
-                            navigate('/ecommerce/my-profile');
-                            window.location.reload();
-                        }}><IoPersonOutline /> My Profile</li>
-
-                    <li onClick={() => {
-                        navigate('/ecommerce/change-password');
-                        window.location.reload();
-                    }}><TbPasswordUser /> Change Password</li>
-
-                    <li onClick={() => {
-                        navigate('/ecommerce/my-wishlist');
-                        window.location.reload();
-                    }}><FaRegHeart /> My Wishlist</li>
-
-                    <li onClick={() => {
-                        navigate('/ecommerce/my-orders');
-                        window.location.reload();
-                    }}><CiCircleList /> Order List</li>
-
-                    <li onClick={() => {
-                        navigate('/ecommerce/refer-and-earn');
-                        window.location.reload();
-                    }}><MdCurrencyRupee /> Refer & Earn</li>
-
-                    <li onClick={() => {
-                        navigate('/ecommerce/coupon-code');
-                        window.location.reload();
-                    }}><RiCouponLine /> Coupon Code</li>
-
-                    <li onClick={() => {
-                        navigate('/ecommerce/my-ecommerce');
-                        window.location.reload();
-                    }}><BsCreditCard2Back /> My Ecommerce</li>
-
-                    <li onClick={handleLogout}><MdLock /> Logout</li>
-                </ul>
-            </div>
-
-            <div className="my-profile-section">
-                <div className="my-profile-section-header">
-                    <h1>MY PROFILE</h1>
-                </div>
-                <div className="my-profile-section-body">
-                    <div className="profile-detail">
-                        <h3><RiShieldUserLine /> FULL NAME</h3>
-                        {editMode.name ? (
-                            <div className='edit-part'>
-                                <input
-                                    type="text"
-                                    value={updateCustomer.customerName}
-                                    ref={nameRef}
-                                    onChange={(e) => setUpdateCustomer({ ...updateCustomer, customerName: e.target.value })}
-                                ></input>
-                                <span className="delete" onClick={() => handleCancelProfileClick('name')}>
-                                    <ImCancelCircle />
-                                </span>
-                            </div>
-                        ) : (
-                            <p>
-                                <>
-                                    {customer.customerName}
-                                    <span className="edit" onClick={() => handleEditProfileClick('name')}>
-                                        <FaRegEdit />
-                                    </span>
-                                </>
-                            </p>
-                        )}
-
-                        <h3><MdPhoneAndroid /> MOBILE NUMBER</h3>
-                        {editMode.mobile ? (
-                            <div className='edit-part'>
-                                <input
-                                    type="text"
-                                    ref={mobileRef}
-                                    value={updateCustomer.customerMobile}
-                                    onChange={(e) => setUpdateCustomer({ ...updateCustomer, customerMobile: e.target.value })}
-                                />
-                                <span className="delete" onClick={() => handleCancelProfileClick('mobile')}>
-                                    <ImCancelCircle />
-                                </span>
-                            </div>
-                        ) : (
-                            <p>
-                                <>
-                                    {customer.customerMobile}
-                                    <span className="edit" onClick={() => handleEditProfileClick('mobile')}>
-                                        <FaRegEdit />
-                                    </span>
-                                </>
-                            </p>
-                        )}
-
-                        {/* Email Address don't edit */}
-                        <h3><MdOutlineMail /> EMAIL ADDRESS</h3>
-                        <p>{customer.customerEmail}</p>
-
-                        <h3><BiMaleFemale /> GENDER</h3>
-                        {editMode.gender ? (
-                            <p>
-                                <div className="gender-container">
-                                    <input
-                                        type="radio"
-                                        id="male"
-                                        name="gender"
-                                        value="1"
-                                        onChange={(e) => setUpdateCustomer({ ...updateCustomer, customerGender: e.target.value })}
-                                    />
-                                    <label htmlFor="male">
-                                        <FaMale /> Male
-                                    </label>
-
-                                    <input
-                                        type="radio"
-                                        id="female"
-                                        name="gender"
-                                        value="2"
-                                        onChange={(e) => setUpdateCustomer({ ...updateCustomer, customerGender: e.target.value })}
-                                    />
-                                    <label htmlFor="female">
-                                        <FaFemale /> Female
-                                    </label>
+                                    }}>
+                                        {/* <FaUserEdit/> Edit */}
+                                        <FaUserEdit />
+                                    </button>
+                                    <button
+                                        className={`view-btn ${image === 'default.png' ? 'disabled' : ''}`}
+                                        onClick={() => {
+                                            handleDeleteClick();
+                                            // window.location.reload();
+                                        }}
+                                        disabled={image === 'default.png'}
+                                    >
+                                        {/* <MdDelete/> Delete */}
+                                        <MdDelete />
+                                    </button>
                                 </div>
-                                <span className="delete" onClick={() => handleCancelProfileClick('gender')}>
-                                    <ImCancelCircle />
-                                </span>
-                            </p>
-                        ) : (
-                            <p>
-                                {customer.customerGender === 1 ? (
-                                    <>
-                                        <label><FaMale /> Male</label>
-                                    </>
-                                ) : customer.customerGender === 2 ? (
-                                    <>
-                                        <label><FaFemale /> Female</label>
-                                    </>
-                                ) : (
-                                    "Not Specified Yet"
-                                )}
-                                <span className="edit" onClick={() => handleEditProfileClick('gender')}>
-                                    <FaRegEdit />
-                                </span>
-                            </p>
-                        )}
+                            )}
+                        </div>
+                        <h3>Hello {customer.customerName}</h3>
+                        <p>{customer.customerMobile}</p>
+                        <p className='ecommerce-points'>
+                            Ecommerce Points: <span>{customer.customerPoints ? customer.customerPoints.toFixed(2) : '0.00'}</span>
+                        </p>
+                    </div>
+                    <ul className='nav-list'>
+                        <li className='active'
+                            onClick={() => {
+                                navigate('/ecommerce/my-profile');
+                                window.location.reload();
+                            }}><IoPersonOutline /> My Profile</li>
 
-                        {/* Date of Birth */}
-                        <h3><BsCalendarDate /> DATE OF BIRTH</h3>
-                        {editMode.dob ? (
-                            <div className='edit-part'>
-                                <input
-                                    type="date"
-                                    value={updateCustomer.customerDob || ''}
-                                    onChange={(e) => setUpdateCustomer({ ...updateCustomer, customerDob: e.target.value })}
-                                    useRef={dobRef}
-                                />
-                                <span className="delete" onClick={() => handleCancelProfileClick('dob')}>
-                                    <ImCancelCircle />
-                                </span>
-                            </div>
-                        ) : (
-                            <p>
-                                <>
-                                    {formatDate(customer.customerDob)}
-                                    <span className="edit" onClick={() => handleEditProfileClick('dob')}>
+                        <li onClick={() => {
+                            navigate('/ecommerce/change-password');
+                            window.location.reload();
+                        }}><TbPasswordUser /> Change Password</li>
+
+                        <li onClick={() => {
+                            navigate('/ecommerce/my-wishlist');
+                            window.location.reload();
+                        }}><FaRegHeart /> My Wishlist</li>
+
+                        <li onClick={() => {
+                            navigate('/ecommerce/my-orders');
+                            window.location.reload();
+                        }}><CiCircleList /> Order List</li>
+
+                        <li onClick={() => {
+                            navigate('/ecommerce/refer-and-earn');
+                            window.location.reload();
+                        }}><MdCurrencyRupee /> Refer & Earn</li>
+
+                        <li onClick={() => {
+                            navigate('/ecommerce/coupon-code');
+                            window.location.reload();
+                        }}><RiCouponLine /> Coupon Code</li>
+
+                        <li onClick={() => {
+                            navigate('/ecommerce/my-ecommerce');
+                            window.location.reload();
+                        }}><BsCreditCard2Back /> My Ecommerce</li>
+
+                        <li onClick={handleLogout}><MdLock /> Logout</li>
+                    </ul>
+                </div>
+
+                <div className="my-profile-section">
+                    <div className="my-profile-section-header">
+                        <h1>MY PROFILE</h1>
+                    </div>
+                    <div className="my-profile-section-body">
+                        <div className="profile-detail">
+                            <h3><RiShieldUserLine /> FULL NAME</h3>
+                            {editMode.name ? (
+                                <div className='edit-part'>
+                                    <input
+                                        type="text"
+                                        value={updateCustomer.customerName}
+                                        ref={nameRef}
+                                        onChange={(e) => setUpdateCustomer({ ...updateCustomer, customerName: e.target.value })}
+                                    ></input>
+                                    <span className="delete" onClick={() => handleCancelProfileClick('name')}>
+                                        <ImCancelCircle />
+                                    </span>
+                                </div>
+                            ) : (
+                                <p>
+                                    <>
+                                        {customer.customerName}
+                                        <span className="edit" onClick={() => handleEditProfileClick('name')}>
+                                            <FaRegEdit />
+                                        </span>
+                                    </>
+                                </p>
+                            )}
+
+                            {/* Mobile Number don't edit */}
+                            <h3><MdPhoneAndroid /> MOBILE NUMBER</h3>
+                            <p>{customer.customerMobile}</p>
+
+                            {/* Email Address don't edit */}
+                            <h3><MdOutlineMail /> EMAIL ADDRESS</h3>
+                            <p>{customer.customerEmail}</p>
+
+                            <h3><BiMaleFemale /> GENDER</h3>
+                            {editMode.gender ? (
+                                <p>
+                                    <div className="gender-container">
+                                        <input
+                                            type="radio"
+                                            id="male"
+                                            name="gender"
+                                            value="1"
+                                            onChange={(e) => setUpdateCustomer({ ...updateCustomer, customerGender: e.target.value })}
+                                        />
+                                        <label htmlFor="male">
+                                            <FaMale /> Male
+                                        </label>
+
+                                        <input
+                                            type="radio"
+                                            id="female"
+                                            name="gender"
+                                            value="2"
+                                            onChange={(e) => setUpdateCustomer({ ...updateCustomer, customerGender: e.target.value })}
+                                        />
+                                        <label htmlFor="female">
+                                            <FaFemale /> Female
+                                        </label>
+                                    </div>
+                                    <span className="delete" onClick={() => handleCancelProfileClick('gender')}>
+                                        <ImCancelCircle />
+                                    </span>
+                                </p>
+                            ) : (
+                                <p>
+                                    {customer.customerGender === 1 ? (
+                                        <>
+                                            <label><FaMale /> Male</label>
+                                        </>
+                                    ) : customer.customerGender === 2 ? (
+                                        <>
+                                            <label><FaFemale /> Female</label>
+                                        </>
+                                    ) : (
+                                        "Not Specified Yet"
+                                    )}
+                                    <span className="edit" onClick={() => handleEditProfileClick('gender')}>
                                         <FaRegEdit />
                                     </span>
-                                </>
-                            </p>
-                        )}
+                                </p>
+                            )}
 
-                        <h3><IoHomeOutline /> ADDRESS</h3>
-                        {editMode.address ? (
-                            <div className='edit-part'>
-                                <input
-                                    type="text"
-                                    value={updateCustomer.customerAddress}
-                                    onChange={(e) => setUpdateCustomer({ ...updateCustomer, customerAddress: e.target.value })}
-                                    ref={addressRef}
-                                />
-                                <span className="delete" onClick={() => handleCancelProfileClick('address')}>
-                                    <ImCancelCircle />
-                                </span>
-                            </div>
-                        ) : (
-                            <p>
-                                <>
-                                    {customer.customerAddress || "Not Specified Yet"}
-                                    <span className="edit" onClick={() => handleEditProfileClick('address')}>
-                                        <FaRegEdit />
+                            {/* Date of Birth */}
+                            <h3><BsCalendarDate /> DATE OF BIRTH</h3>
+                            {editMode.dob ? (
+                                <div className='edit-part'>
+                                    <input
+                                        type="date"
+                                        value={updateCustomer.customerDob || ''}
+                                        onChange={(e) => setUpdateCustomer({ ...updateCustomer, customerDob: e.target.value })}
+                                        useRef={dobRef}
+                                    />
+                                    <span className="delete" onClick={() => handleCancelProfileClick('dob')}>
+                                        <ImCancelCircle />
                                     </span>
-                                </>
-                            </p>
+                                </div>
+                            ) : (
+                                <p>
+                                    <>
+                                        {formatDate(customer.customerDob)}
+                                        <span className="edit" onClick={() => handleEditProfileClick('dob')}>
+                                            <FaRegEdit />
+                                        </span>
+                                    </>
+                                </p>
+                            )}
+
+                            <h3><IoHomeOutline /> ADDRESS</h3>
+                            {editMode.address ? (
+                                <div className='edit-part'>
+                                    <input
+                                        type="text"
+                                        value={updateCustomer.customerAddress}
+                                        onChange={(e) => setUpdateCustomer({ ...updateCustomer, customerAddress: e.target.value })}
+                                        ref={addressRef}
+                                    />
+                                    <span className="delete" onClick={() => handleCancelProfileClick('address')}>
+                                        <ImCancelCircle />
+                                    </span>
+                                </div>
+                            ) : (
+                                <p>
+                                    <>
+                                        {customer.customerAddress || "Not Specified Yet"}
+                                        <span className="edit" onClick={() => handleEditProfileClick('address')}>
+                                            <FaRegEdit />
+                                        </span>
+                                    </>
+                                </p>
+                            )}
+                        </div>
+                        {(editMode.name || editMode.mobile || editMode.gender || editMode.dob || editMode.address) && (
+                            <button className="save-btn" onClick={handleSaveProfileClick}>
+                                UPDATE
+                            </button>
                         )}
                     </div>
-                    {(editMode.name || editMode.mobile || editMode.gender || editMode.dob || editMode.address) && (
-                        <button className="save-btn" onClick={handleSaveProfileClick}>
-                            UPDATE
-                        </button>
-                    )}
                 </div>
+
+
+                <input
+                    id="file-input"
+                    type="file"
+                    style={{ display: 'none' }}
+                    onChange={handleImageChange}
+                    accept="image/*"
+                />
             </div>
-
-
-            <input
-                id="file-input"
-                type="file"
-                style={{ display: 'none' }}
-                onChange={handleImageChange}
-                accept="image/*"
-            />
+            {showModal && <ImageModal image={image} closeModal={closeModal} />}
         </div>
-        {showModal && <ImageModal image={image} closeModal={closeModal} />}
-    </div>
-);
+    );
 };

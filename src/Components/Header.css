@@ -70,6 +70,10 @@
     border-radius: 0px;
 }
 
+.search-bar:focus {
+    border-color: #133365;
+}
+
 .search-icon {
     position: absolute;
     left: 9px;
