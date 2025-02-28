@@ -140,7 +140,7 @@ export const Home = () => {
                     onMouseLeave={() => setIsPaused(false)}
                 >
                     <BsArrowLeftCircleFill className='arrow arrow-left' onClick={handleLeft} />
-                    <Link to={"/ecommerce/demo"}>
+                    <Link to={'/ecommerce/offers/best-of-veg-fruits'}>
                         <img
                             src={Slides[currentSlide].src}
                             alt={Slides[currentSlide].alt}

@@ -139,18 +139,19 @@ export const MyCart = () => {
           paymentMode: updateDelivery.paymentMethod,
           totalAmount: calculateTotalPayable(),
           deliveryTimeSlotId: updateDelivery.deliveryTime,
-          carts: cartItems,
-          paymentId, // Razorpay payment ID (only for online payment)
+          carts: cartItems
         }
       );
 
       if (response.status === 200) {
-        await Swal.fire({
-          title: "Order",
-          text: "Order Placed Successfully!",
-          icon: "success",
-          confirmButtonText: "OK",
-        });
+        if(updateDelivery.paymentMethod === 1) {
+          await Swal.fire({
+            title: "Order",
+            text: "Order Placed Successfully!",
+            icon: "success",
+            confirmButtonText: "OK",
+          });
+        }
         return response.data;
       }
     } catch (error) {
@@ -224,6 +225,8 @@ export const MyCart = () => {
           carts: cartItems,
         }
       );
+
+      // const orderResponse = await placeOrder();
 
       if (!orderResponse.data || !orderResponse.data.invoiceNum) {
         throw new Error("Failed to generate invoice number.");

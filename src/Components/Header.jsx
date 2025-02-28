@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { RiFileSearchFill } from "react-icons/ri";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
@@ -20,6 +20,24 @@ export const Header = () => {
     const [customerDetails, setCustomerDetails] = useState({});
     const { setLoading } = useLoading();
     const navigate = useNavigate();
+    const [noResult, setNoResult] = useState(false);
+    const [searchResult, setSearchResult] = useState([]);
+    const [searchQuery, setSearchQuery] = useState("");
+    const searchRef = useRef(null);
+    const [showResult, setShowResult] = useState(false);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (searchRef.current && !searchRef.current.contains(event.target)) {
+                setShowResult(false);
+            }
+        };
+
+        document.addEventListener("click", handleClickOutside, true);
+        return () => {
+            document.removeEventListener("click", handleClickOutside, true);
+        };
+    }, []);
 
     const fetchCustomerDetails = async () => {
         if (isAuthenticated && customerEmail) {
@@ -84,7 +102,7 @@ export const Header = () => {
             return;
         }
 
-        if(cartCount === 0){
+        if (cartCount === 0) {
             window.location.reload();
             return;
         }
@@ -124,6 +142,49 @@ export const Header = () => {
         }
     };
 
+    const fetchResults = async (query) => {
+        try {
+            const response = await axios.get(`http://localhost:9000/search?query=${encodeURIComponent(query)}`);
+            if (response.status === 200) {
+                if (response.data.length === 0) {
+                    setNoResult(true);
+                    return;
+                }
+                setSearchResult(response.data);
+                setNoResult(false);
+                setShowResult(true);
+            }
+        } catch (error) {
+            if (error.response.status === 404) {
+                setNoResult(true);
+            } else {
+                console.error("Error fetching search results:", error);
+                setNoResult(true);
+                alert("Error fetching search results. Please try again later.");
+            }
+        }
+    }
+
+
+    const handleSearchChange = async (e) => {
+        const query = e.target.value;
+        setSearchQuery(query);
+
+        if (query.trim() === "") {
+            setShowResult(false);
+            setSearchQuery("");
+            return;
+        }
+
+        fetchResults(query);
+    }
+
+    const handleFocus = () => {
+        if (searchQuery.trim() !== "") {
+            setShowResult(true);
+        }
+    }
+
     return (
         <>
             <header className="fixed-header">
@@ -140,20 +201,55 @@ export const Header = () => {
                         </div>
                     </div>
 
-                    <div className="navbar-center">
+                    <div className="navbar-center" ref={searchRef}>
                         <div className="search-container">
                             <SearchIcon className="search-icon" />
                             <input
                                 type="text"
                                 className="search-bar"
                                 placeholder="Search for Products"
+                                value={searchQuery}
+                                onChange={handleSearchChange}
+                                onFocus={handleFocus}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        navigate(`/ecommerce/search-result/${searchQuery}`);
+                                        setShowResult(false);
+                                        setSearchQuery('');
+                                    }
+                                }}
                             />
                         </div>
-                        <div className="search-button" onClick={() => alert("Search Button Clicked")}>
+                        <div className="search-button" onClick={() => {
+                            navigate(`/ecommerce/search-result/${searchQuery}`);
+                            setShowResult(false);
+                            setSearchQuery('');
+                        }}>
                             <RiFileSearchFill />
                             <span>SEARCH</span>
                         </div>
+                        {showResult && (
+                            <div className="search-results">
+                                {noResult ? (
+                                    <div className="no-result">NO RESULTS FOUND</div>
+                                ) : (
+                                    searchResult.map((product) => (
+                                        <div
+                                            className='search-item'
+                                            key={product.id}
+                                            onClick={() => {
+                                                navigate(`/ecommerce/product/${product.slug_title}`);
+                                                setShowResult(false);
+                                                setSearchQuery('');
+                                            }}>
+                                            {product.name}
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        )}
                     </div>
+
 
                     <div className="navbar-right">
                         {!isAuthenticated ? (

@@ -25,7 +25,7 @@ const importAll = (r) => {
 };
 
 const imageMap = importAll(require.context("../assets/Customer", false, /\.(png|jpeg|svg|jpg|JPEG|JPG)$/));
-
+const productImages = importAll(require.context("../assets/Product", false, /\.(png|jpeg|svg|jpg|JPEG)$/));
 
 export const MyOrderList = () => {
   const [customer, setCustomer] = useState({});
@@ -36,6 +36,8 @@ export const MyOrderList = () => {
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
   const { setLoading } = useLoading();
+  const [orderList, setOrderList] = useState([]);
+  const [orderDetails, setOrderDetails] = useState([]);
 
   const fetchCustomerDetails = async () => {
     setLoading(true);
@@ -187,6 +189,69 @@ export const MyOrderList = () => {
   const closeModal = () => {
     setShowModal(false);
   };
+
+  const fetchOrderList = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`http://localhost:9000/orders/${sessionStorage.getItem("customerEmail")}`);
+      if (response.status === 200) {
+        setOrderList(response.data);
+      }
+    } catch (error) {
+      if (error.response.status === 404) {
+        console.log("Customer not found");
+      } else {
+        console.error("Error fetching customer details:", error);
+        alert("Something went wrong in fetching Customer Details. Please try again!");
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const fetchOrderDetails = async (invoiceNum) => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`http://localhost:9000/product-order/${invoiceNum}`);
+
+      if (response.status === 200) {
+        return response.data;
+      }
+    } catch (error) {
+      if (error.response.status === 404) {
+        console.log("Customer not found");
+      } else {
+        console.error("Error fetching customer details:", error);
+        alert("Something went wrong in fetching Customer Details. Please try again!");
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const fetchDetails = async () => {
+    const details = {};
+    for (const order of orderList) {
+      try {
+        const response = await fetchOrderDetails(order.invoiceNum); // Fetch order details (including products)
+        details[order.invoiceNum] = response; // Store products in state using invoiceNum as key
+      } catch (error) {
+        console.error(`Error fetching details for ${order.invoiceNum}:`, error);
+      }
+    }
+    setOrderDetails(details);
+  };
+
+  useEffect(() => {
+    fetchOrderList();
+  }, []);
+
+  useEffect(() => {
+    if (orderList.length > 0) {
+      fetchDetails();
+    }
+  }, [orderList]);
+
   return (
     <div className='my-wishlist'>
       <div className='profile-section'>
@@ -272,12 +337,64 @@ export const MyOrderList = () => {
             <h1>Order List</h1>
           </div>
           <div className='my-profile-section-body'>
-            <div className='profile-detail'>
+            {/* <div className='profile-detail'> */}
+              <div className="order-container">
+                {orderList.length > 0 &&
+                  orderList.map((order) => (
+                    <div key={order.invoiceNum} className="order-box">
+                      <h3>{order.invoicePrefix + order.invoiceNum}</h3>
+                      <div className="order-date">
+                        <span>Date: {order.invoiceDate}</span>
+                      </div>
+                      {orderDetails[order.invoiceNum] ? (
+                        orderDetails[order.invoiceNum].map((item) => {
+                          const imageSrc =
+                            productImages[item.product?.image_url] || productImages["default.jpg"];
 
-            </div>
+                          return (
+                            <div key={item.productId} className="order-details">
+
+                              <div className="order-image">
+                                <img src={imageSrc} alt="Product" />
+                                <span>{item.product?.name}</span>
+                                <span>Quantity : {item.quantity}</span>
+                              </div>
+
+                              <div className="order-price">
+                                <span>Price : ₹{item.totalAmount}</span>
+                                <span>Payment : {order.invoicePaymentMode == 1 ? "Cash on Delivery" : "Online Payment"}</span>
+                              </div>
+
+                              <div className='order-status'>
+                                <span>Status : {order.invoiceStatus == 1 ?
+                                  <span>Pending</span>
+                                  : order.invoiceStatus == 2 ?
+                                    <span>Confirm</span>
+                                    : order.invoiceStatus == 3 ?
+                                      <span>Dispatched</span> :
+                                      order.invoiceStatus == 4 ?
+                                        <span>Delivered</span> :
+                                        order.invoiceStatus == 5 ?
+                                          <span>Rejected</span> :
+                                          order.invoiceStatus == 6 ?
+                                            <span>Cancelled</span> : ""
+                                }</span>
+                              </div>
+                            </div>
+                          );
+                        })
+                      ) : (
+                        <span>Loading products...</span> // ✅ Show a message if products are still loading
+                      )}
+                    </div>
+                  ))}
+              </div>
+
+
+            {/* </div> */}
           </div>
         </div>
-        
+
         <input
           id="file-input"
           type="file"

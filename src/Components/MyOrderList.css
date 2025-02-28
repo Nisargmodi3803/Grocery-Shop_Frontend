@@ -1,4 +1,4 @@
-.my-order-list{
+.my-order-list {
     padding-top: 165px;
     font-family: "Maven Pro", sans-serif;
     background: #f4f4f4;
@@ -7,4 +7,135 @@
     justify-content: center;
     flex-wrap: wrap;
     text-decoration: none;
+}
+
+
+.order-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+}
+
+.order-box {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    transition: 0.3s ease-in-out;
+}
+
+.order-box:hover {
+    transform: translateY(-2px);
+}
+
+.order-box h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.order-details {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    padding: 10px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.order-date span {
+    font-size: 14px;
+    color: #666;
+}
+
+.order-image {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.order-image img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.order-image span {
+    font-size: 14px;
+    color: #444;
+    font-weight: 500;
+}
+
+.order-price {
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+    color: #444;
+}
+
+.order-status {
+    font-size: 14px;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.order-status span {
+    padding: 5px 12px;
+    border-radius: 5px;
+    font-size: 14px;
+    color: #fff;
+}
+
+/* ✅ Status Colors */
+.order-status span {
+    background: gray;
+}
+
+.order-status span:nth-child(1) {
+    background: #ff9800;
+}
+
+/* Pending - Orange */
+.order-status span:nth-child(2) {
+    background: #4caf50;
+}
+
+/* Confirm - Green */
+.order-status span:nth-child(3) {
+    background: #2196f3;
+}
+
+/* Dispatched - Blue */
+.order-status span:nth-child(4) {
+    background: #2e7d32;
+}
+
+/* Delivered - Dark Green */
+.order-status span:nth-child(5) {
+    background: #d32f2f;
+}
+
+/* Rejected - Red */
+.order-status span:nth-child(6) {
+    background: #757575;
+}
+
+/* Cancelled - Gray */
+
+/* ✅ Responsive Design */
+@media (max-width: 768px) {
+    .order-details {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .order-image img {
+        width: 50px;
+        height: 50px;
+    }
 }
