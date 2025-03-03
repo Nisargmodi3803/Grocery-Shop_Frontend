@@ -9,133 +9,202 @@
     text-decoration: none;
 }
 
-
 .order-container {
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    padding: 20px;
+    gap: 15px;
+    padding-bottom: -10px;
+    margin-top: -15px;
+}
+
+.order-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #e0e4e7;
+    position: relative;
+}
+
+.order-title h3 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #133365;
+    margin: 0;
+    padding-left: 5px;
+}
+
+.order-date {
+    font-size: 18px;
+    color: #555;
+    padding-right: 5px;
 }
 
 .order-box {
     background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    transition: 0.3s ease-in-out;
+    padding: 15px;
+    padding-bottom: 0px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
 }
 
-.order-box:hover {
-    transform: translateY(-2px);
+.order-images {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 5px;
 }
 
-.order-box h3 {
-    font-size: 18px;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 10px;
+.order-img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border: 1px solid #ccc;
+    border-radius: 5px;
 }
 
-.order-details {
+.order-info-container {
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
-    padding: 10px;
-    border-top: 1px solid #e0e0e0;
+    margin-top: -30px;
 }
 
-.order-date span {
+.order-status h3 {
+    font-size: 18px;
+    font-weight: bold;
+    color: #2c2c2c;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.status-icon {
+    font-size: 18px;
+}
+
+.delivered {
+    color: #4CAF50;
+}
+
+.order-date {
     font-size: 14px;
     color: #666;
 }
 
-.order-image {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+.order-amount {
+    font-size: 20px;
+    font-weight: bold;
+    color: #111;
 }
 
-.order-image img {
-    width: 60px;
-    height: 60px;
-    object-fit: cover;
-    border-radius: 8px;
-    border: 1px solid #ddd;
+.cancel-button {
+    font-size: 22px;
+    color: red;
+    cursor: pointer;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    transition: transform 0.2s ease-in-out;
 }
 
-.order-image span {
-    font-size: 14px;
-    color: #444;
-    font-weight: 500;
-}
-
-.order-price {
-    display: flex;
-    flex-direction: column;
-    font-size: 14px;
-    color: #444;
+.cancel-button:hover {
+    transform: scale(1.1);
 }
 
 .order-status {
-    font-size: 14px;
-    font-weight: 600;
-    padding: 5px 10px;
-    border-radius: 5px;
+    font-weight: bold;
 }
 
 .order-status span {
-    padding: 5px 12px;
-    border-radius: 5px;
+    display: inline-block;
     font-size: 14px;
     color: #fff;
+    text-transform: uppercase;
+    font-weight: bold;
 }
 
-/* ✅ Status Colors */
-.order-status span {
-    background: gray;
+.order-status .Pending {
+    color: #ff9800;
 }
 
-.order-status span:nth-child(1) {
-    background: #ff9800;
+.order-status .Confirm {
+    color: #4caf50;
 }
 
-/* Pending - Orange */
-.order-status span:nth-child(2) {
-    background: #4caf50;
+.order-status .Dispatched {
+    color: #2196f3;
 }
 
-/* Confirm - Green */
-.order-status span:nth-child(3) {
-    background: #2196f3;
+.order-status .Delivered {
+    color: #2e7d32;
 }
 
-/* Dispatched - Blue */
-.order-status span:nth-child(4) {
-    background: #2e7d32;
+.order-status .Rejected {
+    color: #d32f2f;
 }
 
-/* Delivered - Dark Green */
-.order-status span:nth-child(5) {
-    background: #d32f2f;
+.order-status .Cancelled {
+    color: #d32f2f;
 }
 
-/* Rejected - Red */
-.order-status span:nth-child(6) {
-    background: #757575;
+
+.pagination {
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+    gap: 5px;
+    font-family: Arial, sans-serif;
+    margin-left: 20px;
 }
 
-/* Cancelled - Gray */
+.pagination span {
+    font-size: 16px;
+    color: #133365;
+    justify-content: left;
+    margin-right: 422px;
+}
 
-/* ✅ Responsive Design */
-@media (max-width: 768px) {
-    .order-details {
-        flex-direction: column;
-        align-items: flex-start;
-    }
+.pagination button {
+    padding: 10px 14px;
+    border: none;
+    background: #fff;
+    color: #133365;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
 
-    .order-image img {
-        width: 50px;
-        height: 50px;
-    }
+.pagination button.active {
+    background: #133365;
+    color: white;
+}
+
+.pagination button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.pagination button:hover:not(:disabled):not(.active) {
+    background: #ddd;
+}
+
+.cancel-button {
+    position: absolute;
+    top: 52px;
+    right: 5px;
+    font-size: 24px;
+    cursor: pointer;
+    color: red;
+    background: transparent;
+    border: none;
+    transition: transform 0.2s ease-in-out;
+}
+
+.cancel-button:hover {
+    transform: scale(1.05);
 }

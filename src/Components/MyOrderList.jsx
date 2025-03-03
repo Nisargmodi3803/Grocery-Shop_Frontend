@@ -15,6 +15,8 @@ import { RiCouponLine } from "react-icons/ri";
 import { BsCreditCard2Back } from "react-icons/bs";
 import { MdLock } from "react-icons/md";
 import Swal from 'sweetalert2';
+import { MdCancelPresentation } from "react-icons/md";
+import { FaCheckCircle } from "react-icons/fa";
 
 const importAll = (r) => {
   let images = {};
@@ -38,6 +40,25 @@ export const MyOrderList = () => {
   const { setLoading } = useLoading();
   const [orderList, setOrderList] = useState([]);
   const [orderDetails, setOrderDetails] = useState([]);
+
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const ordersPerPage = 5;
+  const totalPages = Math.ceil(orderList.length / ordersPerPage);
+  const startIndex = (currentPage - 1) * ordersPerPage;
+  const endIndex = startIndex + ordersPerPage;
+  const paginatedOrders = orderList.slice(startIndex, endIndex);
+
+  // Pagination Settings
+  const maxPageNumbersToShow = 4;
+  const startPage = Math.max(1, currentPage - Math.floor(maxPageNumbersToShow / 2));
+  const endPage = Math.min(totalPages, startPage + maxPageNumbersToShow - 1);
+
+  // Handle Click
+  const handlePageClick = (page) => {
+    setCurrentPage(page);
+  };
+
 
   const fetchCustomerDetails = async () => {
     setLoading(true);
@@ -209,10 +230,10 @@ export const MyOrderList = () => {
     }
   }
 
-  const fetchOrderDetails = async (invoiceNum) => {
+  const fetchOrderDetails = async (invoiceId) => {
     setLoading(true);
     try {
-      const response = await axios.get(`http://localhost:9000/product-order/${invoiceNum}`);
+      const response = await axios.get(`http://localhost:9000/product-order/${invoiceId}`);
 
       if (response.status === 200) {
         return response.data;
@@ -233,7 +254,7 @@ export const MyOrderList = () => {
     const details = {};
     for (const order of orderList) {
       try {
-        const response = await fetchOrderDetails(order.invoiceNum); // Fetch order details (including products)
+        const response = await fetchOrderDetails(order.invoiceId); // Fetch order details (including products)
         details[order.invoiceNum] = response; // Store products in state using invoiceNum as key
       } catch (error) {
         console.error(`Error fetching details for ${order.invoiceNum}:`, error);
@@ -251,6 +272,86 @@ export const MyOrderList = () => {
       fetchDetails();
     }
   }, [orderList]);
+
+  const getOrderStatus = (status) => {
+    switch (status) {
+      case 1: return "Pending";
+      case 2: return "Confirmed";
+      case 3: return "Dispatched";
+      case 4: return "Delivered";
+      case 5: return "Rejected";
+      case 6: return "Cancelled";
+      default: return "";
+    }
+  };
+
+  const formatDateTime = (dateString, timeString) => {
+    if (!dateString || !timeString) return "Invalid Date";
+
+    const dateParts = dateString.split("-");
+    if (dateParts.length === 3) {
+      dateString = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+    }
+
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return "Invalid Date";
+
+    const getOrdinalSuffix = (day) => {
+      if (day > 3 && day < 21) return "th";
+      switch (day % 10) {
+        case 1: return "st";
+        case 2: return "nd";
+        case 3: return "rd";
+        default: return "th";
+      }
+    };
+
+    const day = date.getDate();
+    const month = date.toLocaleString("en-US", { month: "short" }); // "Jan", "Feb", etc.
+    const year = date.getFullYear();
+
+    let [hours, minutes] = timeString.split(":").map(Number);
+    if (isNaN(hours) || isNaN(minutes)) return "Invalid Time";
+
+    const ampm = hours >= 12 ? "PM" : "AM";
+    const formattedHours = hours % 12 || 12;
+
+    return `${day}${getOrdinalSuffix(day)} ${month} ${year}, ${formattedHours}:${minutes.toString().padStart(2, "0")} ${ampm}`;
+  };
+
+  const handleCancelOrder = async (invoiceNum) => {
+    const result = await Swal.fire({
+      title: `Are you sure you want to cancel Order BI - ${invoiceNum}?`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+      cancelButtonText: "No",
+      confirmButtonColor: "green",
+      cancelButtonColor: "red",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        const response = await axios.patch(`http://localhost:9000/cancel-order/${invoiceNum}`)
+        if (response.status === 200) {
+          console.log("Order cancelled successfully");
+          fetchOrderList();
+          fetchDetails();
+          await Swal.fire("Cancelled!", "Your order BI - " + invoiceNum + " has been cancelled.", "success");
+        }
+        else {
+          await Swal.fire("Error", "Something went wrong. Please try again!", "error");
+        }
+      } catch (error) {
+        if (error.response.status === 404) {
+          console.log("Invoice not found");
+        } else {
+          console.error("Error cancelling order:", error);
+          alert("Something went wrong in cancelling order. Please try again!");
+        }
+      }
+    }
+  }
 
   return (
     <div className='my-wishlist'>
@@ -336,62 +437,141 @@ export const MyOrderList = () => {
           <div className='my-profile-section-header'>
             <h1>Order List</h1>
           </div>
+
+          {/* <div className='brand-header'>
+            <span class="brand-name"></span>
+            <select class="sort-dropdown">
+              <option>Last 30 days</option>
+              <option>Sort by: Price (Low to High)</option>
+              <option>Sort by: Price (High to Low)</option>
+              <option>Sort by: Discount (High to Low)</option>
+              <option>Sort by: Discount (Low to High)</option>
+              <option>Sort by: Name (A to Z)</option>
+              <option>Sort by: Name (Z to A)</option>
+            </select>
+          </div> */}
           <div className='my-profile-section-body'>
-            {/* <div className='profile-detail'> */}
-              <div className="order-container">
-                {orderList.length > 0 &&
-                  orderList.map((order) => (
-                    <div key={order.invoiceNum} className="order-box">
+            <div className="order-container">
+              {paginatedOrders.length > 0 ? (
+                paginatedOrders.map((order) => (
+                  <div key={order.invoiceNum} className="order-box"
+                    onClick={() => {
+                      navigate(`/ecommerce/view-order/${order.invoiceNum}`);
+                      window.location.reload();
+                    }}>
+                    <div className="order-title">
                       <h3>{order.invoicePrefix + order.invoiceNum}</h3>
-                      <div className="order-date">
-                        <span>Date: {order.invoiceDate}</span>
-                      </div>
-                      {orderDetails[order.invoiceNum] ? (
-                        orderDetails[order.invoiceNum].map((item) => {
-                          const imageSrc =
-                            productImages[item.product?.image_url] || productImages["default.jpg"];
-
-                          return (
-                            <div key={item.productId} className="order-details">
-
-                              <div className="order-image">
-                                <img src={imageSrc} alt="Product" />
-                                <span>{item.product?.name}</span>
-                                <span>Quantity : {item.quantity}</span>
-                              </div>
-
-                              <div className="order-price">
-                                <span>Price : ₹{item.totalAmount}</span>
-                                <span>Payment : {order.invoicePaymentMode == 1 ? "Cash on Delivery" : "Online Payment"}</span>
-                              </div>
-
-                              <div className='order-status'>
-                                <span>Status : {order.invoiceStatus == 1 ?
-                                  <span>Pending</span>
-                                  : order.invoiceStatus == 2 ?
-                                    <span>Confirm</span>
-                                    : order.invoiceStatus == 3 ?
-                                      <span>Dispatched</span> :
-                                      order.invoiceStatus == 4 ?
-                                        <span>Delivered</span> :
-                                        order.invoiceStatus == 5 ?
-                                          <span>Rejected</span> :
-                                          order.invoiceStatus == 6 ?
-                                            <span>Cancelled</span> : ""
-                                }</span>
-                              </div>
-                            </div>
-                          );
-                        })
-                      ) : (
-                        <span>Loading products...</span> // ✅ Show a message if products are still loading
+                      <p className="order-date">
+                        Placed at {formatDateTime(order.invoiceDate, order.invoiceTime)}
+                      </p>
+                      {order.invoiceStatus == 1 && (
+                        <span className="cancel-button" onClick={() => handleCancelOrder(order.invoiceNum)}>
+                          <MdCancelPresentation />
+                        </span>
                       )}
                     </div>
-                  ))}
+                    <div className='order-details'>
+                      <div className="order-images">
+                        {orderDetails[order.invoiceNum] &&
+                          orderDetails[order.invoiceNum].map((item) => {
+                            const imageSrc =
+                              productImages[item.product?.image_url] || productImages["default.jpg"];
+                            return (
+                              <img key={item.productId} src={imageSrc} alt="Product" className="order-img" />
+                            );
+                          })}
+                      </div>
+
+                      <div className="order-info-container">
+                        <div className="order-status">
+                          <h3>
+                            Order{" "}
+                            {order.invoiceStatus == 4 ? (
+                              <>
+                                <b>delivered</b> <FaCheckCircle className="status-icon delivered" />
+                              </>
+                            ) : (
+                              <>
+                                <div className="order-status">
+                                  <h3 className={
+                                    order.invoiceStatus == 1 ? "Pending" :
+                                      order.invoiceStatus == 2 ? "Confirm" :
+                                        order.invoiceStatus == 3 ? "Dispatched" :
+                                          order.invoiceStatus == 4 ? "Delivered" :
+                                            order.invoiceStatus == 5 ? "Rejected" :
+                                              order.invoiceStatus == 6 ? "Cancelled" : ""
+                                  }>
+                                    {order.invoiceStatus == 1 ? "Pending" :
+                                      order.invoiceStatus == 2 ? "Confirmed" :
+                                        order.invoiceStatus == 3 ? "Dispatched" :
+                                          order.invoiceStatus == 4 ? "Delivered" :
+                                            order.invoiceStatus == 5 ? "Rejected" :
+                                              order.invoiceStatus == 6 ? "Cancelled" : ""}
+                                  </h3>
+                                </div>
+                              </>
+                            )}
+                          </h3>
+                        </div>
+
+                        <h3 className="order-amount">₹{order.invoiceTotalAmount}</h3>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className='profile-detail'>
+                  <h1 style={{ fontSize: '1.5rem', color: 'red' }}>
+                    NO ORDER YET!
+                  </h1>
+                </div>
+              )}
+            </div>
+
+            {paginatedOrders.length > 0 && (
+
+              <div className="pagination">
+                <span>Showing {startIndex + 1} to {Math.min(endIndex, orderList.length)} of {orderList.length} entries</span>
+
+                {/* Previous Button */}
+                <button onClick={() => handlePageClick(currentPage - 1)} disabled={currentPage === 1}>
+                  &lt;
+                </button>
+
+                {/* First Page */}
+                {/* {startPage > 1 && (
+                <>
+                  <button onClick={() => handlePageClick(1)}>1</button>
+                  {startPage > 2 && <span>...</span>}
+                </>
+              )} */}
+
+                {/* Dynamic Page Numbers */}
+                {Array.from({ length: endPage - startPage + 1 }, (_, index) => (
+                  <button
+                    key={startPage + index}
+                    className={currentPage === startPage + index ? "active" : ""}
+                    onClick={() => handlePageClick(startPage + index)}
+                  >
+                    {startPage + index}
+                  </button>
+                ))}
+
+                {/* Last Page */}
+                {/* {endPage < totalPages && (
+                <>
+                  {endPage < totalPages - 1 && <span>...</span>}
+                  <button onClick={() => handlePageClick(totalPages)}>{totalPages}</button>
+                </>
+              )} */}
+
+                {/* Next Button */}
+                <button onClick={() => handlePageClick(currentPage + 1)} disabled={currentPage === totalPages}>
+                  &gt;
+                </button>
               </div>
+            )}
 
-
-            {/* </div> */}
           </div>
         </div>
 

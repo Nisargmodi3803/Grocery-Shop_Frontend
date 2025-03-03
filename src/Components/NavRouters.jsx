@@ -27,6 +27,7 @@ import { MyPoints } from './MyPoints';
 import { Offers } from './Offers';
 import { OffersNewYear } from './OffersNewYear';
 import { SearchResult } from './SearchResult';
+import { ViewOrder } from './ViewOrder';
 
 export const NavRouters = () => {
 
@@ -59,6 +60,7 @@ export const NavRouters = () => {
         <Route path='/ecommerce/offers/best-of-veg-fruits' element={<Offers/>}/>
         <Route path='/ecommerce/offers/new-year' element={<OffersNewYear/>}/>
         <Route path='/ecommerce/search-result/:searchQuery' element={<SearchResult/>}/>
+        <Route path='/ecommerce/view-order/:invoiceNum' element={<ViewOrder/>}/>
       </Routes>
       <Footer />
     </>

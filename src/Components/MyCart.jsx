@@ -156,6 +156,7 @@ export const MyCart = () => {
       }
     } catch (error) {
       console.error("Error placing order:", error);
+      setLoading(false);
       Swal.fire({
         title: "Order",
         text: "Order Placement Failed!",
@@ -299,7 +300,7 @@ export const MyCart = () => {
               sessionStorage.removeItem("cartState");
               sessionStorage.removeItem("cartCount");
               window.dispatchEvent(new Event("cartUpdated"));
-              navigate("/ecommerce/");
+              navigate("/ecommerce/my-orders");
               window.location.reload();
             } else {
               Swal.fire({
@@ -355,7 +356,7 @@ export const MyCart = () => {
         sessionStorage.removeItem("cartCount");
         window.dispatchEvent(new Event("cartUpdated"));
 
-        navigate('/ecommerce/');
+        navigate('/ecommerce/my-orders');
         window.location.reload();
       } catch (error) {
         console.error("Error during order placement process:", error);
