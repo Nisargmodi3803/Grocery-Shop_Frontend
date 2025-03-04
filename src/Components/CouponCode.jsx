@@ -218,7 +218,6 @@ export const CouponCode = () => {
                     className={`view-btn ${image === 'default.png' ? 'disabled' : ''}`}
                     onClick={() => {
                       handleDeleteClick();
-                      window.location.reload();
                     }}
                     disabled={image === 'default.png'}
                   >

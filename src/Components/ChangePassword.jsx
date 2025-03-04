@@ -316,7 +316,6 @@ export const ChangePassword = () => {
                     className={`view-btn ${image === 'default.png' ? 'disabled' : ''}`}
                     onClick={() => {
                       handleDeleteClick();
-                      window.location.reload();
                     }}
                     disabled={image === 'default.png'}
                   >

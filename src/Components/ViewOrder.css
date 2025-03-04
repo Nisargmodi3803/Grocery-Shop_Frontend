@@ -8,3 +8,241 @@
     flex-wrap: wrap;
     text-decoration: none;
 }
+
+.order {
+    display: flex;
+    gap: 30px;
+    padding: 20px;
+    width: 100%;
+    margin: 20px;
+}
+
+/* Left Section: Products (Larger) */
+.order-details-products {
+    flex: 2;
+    background: #fff;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    height: max-content;
+}
+
+.product-counts {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #133365;
+    text-align: left;
+}
+
+.order-details1 {
+    display: flex;
+    padding: 10px 12px;
+    border-bottom: 2px solid #ddd;
+    text-align: left;
+    padding-top: 20px;
+}
+
+.order-details1:last-child {
+    border-bottom: none;
+}
+
+.order-details-image img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-right: 15px;
+    cursor: pointer;
+}
+
+.order-details-info {
+    flex: 1;
+}
+
+.order-details-info-title{
+    cursor: pointer;
+}
+
+.order-details-info-title,
+.order-details-info-price {
+    margin-bottom: 5px;
+}
+
+.order-details-info-title span {
+    font-weight: 600;
+    font-size: 18px;
+    color: #133365;
+}
+
+.order-details-info-price span {
+    font-weight: 600;
+    font-size: 14px;
+    color: #7f8c8d;
+}
+
+.order-details-info-quantity span {
+    font-size: 13px;
+    color: #133365;
+}
+
+/* Right Section: Order Summary (Smaller) */
+.order-details-address-mrp {
+    flex: 1;
+    background: #fff;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    text-align: left;
+    height: max-content;
+    width: 100%;
+}
+
+.order-number-title{
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 20px;
+}
+
+.order-no {
+    display: flex;
+    justify-content: space-between;
+    font-size: 18px;
+    font-weight: 600;
+    color: #133365;
+    margin-bottom: 15px;
+}
+
+.order-details-status {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.order-details-status .Pending {
+    color: #ff9800;
+}
+
+.order-details-status .Confirm {
+    color: #4caf50;
+}
+
+.order-details-status .Dispatched {
+    color: #2196f3;
+}
+
+.order-details-status .Delivered {
+    color: #2e7d32;
+}
+
+.order-status .Rejected {
+    color: #d32f2f;
+}
+
+.order-details-status .Cancelled {
+    color: #d32f2f;
+}
+
+.order-details-address {
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 25px;
+}
+
+.order-details-address h3 {
+    margin-top: 20px;
+    font-size: 20px;
+    font-weight: 600;
+    color: #133365;
+    margin-bottom: 10px;
+}
+
+.order-details-address-info h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #133365;
+    padding-left: 5px;
+    margin-bottom: -10px;
+}
+
+.order-details-address-info p {
+    font-size: 16px;
+    padding-left: 5px;
+    color: #133365;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.order-details-address-info span {
+    font-size: 14px;
+    padding-left: 5px;
+    color: #7f8c8d;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 600;
+}
+
+/* Price Details */
+.order-details-mrp {
+    margin-top: 25px;
+}
+
+.order-details-price,
+.order-details-mrp-price,
+.order-details-mrp-delivery,
+.order-details-mrp-total {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.order-details-mrp-total {
+    padding-top: 10px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #133365;
+}
+
+.order-details-mrp-total span{
+    font-size: 18px;
+}
+
+.order-details-mrp-price span{
+    color: #133365;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.order-details-mrp-delivery{
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 20px;
+}
+
+.order-details-mrp-delivery span {
+    color: red;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.order-details-mrp-price p,
+.order-details-mrp-delivery p{
+    color: #7f8c8d;
+}
+
+.order-details-price p,
+.order-details-mrp-price p,
+.order-details-mrp-delivery p,
+.order-details-mrp-total p {
+    margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .order {
+        flex-direction: column;
+    }
+
+    .order-details-products,
+    .order-details-address-mrp {
+        width: 100%;
+    }
+}

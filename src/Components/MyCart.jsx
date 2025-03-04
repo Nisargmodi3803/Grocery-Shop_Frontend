@@ -11,6 +11,7 @@ import { FaArrowRightLong } from "react-icons/fa6";
 import { MdCancelPresentation } from "react-icons/md";
 import Swal from 'sweetalert2';
 import { FaUser, FaPhone, FaEnvelope, FaCity, FaMapMarkerAlt, FaClipboardList, FaClock } from "react-icons/fa";
+import { FaPhoneAlt } from "react-icons/fa";
 
 const importAll = (r) => {
   let images = {};
@@ -300,7 +301,7 @@ export const MyCart = () => {
               sessionStorage.removeItem("cartState");
               sessionStorage.removeItem("cartCount");
               window.dispatchEvent(new Event("cartUpdated"));
-              navigate("/ecommerce/my-orders");
+              navigate(`/ecommerce/view-order/${invoiceNum}`);
               window.location.reload();
             } else {
               Swal.fire({
@@ -348,15 +349,15 @@ export const MyCart = () => {
 
     if (updateDelivery.paymentMethod === 1) {
       try {
-        await placeOrder();
-
+        const {invoiceNum} = await placeOrder();
+        console.log("Generated Invoice Number:", invoiceNum);
         await updateCustomer();
 
         sessionStorage.removeItem("cartState");
         sessionStorage.removeItem("cartCount");
         window.dispatchEvent(new Event("cartUpdated"));
 
-        navigate('/ecommerce/my-orders');
+        navigate(`/ecommerce/view-order/${invoiceNum}`);
         window.location.reload();
       } catch (error) {
         console.error("Error during order placement process:", error);
@@ -803,7 +804,7 @@ export const MyCart = () => {
 
                 <div className="form-row">
                   <div className="form-group">
-                    <h3><FaPhone /> PHONE *</h3>
+                    <h3><FaPhoneAlt /> PHONE *</h3>
                     <input
                       type="text"
                       name='customerMobile'

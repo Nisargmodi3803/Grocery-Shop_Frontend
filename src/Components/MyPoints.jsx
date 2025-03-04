@@ -133,22 +133,34 @@ export const MyPoints = () => {
     const result = await deleteProfileImageAlert(); // Await the user's response
 
     if (result.isConfirmed) {
-      if (image !== 'default.png') {
+      if (image !== "default.png") {
         try {
-          const response = await axios.patch(`http://localhost:9000/delete-profile-image/${sessionStorage.getItem("customerEmail")}`);
+          setLoading(true); // Show loading state
+          Swal.fire({
+            title: "Deleting...",
+            text: "Please wait while we delete your profile image.",
+            allowOutsideClick: false,
+            didOpen: () => {
+              Swal.showLoading();
+            },
+          });
+
+          const response = await axios.patch(
+            `http://localhost:9000/delete-profile-image/${sessionStorage.getItem("customerEmail")}`
+          );
+
           if (response.status === 200) {
-            console.log('Image deleted successfully:', response.data);
-            setImage('default.png'); // Update the image after deletion
+            setImage("default.png"); // Update the image after deletion
             Swal.fire("Deleted!", "Your profile image has been deleted.", "success");
           }
         } catch (error) {
           if (error.response?.status === 404) {
-            console.log("Customer not found");
             Swal.fire("Error", "Customer not found.", "error");
           } else {
-            console.error('Error deleting image:', error);
             Swal.fire("Error", "Something went wrong. Please try again!", "error");
           }
+        } finally {
+          setLoading(false); // Hide loading state
         }
       }
     }
@@ -218,7 +230,6 @@ export const MyPoints = () => {
                     className={`view-btn ${image === 'default.png' ? 'disabled' : ''}`}
                     onClick={() => {
                       handleDeleteClick();
-                      window.location.reload();
                     }}
                     disabled={image === 'default.png'}
                   >

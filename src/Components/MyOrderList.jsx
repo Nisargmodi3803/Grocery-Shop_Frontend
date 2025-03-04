@@ -61,7 +61,7 @@ export const MyOrderList = () => {
 
 
   const fetchCustomerDetails = async () => {
-    setLoading(true);
+    // setLoading(true);
     try {
       const response = await axios.get(`http://localhost:9000/profile/${sessionStorage.getItem("customerEmail")}`);
       if (response.status === 200) {
@@ -76,7 +76,7 @@ export const MyOrderList = () => {
         alert("Something went wrong in fetching Customer Details. Please try again!");
       }
     } finally {
-      setLoading(false);
+      // setLoading(false);
     }
   };
 
@@ -177,7 +177,6 @@ export const MyOrderList = () => {
     }
   };
 
-
   const handleEditClick = () => {
     document.getElementById("file-input").click(); // Trigger the file input on edit click
   };
@@ -272,18 +271,6 @@ export const MyOrderList = () => {
       fetchDetails();
     }
   }, [orderList]);
-
-  const getOrderStatus = (status) => {
-    switch (status) {
-      case 1: return "Pending";
-      case 2: return "Confirmed";
-      case 3: return "Dispatched";
-      case 4: return "Delivered";
-      case 5: return "Rejected";
-      case 6: return "Cancelled";
-      default: return "";
-    }
-  };
 
   const formatDateTime = (dateString, timeString) => {
     if (!dateString || !timeString) return "Invalid Date";
@@ -384,7 +371,6 @@ export const MyOrderList = () => {
                     className={`view-btn ${image === 'default.png' ? 'disabled' : ''}`}
                     onClick={() => {
                       handleDeleteClick();
-                      window.location.reload();
                     }}
                     disabled={image === 'default.png'}
                   >
@@ -441,13 +427,10 @@ export const MyOrderList = () => {
           {/* <div className='brand-header'>
             <span class="brand-name"></span>
             <select class="sort-dropdown">
-              <option>Last 30 days</option>
-              <option>Sort by: Price (Low to High)</option>
-              <option>Sort by: Price (High to Low)</option>
-              <option>Sort by: Discount (High to Low)</option>
-              <option>Sort by: Discount (Low to High)</option>
-              <option>Sort by: Name (A to Z)</option>
-              <option>Sort by: Name (Z to A)</option>
+              <option>Sort by: Last 30 days</option>
+              <option>Sort by: Last 3 Months</option>
+              <option>LSort by: ast 6 Months</option>
+              <option>Sort by: All Orders</option>
             </select>
           </div> */}
           <div className='my-profile-section-body'>
