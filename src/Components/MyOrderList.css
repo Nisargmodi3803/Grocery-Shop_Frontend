@@ -41,13 +41,13 @@
 }
 
 .order-box {
+    cursor: pointer;
     background: #fff;
     padding: 15px;
     padding-bottom: 0px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
-    cursor: pointer;
 }
 
 .order-images {

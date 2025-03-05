@@ -438,23 +438,35 @@ export const MyOrderList = () => {
               {paginatedOrders.length > 0 ? (
                 paginatedOrders.map((order) => (
                   <div key={order.invoiceNum} className="order-box"
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       navigate(`/ecommerce/view-order/${order.invoiceNum}`);
                       window.location.reload();
-                    }}>
+                    }}
+                  >
                     <div className="order-title">
                       <h3>{order.invoicePrefix + order.invoiceNum}</h3>
                       <p className="order-date">
                         Placed at {formatDateTime(order.invoiceDate, order.invoiceTime)}
                       </p>
                       {order.invoiceStatus == 1 && (
-                        <span className="cancel-button" onClick={() => handleCancelOrder(order.invoiceNum)}>
+                        <span
+                          className="cancel-button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleCancelOrder(order.invoiceNum);
+                          }}
+                        >
                           <MdCancelPresentation />
                         </span>
                       )}
                     </div>
                     <div className='order-details'>
-                      <div className="order-images">
+                      <div className="order-images"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/ecommerce/product/${orderDetails[order.invoiceNum][0].product.slug_title}`);
+                        }}>
                         {orderDetails[order.invoiceNum] &&
                           orderDetails[order.invoiceNum].map((item) => {
                             const imageSrc =

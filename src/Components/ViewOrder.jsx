@@ -239,7 +239,9 @@ export const ViewOrder = () => {
                             <span>Order Number</span>
                             <span>{orderList.invoicePrefix}{orderList.invoiceNum}</span>
                         </div>
-
+                        <p className="order-date">
+                            Placed at {formatDateTime(orderList.invoiceDate, orderList.invoiceTime)}
+                        </p>
                         <div className="order-details-status">
                             <span className={
                                 orderList.invoiceStatus == 1 ? "Pending" :

@@ -12,6 +12,7 @@ import { MdCancelPresentation } from "react-icons/md";
 import Swal from 'sweetalert2';
 import { FaUser, FaPhone, FaEnvelope, FaCity, FaMapMarkerAlt, FaClipboardList, FaClock } from "react-icons/fa";
 import { FaPhoneAlt } from "react-icons/fa";
+import ShowOffers from './ShowOffers';
 
 const importAll = (r) => {
   let images = {};
@@ -30,6 +31,7 @@ export const MyCart = () => {
   const { setLoading } = useLoading();
   const [customer, setCustomer] = useState({});
   const [discountMap, setDiscountMap] = useState({});
+  const [showOffers, setShowOffers] = useState(false);
   const [cartState, setCartState] = useState(() => {
     const storedCart = sessionStorage.getItem("cartState");
     return storedCart ? JSON.parse(storedCart) : {};
@@ -663,6 +665,10 @@ export const MyCart = () => {
     fetchDeliveryTimes();
   }, []);
 
+  const closeOffersModal = () => {
+    setShowOffers(false);
+  }
+
   return (
     <div className='my-cart'>
       <div>
@@ -735,7 +741,11 @@ export const MyCart = () => {
                     <button>Apply</button>
                   </div>
 
-                  <div className='cart-info-payment-show-offer'>
+                  <div className='cart-info-payment-show-offer'
+                  onClick={(e) => {
+                    // e.stopPropagation();
+                    setShowOffers(true);
+                  }}>
                     <span>SHOW OFFERS</span>
                   </div>
                 </div>
@@ -955,7 +965,7 @@ export const MyCart = () => {
         </div>
 
       </div>
-
+      {showOffers && <ShowOffers closeOffersModal={closeOffersModal} amount={calculateNetAmount()}/>}
     </div>
   )
 }

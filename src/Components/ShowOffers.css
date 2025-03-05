@@ -1,0 +1,68 @@
+.offer-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    z-index: 1000;
+    pointer-events: auto;
+}
+
+body.modal-open {
+    overflow: hidden;
+}
+
+.offer-modal-container {
+    width: 27%;
+    height: 100vh;
+    background: white;
+    box-shadow: -2px 0px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.offer-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #0a3570;
+    color: white;
+    padding: 15px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    font-size: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.offer-close-btn {
+    background: white;
+    border: none;
+    color: #133365;
+    border-radius: 50%;
+    cursor: pointer;
+    width: 25px;
+    height: 25px;
+}
+
+.offer-modal-content {
+    flex: 1;
+    padding: 20px;
+    font-size: 16px;
+    color: #333;
+    overflow-y: auto;
+    max-height: calc(100vh - 50px);
+}
+
+.offer-no-offers {
+    font-size: 18px;
+    font-weight: bold;
+    color: #0a3570;
+    text-align: left;
+}
