@@ -145,13 +145,16 @@ export const ViewOrder = () => {
     };
 
     const calculateTotalMrp = () => {
-        if (!orderDetails[invoiceNum] || !Array.isArray(orderDetails[invoiceNum])) return 0; // Safety check
+        if (!orderDetails[invoiceNum] || !Array.isArray(orderDetails[invoiceNum])) return 0;
+        
         return orderDetails[invoiceNum].reduce((acc, item) => acc + item.mrp * item.quantity, 0);
     };
 
     const calculateDiscount = () => {
-        if (!orderList[invoiceNum] || !Array.isArray(orderList[invoiceNum])) return 0; // Safety check
-        const totalDiscount = orderList[invoiceNum].reduce((acc, item) => acc + (item.product.discount_amt * item.quantity), 0);
+        if (!orderDetails[invoiceNum] || !Array.isArray(orderDetails[invoiceNum])) return 0;
+
+        const totalDiscount = orderDetails[invoiceNum].reduce((acc, item) => acc + item.totalAmount * item.quantity, 0);
+
         return calculateTotalMrp() - totalDiscount;
     };
 
@@ -302,7 +305,6 @@ export const ViewOrder = () => {
                             <span>
                                 <HiMiniMinusSmall />₹{(orderList.invoiceCouponCodeDiscount || 0).toFixed(2)}
                             </span>
-
                         </div>
 
                         <div className='order-details-mrp-delivery'>

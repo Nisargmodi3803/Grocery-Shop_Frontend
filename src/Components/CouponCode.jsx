@@ -15,6 +15,7 @@ import { RiCouponLine } from "react-icons/ri";
 import { BsCreditCard2Back } from "react-icons/bs";
 import { MdLock } from "react-icons/md";
 import Swal from 'sweetalert2';
+import noCoupons from '../assets/Logo/No Wishlist.jpg';
 
 const importAll = (r) => {
   let images = {};
@@ -36,6 +37,9 @@ export const CouponCode = () => {
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
   const { setLoading } = useLoading();
+  const [coupons, setCoupons] = useState([]);
+  const [copied, setCopied] = useState(false);
+  const [copiedCouponId, setCopiedCouponId] = useState(null);
 
   const fetchCustomerDetails = async () => {
     setLoading(true);
@@ -187,6 +191,37 @@ export const CouponCode = () => {
   const closeModal = () => {
     setShowModal(false);
   };
+
+  const fetchCoupons = async () => {
+    try {
+      const response = await axios.get('http://localhost:9000/all-coupons');
+
+      if (response.status === 200) {
+        setCoupons(response.data);
+      }
+    } catch (error) {
+      if (error.response.status === 404) {
+        console.log("Coupons not found");
+      } else {
+        console.error("Error fetching coupons:", error);
+        alert("Something went wrong in fetching Coupons. Please try again!");
+      }
+    }
+  }
+
+  useEffect(() => {
+    console.log("Use Effect Call")
+    fetchCoupons();
+  }, []);
+
+
+  const handleCopy = (couponCode, couponId) => {
+    navigator.clipboard.writeText(couponCode);
+    setCopiedCouponId(couponId);
+    setTimeout(() => setCopiedCouponId(null), 4000);
+  };
+
+
   return (
     <div className='my-wishlist'>
       <div className='profile-section'>
@@ -278,9 +313,43 @@ export const CouponCode = () => {
             <h1>GET THE BEST DEAL HAVE TO USE THE BELOW COUPON CODE</h1>
           </div>
           <div className='my-profile-section-body'>
-            <div className='profile-detail'>
+            {coupons.length > 0 ? (
+              <div className="coupon-modal-content">
+                {coupons.map((coupon) => (
+                  <div className="coupon-item" key={coupon.couponId}>
+                    <div className="coupon-item-header">
+                      <div className="coupon-item-header-title">
+                        <h3>{coupon.couponCode}</h3>
+                        <span 
+                            onClick={() => handleCopy(coupon.couponCode, coupon.couponId)}
+                            className={`coupon-copy-btn ${copiedCouponId === coupon.couponId ? "copied" : ""}`}
+                        >
+                            {copiedCouponId === coupon.couponId ? "COPIED!" : "COPY"}
+                        </span>
+                      </div>
 
-            </div>
+                      <div className="coupon-item-header-info">
+                        <span>Save ₹{coupon.couponMaxDiscount} on this Order!</span>
+                      </div>
+                    </div>
+
+                    <div className="coupon-item-body">
+                      <span>{coupon.couponTitle}</span>
+                    </div>
+                    <div className='coupon-item-footer'>
+                      <span>Minimum Amount : ₹{coupon.couponMinimumBillAmount}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className='no-wishlist'>
+                <h1 style={{ fontSize: '1.5rem', color: '#133365' }}>
+                  NO COUPON CODE IS AVAILABLE!
+                </h1>
+                <img src={noCoupons} alt='No Coupons' />
+              </div>
+            )}
           </div>
         </div>
         <input

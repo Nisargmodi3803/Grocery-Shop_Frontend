@@ -1,4 +1,4 @@
-.coupon-code{
+.coupon-code {
     padding-top: 150px;
     font-family: "Maven Pro", sans-serif;
     background: #f4f4f4;
@@ -7,4 +7,117 @@
     justify-content: center;
     flex-wrap: wrap;
     text-decoration: none;
+}
+
+.coupon-modal-content {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    justify-items: center;
+    padding: 20px;
+    font-size: 16px;
+    color: #333;
+    overflow-y: auto;
+    max-height: calc(100vh - 50px);
+    text-align: left;
+
+    /* Hide scrollbar */
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE/Edge */
+}
+
+.coupon-modal-content::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari */
+}
+
+.coupon-item {
+    width: 100%;
+    max-width: 400px;
+    border: 1px solid #133365;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    background: white;
+    text-align: left;
+}
+
+.coupon-item-header {
+    width: 100%;
+    border-bottom: 1px dotted #133365;
+    padding-bottom: 5px;
+}
+
+.coupon-item-header-title {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: left;
+
+}
+
+.coupon-item-header-title h3 {
+    font-size: 18px;
+    font-weight: bold;
+    color: #133365;
+    margin: 0;
+}
+
+.coupon-item-header-info {
+    padding-bottom: 5px;
+}
+
+.coupon-item-header-info span {
+    font-size: 14px;
+    color: #2e7d32;
+    font-weight: 500;
+}
+
+.coupon-item-body {
+    width: 100%;
+    text-align: left;
+}
+
+.coupon-item-body span {
+    font-size: 14px;
+    color: #757575;
+    padding-top: 10px;
+    display: flex;
+    text-align: left;
+}
+
+.coupon-item-footer {
+    padding-top: 5px;
+    width: 100%;
+    font-size: 14px;
+    color: #133365;
+    font-weight: bold;
+}
+
+.coupon-copy-btn {
+    font-size: 14px;
+    font-weight: bold;
+    color: #2e7d32;
+    background-color: transparent;
+    border: 1px solid #2e7d32;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+.coupon-copy-btn:active {
+    transform: scale(0.95);
+}
+
+.coupon-copy-btn.copied {
+    background-color: #2e7d32;
+    color: white;
+    border-color: #2e7d32;
 }

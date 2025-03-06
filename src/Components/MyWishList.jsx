@@ -19,7 +19,7 @@ import { FaRegHeart, FaHeart } from "react-icons/fa";
 import { MdAccessTime, MdOutlineChatBubbleOutline } from "react-icons/md";
 import { MdCancelPresentation } from "react-icons/md";
 import { InquiryNow } from './InquiryNow';
-import { use } from 'react';
+import noWishList from '../assets/Logo/No Wishlist.jpg'
 
 const importAll = (r) => {
   let images = {};
@@ -604,9 +604,12 @@ export const MyWishList = () => {
                 </div>
               ) : (
                 { productNotFound } ? (
-                  <h1 style={{ fontSize: '1.5rem', color: 'red' }}>
-                    NO PRODUCT AVAILABLE ON YOUR WISHLIST!
-                  </h1>
+                  <div className='no-wishlist'>
+                    <h1 style={{ fontSize: '1.5rem', color: '#133365' }}>
+                      NO PRODUCT AVAILABLE ON YOUR WISHLIST!
+                    </h1>
+                    <img src={noWishList} alt='No Wishlist' />
+                  </div>
                 ) : null
               )}
             </div>

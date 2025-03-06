@@ -13,6 +13,7 @@ import Swal from 'sweetalert2';
 import { FaUser, FaPhone, FaEnvelope, FaCity, FaMapMarkerAlt, FaClipboardList, FaClock } from "react-icons/fa";
 import { FaPhoneAlt } from "react-icons/fa";
 import ShowOffers from './ShowOffers';
+import emptyCart from '../assets/Logo/shopping-cart.png'
 
 const importAll = (r) => {
   let images = {};
@@ -42,7 +43,9 @@ export const MyCart = () => {
   const [showDeliveryAddress, setDeliveryAddress] = useState(true);
   const [showPaymentMethod, setPaymentMethod] = useState(true);
 
-  const [couponCode, setCouponCode] = useState({}); // For Coupon Code
+  const [couponCode, setCouponCode] = useState("");
+  const [coupon, setCoupon] = useState({});
+  const [isCouponApplied, setIsCouponApplied] = useState();
 
   const [updateDelivery, setUpdateDelivery] = useState({
     customerName: "",
@@ -139,15 +142,15 @@ export const MyCart = () => {
           address: updateDelivery.customerAddress,
           pincode: updateDelivery.customerPincode,
           specialInstructions: updateDelivery.specialInstructions,
-          paymentMode: updateDelivery.paymentMethod,
+          paymentMode: 1, // 2 = Cash on Delivery
           totalAmount: calculateTotalPayable(),
           deliveryTimeSlotId: updateDelivery.deliveryTime,
-          carts: cartItems
+          carts: cartItems,
         }
       );
 
       if (response.status === 200) {
-        if(updateDelivery.paymentMethod === 1) {
+        if (updateDelivery.paymentMethod === 1) {
           await Swal.fire({
             title: "Order",
             text: "Order Placed Successfully!",
@@ -213,22 +216,44 @@ export const MyCart = () => {
       console.log("Placing order to generate invoiceNum...");
 
       // Step 1: Call `addOrder` to generate `invoiceNum`
-      const orderResponse = await axios.post(
-        `http://localhost:9000/add-order/${sessionStorage.getItem("customerEmail")}`,
-        {
-          name: updateDelivery.customerName,
-          mobile: updateDelivery.customerMobile,
-          email: updateDelivery.customerEmail,
-          cityId: updateDelivery.customerCity,
-          address: updateDelivery.customerAddress,
-          pincode: updateDelivery.customerPincode,
-          specialInstructions: updateDelivery.specialInstructions,
-          paymentMode: 2, // 2 = Online Payment
-          totalAmount: calculateTotalPayable(),
-          deliveryTimeSlotId: updateDelivery.deliveryTime,
-          carts: cartItems,
-        }
-      );
+      let orderResponse;
+      if (isCouponApplied === true) {
+        orderResponse = await axios.post(
+          `http://localhost:9000/add-order/${sessionStorage.getItem("customerEmail")}`,
+          {
+            name: updateDelivery.customerName,
+            mobile: updateDelivery.customerMobile,
+            email: updateDelivery.customerEmail,
+            cityId: updateDelivery.customerCity,
+            address: updateDelivery.customerAddress,
+            pincode: updateDelivery.customerPincode,
+            specialInstructions: updateDelivery.specialInstructions,
+            paymentMode: 2, // 2 = Online Payment
+            totalAmount: calculateTotalPayable(),
+            deliveryTimeSlotId: updateDelivery.deliveryTime,
+            carts: cartItems,
+            couponId: coupon.couponId,
+            couponDiscount: coupon.couponMaxDiscount
+          }
+        );
+      } else {
+        orderResponse = await axios.post(
+          `http://localhost:9000/add-order/${sessionStorage.getItem("customerEmail")}`,
+          {
+            name: updateDelivery.customerName,
+            mobile: updateDelivery.customerMobile,
+            email: updateDelivery.customerEmail,
+            cityId: updateDelivery.customerCity,
+            address: updateDelivery.customerAddress,
+            pincode: updateDelivery.customerPincode,
+            specialInstructions: updateDelivery.specialInstructions,
+            paymentMode: 2, // 2 = Online Payment
+            totalAmount: calculateTotalPayable(),
+            deliveryTimeSlotId: updateDelivery.deliveryTime,
+            carts: cartItems,
+          }
+        );
+      }
 
       // const orderResponse = await placeOrder();
 
@@ -351,7 +376,7 @@ export const MyCart = () => {
 
     if (updateDelivery.paymentMethod === 1) {
       try {
-        const {invoiceNum} = await placeOrder();
+        const { invoiceNum } = await placeOrder();
         console.log("Generated Invoice Number:", invoiceNum);
         await updateCustomer();
 
@@ -590,7 +615,11 @@ export const MyCart = () => {
 
   const calculateTotalPayable = () => {
     const Charge = deliveryCharge();
-    return calculateTotalPointsAmt() + Charge;
+
+    if (isCouponApplied === true && updateDelivery.paymentMethod === 2)
+      return calculateTotalPointsAmt() + Charge - coupon.couponMaxDiscount;
+    else
+      return calculateTotalPointsAmt() + Charge;
   }
 
   useEffect(() => {
@@ -669,8 +698,36 @@ export const MyCart = () => {
     setShowOffers(false);
   }
 
+  const closeOffersModalWithCoupon = (code) => {
+    setCouponCode(code);
+    setShowOffers(false);
+
+    if (couponCode !== null) {
+      applyCouponCode(code);
+    }
+  }
+
+  const applyCouponCode = async (code) => {
+    try {
+      const response = await axios.get(`http://localhost:9000/coupon-code?code=${code}&amount=${calculateNetAmount()}`);
+
+      if (response.status === 200) {
+        setIsCouponApplied(true);
+        setCoupon(response.data);
+      }
+    } catch (error) {
+      if (error.response.status === 404) {
+        console.log("Coupon Code not found");
+        setIsCouponApplied(false);
+      } else {
+        console.error("Error applying coupon code:", error);
+        alert("Something went wrong in applying Coupon Code. Please try again!");
+      }
+    }
+  }
+
   return (
-    <div className='my-cart'>
+    <div className={cartItems.length > 0 ? 'my-cart' : 'my-empty-cart'}>
       <div>
         <section className='product-navigate-section'>
           <span className='navigate'>
@@ -683,289 +740,309 @@ export const MyCart = () => {
         </section>
       </div>
 
-      <div className='my-cart-section'>
-        <div className='cart-section'>
-          <div className='cart-nav-section'>
-            <div className='cart-info'>
-              <div className='cart-info-header'>
-                <div className='cart-info-header-upper'>
-                  <h3>MY CART</h3>
-                  <p>({sessionStorage.getItem('cartCount')} item)</p>
+      {cartItems.length > 0 ? (
+        <div className='my-cart-section'>
+          <div className='cart-section'>
+            <div className='cart-nav-section'>
+              <div className='cart-info'>
+                <div className='cart-info-header'>
+                  <div className='cart-info-header-upper'>
+                    <h3>MY CART</h3>
+                    <p>({sessionStorage.getItem('cartCount')} item)</p>
+                  </div>
+                  <div className='cart-info-header-lower'>
+                    <span>Availabe Points : {customer.customerPoint ? customer.customerPoint.toFixed(2) : '0.00'}</span>
+                  </div>
                 </div>
-                <div className='cart-info-header-lower'>
-                  <span>Availabe Points : {customer.customerPoint ? customer.customerPoint.toFixed(2) : '0.00'}</span>
-                </div>
-              </div>
 
-              <div className='cart-info-body'>
-                {cartItems.map((item) => {
-                  const discount = discountMap[item.product.id] || 0;
-                  return (
-                    <div className='cart-info-body-card'>
-                      <div className='cart-info-body-card-image'>
-                        <img src={imageMap[item.product.image_url || "default.jpg"]} alt="" />
-                      </div>
-
-                      <div className='cart-info-card-details'>
-                        <p>{item.product.name} | {item.product.variantName}</p>
-                        <div className='product-offer-price3'>
-                          {discount > 0 && <span className='product-regular-price3'>₹{item.product.mrp.toFixed(2)}</span>}
-                          <span className='product-discount-price3'>₹{item.product.discount_amt.toFixed(2)}</span>
+                <div className='cart-info-body'>
+                  {cartItems.map((item) => {
+                    const discount = discountMap[item.product.id] || 0;
+                    return (
+                      <div className='cart-info-body-card'>
+                        <div className='cart-info-body-card-image'>
+                          <img src={imageMap[item.product.image_url || "default.jpg"]} alt="" />
                         </div>
-                        {cartState[item.product.id] ? (
-                          <div className='add-to-cart-quantity3'>
-                            <button onClick={() => updateCartCount(item.product.id, -1)}>-</button>
-                            <span>{cartState[item.product.id]?.cartCount || 0}</span>
-                            <button onClick={() => updateCartCount(item.product.id, 1)}>+</button>
+
+                        <div className='cart-info-card-details'>
+                          <p>{item.product.name} | {item.product.variantName}</p>
+                          <div className='product-offer-price3'>
+                            {discount > 0 && <span className='product-regular-price3'>₹{item.product.mrp.toFixed(2)}</span>}
+                            <span className='product-discount-price3'>₹{item.product.discount_amt.toFixed(2)}</span>
                           </div>
-                        ) : (
-                          null // ✅ Item removed when count is 0
-                        )}
+                          {cartState[item.product.id] ? (
+                            <div className='add-to-cart-quantity3'>
+                              <button onClick={() => updateCartCount(item.product.id, -1)}>-</button>
+                              <span>{cartState[item.product.id]?.cartCount || 0}</span>
+                              <button onClick={() => updateCartCount(item.product.id, 1)}>+</button>
+                            </div>
+                          ) : (
+                            null // ✅ Item removed when count is 0
+                          )}
 
+                        </div>
+                        <div className='like-icon3' onClick={() => removeFromCart(item.product.id)}>
+                          <MdCancelPresentation />
+                        </div>
                       </div>
-                      <div className='like-icon3' onClick={() => removeFromCart(item.product.id)}>
-                        <MdCancelPresentation />
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-
-              <div className='cart-info-payment'>
-                <div className='cart-info-payment-discount'>
-                  <div className='cart-info-payment-discount-code'>
-                    <input
-                      type='text'
-                      placeholder='Enter Discount Code'
-                    />
-                    <button>Apply</button>
-                  </div>
-
-                  <div className='cart-info-payment-show-offer'
-                  onClick={(e) => {
-                    // e.stopPropagation();
-                    setShowOffers(true);
-                  }}>
-                    <span>SHOW OFFERS</span>
-                  </div>
+                    )
+                  })}
                 </div>
 
-                <div className='cart-info-payment-bill'>
-                  <div className='cart-info-payment-bill-total'>
-                    <div className='cart-mrp-total'>
-                      <span>MRP TOTAL</span>
-                      <p>₹{calculateTotalMrp()}</p>
+                <div className='cart-info-payment'>
+                  <div className='cart-info-payment-discount'>
+                    <div className='cart-info-payment-discount-code'>
+                      <input
+                        type='text'
+                        placeholder='Enter Discount Code'
+                        value={couponCode}
+                        onChange={(e) => setCouponCode(e.target.value)}
+                        name='couponCode'
+                      />
+                      <button onClick={() => applyCouponCode(couponCode)}>Apply</button>
                     </div>
-                    <div className='cart-discount-total'>
-                      <span>DISCOUNT</span>
-                      <p><HiMiniMinusSmall />₹{calculateDiscount()}</p>
+                    {isCouponApplied == false  && <span className='coupon-not-found'>PLEASE ENTER VALID COUPON CODE!</span>}
+                    {isCouponApplied == true && updateDelivery.paymentMethod === 1 && <><span className='coupon-not-found'>COUPON NOT APPLICABLE FOR CASH ON DELIVERY!</span></>}
+
+                    <div className='cart-info-payment-show-offer'
+                      onClick={(e) => {
+                        // e.stopPropagation();
+                        setShowOffers(true);
+                      }}>
+                      <span>SHOW OFFERS</span>
                     </div>
                   </div>
 
-                  <div className='cart-info-payment-bill-points'>
-                    <div className='cart-net-total'>
-                      <p>NET AMOUNT (For Offer) </p>
-                      <span>₹{calculateNetAmount()}</span>
+                  <div className='cart-info-payment-bill'>
+                    <div className='cart-info-payment-bill-total'>
+                      <div className='cart-mrp-total'>
+                        <span>MRP TOTAL</span>
+                        <p>₹{calculateTotalMrp()}</p>
+                      </div>
+                      <div className='cart-discount-total'>
+                        <span>DISCOUNT</span>
+                        <p><HiMiniMinusSmall />₹{calculateDiscount()}</p>
+                      </div>
+
                     </div>
 
-                    <div className='cart-points-used'>
-                      <p>POINTS USED</p>
-                      <span><HiMiniMinusSmall />{customer.customerPoint}</span>
+                    <div className='cart-info-payment-bill-points'>
+                      <div className='cart-net-total'>
+                        <p>NET AMOUNT (For Offer) </p>
+                        <span>₹{calculateNetAmount()}</span>
+                      </div>
+
+                      <div className='cart-points-used'>
+                        <p>POINTS USED</p>
+                        <span><HiMiniMinusSmall />{customer.customerPoint}</span>
+                      </div>
+
+                      {isCouponApplied === true && updateDelivery.paymentMethod === 2 &&
+                        <div className='order-details-coupon-discount'>
+                          <p>COUPON DISCOUNT</p>
+                          <span>
+                            <HiMiniMinusSmall />₹{coupon.couponMaxDiscount}
+                          </span>
+                        </div>}
+
+                      <div className='cart-delivery-charge'>
+                        <p>DELIVERY CHARGE</p>
+                        <span> +₹{deliveryCharge()}</span>
+                      </div>
                     </div>
 
-                    <div className='cart-delivery-charge'>
-                      <p>DELIVERY CHARGE</p>
-                      <span> +₹{deliveryCharge()}</span>
+                    <div className='cart-info-payment-bill-total-payable'>
+                      <h3>TOTAL PAYABLE</h3>
+                      <span>₹{calculateTotalPayable()}</span>
                     </div>
+                    {calculateNetAmount() < 500 && <span style={{ color: '#133365', display: 'flex' }}>Shop for ₹{500 - calculateNetAmount()} more for free shipping.</span>}
                   </div>
-
-                  <div className='cart-info-payment-bill-total-payable'>
-                    <h3>TOTAL PAYABLE</h3>
-                    <span>₹{calculateTotalPayable()}</span>
-                  </div>
-                  {calculateNetAmount() < 500 && <span style={{ color: '#133365', display: 'flex' }}>Shop for ₹{500 - calculateNetAmount()} more for free shipping.</span>}
                 </div>
               </div>
             </div>
-          </div>
 
-          <div className="my-delivery-section"
-            onClick={(e) => {
-              e.stopPropagation();
-              setDeliveryAddress(!showDeliveryAddress);
-            }}>
-            <div className="my-delivery-section-header">
-              <div className={showDeliveryAddress ? "orange" : "green"}>1</div>
-              <h1>DELIVERY ADDRESS</h1>
-            </div>
-            {showDeliveryAddress && <div className="my-delivery-section-body"
-              onClick={(e) => e.stopPropagation()}>
-              <div className="delivery-form">
-                <div className="form-group">
-                  <h3><FaUser /> FULL NAME *</h3>
-                  <input
-                    type="text"
-                    name='customerName'
-                    value={updateDelivery.customerName || ""}
-                    onChange={handleChange}
-                  />
-                  {errors.customerName && <span className="error">{errors.customerName}</span>}
-                </div>
-
-                <div className="form-row">
+            <div className="my-delivery-section"
+              onClick={(e) => {
+                e.stopPropagation();
+                setDeliveryAddress(!showDeliveryAddress);
+              }}>
+              <div className="my-delivery-section-header">
+                <div className={showDeliveryAddress ? "orange" : "green"}>1</div>
+                <h1>DELIVERY ADDRESS</h1>
+              </div>
+              {showDeliveryAddress && <div className="my-delivery-section-body"
+                onClick={(e) => e.stopPropagation()}>
+                <div className="delivery-form">
                   <div className="form-group">
-                    <h3><FaPhoneAlt /> PHONE *</h3>
+                    <h3><FaUser /> FULL NAME *</h3>
                     <input
                       type="text"
-                      name='customerMobile'
-                      value={updateDelivery.customerMobile || ""}
+                      name='customerName'
+                      value={updateDelivery.customerName || ""}
                       onChange={handleChange}
-                      style={{ width: "95%" }}
-                      disabled
                     />
-                    {errors.customerMobile && <span className="error">{errors.customerMobile}</span>}
+                    {errors.customerName && <span className="error">{errors.customerName}</span>}
                   </div>
 
-                  <div className="form-group" style={{ marginLeft: "10px" }}>
-                    <h3><FaEnvelope /> EMAIL ADDRESS</h3>
-                    <input type="text" value={updateDelivery.customerEmail || ""} disabled />
-                  </div>
-                </div>
+                  <div className="form-row">
+                    <div className="form-group">
+                      <h3><FaPhoneAlt /> PHONE *</h3>
+                      <input
+                        type="text"
+                        name='customerMobile'
+                        value={updateDelivery.customerMobile || ""}
+                        onChange={handleChange}
+                        style={{ width: "95%" }}
+                        disabled
+                      />
+                      {errors.customerMobile && <span className="error">{errors.customerMobile}</span>}
+                    </div>
 
-                <div className="form-row">
+                    <div className="form-group" style={{ marginLeft: "10px" }}>
+                      <h3><FaEnvelope /> EMAIL ADDRESS</h3>
+                      <input type="text" value={updateDelivery.customerEmail || ""} disabled />
+                    </div>
+                  </div>
+
+                  <div className="form-row">
+                    <div className="form-group">
+                      <h3><FaCity /> CITY *</h3>
+                      <select
+                        value={updateDelivery.customerCity || ""}
+                        onChange={handleCheckBoxOption}
+                        name='customerCity'
+                        required
+                      >
+                        <option value={0}>Select City</option>
+                        {cities.map((city) => (
+                          <option key={city.cityId} value={city.cityId}>
+                            {city.cityName}
+                          </option>
+                        ))}
+                      </select>
+                      {errors.customerCity && <span className="error">{errors.customerCity}</span>}
+                    </div>
+
+                    <div className="form-group">
+                      <h3><FaMapMarkerAlt /> PINCODE *</h3>
+                      <input
+                        type="text"
+                        name='customerPincode'
+                        value={updateDelivery.customerPincode || ""}
+                        onChange={handleChange}
+                        required
+                      />
+                      {errors.customerPincode && <span className="error">{errors.customerPincode}</span>}
+                    </div>
+                  </div>
+
                   <div className="form-group">
-                    <h3><FaCity /> CITY *</h3>
+                    <h3><FaMapMarkerAlt /> SHIPPING ADDRESS *</h3>
+                    <textarea
+                      value={updateDelivery.customerAddress || ""}
+                      onChange={handleChange}
+                      name='customerAddress'
+                      required
+                    ></textarea>
+                  </div>
+
+                  <div className="form-group">
+                    <h3><FaClipboardList /> SPECIAL INSTRUCTIONS</h3>
+                    <textarea
+                      value={updateDelivery.specialInstructions || ""}
+                      onChange={handleChange}
+                      name='specialInstructions'
+                    ></textarea>
+                  </div>
+
+                  <div className="form-group">
+                    <h3><FaClock /> SELECT DELIVERY TIME *</h3>
                     <select
-                      value={updateDelivery.customerCity || ""}
+                      value={updateDelivery.deliveryTime || ""}
                       onChange={handleCheckBoxOption}
-                      name='customerCity'
+                      style={{ width: "50%" }}
+                      name='deliveryTime'
                       required
                     >
-                      <option value={0}>Select City</option>
-                      {cities.map((city) => (
-                        <option key={city.cityId} value={city.cityId}>
-                          {city.cityName}
+                      <option value={0}>Select Delivery Time</option>
+                      {deliveryTime.map((time) => (
+                        <option key={time.deliveryTimeSlotId} value={time.deliveryTimeSlotId}>
+                          {time.deliveryTime}
                         </option>
                       ))}
                     </select>
-                    {errors.customerCity && <span className="error">{errors.customerCity}</span>}
-                  </div>
-
-                  <div className="form-group">
-                    <h3><FaMapMarkerAlt /> PINCODE *</h3>
-                    <input
-                      type="text"
-                      name='customerPincode'
-                      value={updateDelivery.customerPincode || ""}
-                      onChange={handleChange}
-                      required
-                    />
-                    {errors.customerPincode && <span className="error">{errors.customerPincode}</span>}
+                    {errors.deliveryTime && <span className="error">{errors.deliveryTime}</span>}
                   </div>
                 </div>
+              </div>}
 
-                <div className="form-group">
-                  <h3><FaMapMarkerAlt /> SHIPPING ADDRESS *</h3>
-                  <textarea
-                    value={updateDelivery.customerAddress || ""}
-                    onChange={handleChange}
-                    name='customerAddress'
-                    required
-                  ></textarea>
-                </div>
 
-                <div className="form-group">
-                  <h3><FaClipboardList /> SPECIAL INSTRUCTIONS</h3>
-                  <textarea
-                    value={updateDelivery.specialInstructions || ""}
-                    onChange={handleChange}
-                    name='specialInstructions'
-                  ></textarea>
-                </div>
-
-                <div className="form-group">
-                  <h3><FaClock /> SELECT DELIVERY TIME *</h3>
-                  <select
-                    value={updateDelivery.deliveryTime || ""}
+              <div className="my-delivery-section-header"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setPaymentMethod(!showPaymentMethod);
+                }}>
+                <div className={showPaymentMethod ? "orange" : "green"}>2</div>
+                <h1>PAYMENT</h1>
+              </div>
+              {showPaymentMethod && <div className='my-delivery-section-body'
+                onClick={(e) => e.stopPropagation()}>
+                <div className="my-payment-section">
+                  <input
+                    type="radio"
+                    id="cash"
+                    name="paymentMethod"
+                    value={1}
+                    checked={updateDelivery.paymentMethod === 1}
                     onChange={handleCheckBoxOption}
-                    style={{ width: "50%" }}
-                    name='deliveryTime'
-                    required
-                  >
-                    <option value={0}>Select Delivery Time</option>
-                    {deliveryTime.map((time) => (
-                      <option key={time.deliveryTimeSlotId} value={time.deliveryTimeSlotId}>
-                        {time.deliveryTime}
-                      </option>
-                    ))}
-                  </select>
-                  {errors.deliveryTime && <span className="error">{errors.deliveryTime}</span>}
+                  />
+                  <label htmlFor="cash">CASH ON DELIVERY</label>
+
+                  <input
+                    type="radio"
+                    id="online"
+                    name="paymentMethod"
+                    value={2}
+                    checked={updateDelivery.paymentMethod === 2}
+                    onChange={handleCheckBoxOption}
+                  />
+                  <label htmlFor="online">PAY ONLINE</label>
+
                 </div>
-              </div>
-            </div>}
+
+                <div className='my-payment-section-button'>
+                  {Object.keys(errors).length === 0 && // ✅ Proper check for an empty object
+                    updateDelivery.customerName &&
+                    updateDelivery.customerMobile &&
+                    updateDelivery.customerCity !== 0 &&
+                    updateDelivery.customerPincode &&
+                    updateDelivery.customerAddress &&
+                    updateDelivery.deliveryTime !== 0 &&
+                    (updateDelivery.paymentMethod === 1 ? (
+                      <button className="btn-otp" onClick={handlePlaceOrder}>
+                        PLACE ORDER <FaArrowRightLong />
+                      </button>
+                    ) : updateDelivery.paymentMethod === 2 ? (
+                      <button className="btn-otp" onClick={handlePlaceOrder}>
+                        PROCEED TO PAY <FaArrowRightLong />
+                      </button>
+                    ) : null)}
+                </div>
 
 
-            <div className="my-delivery-section-header"
-              onClick={(e) => {
-                e.stopPropagation();
-                setPaymentMethod(!showPaymentMethod);
-              }}>
-              <div className={showPaymentMethod ? "orange" : "green"}>2</div>
-              <h1>PAYMENT</h1>
+              </div>}
+
+
             </div>
-            {showPaymentMethod && <div className='my-delivery-section-body'
-              onClick={(e) => e.stopPropagation()}>
-              <div className="my-payment-section">
-                <input
-                  type="radio"
-                  id="cash"
-                  name="paymentMethod"
-                  value={1}
-                  checked={updateDelivery.paymentMethod === 1}
-                  onChange={handleCheckBoxOption}
-                />
-                <label htmlFor="cash">CASH ON DELIVERY</label>
-
-                <input
-                  type="radio"
-                  id="online"
-                  name="paymentMethod"
-                  value={2}
-                  checked={updateDelivery.paymentMethod === 2}
-                  onChange={handleCheckBoxOption}
-                />
-                <label htmlFor="online">PAY ONLINE</label>
-
-              </div>
-
-              <div className='my-payment-section-button'>
-                {Object.keys(errors).length === 0 && // ✅ Proper check for an empty object
-                  updateDelivery.customerName &&
-                  updateDelivery.customerMobile &&
-                  updateDelivery.customerCity !== 0 &&
-                  updateDelivery.customerPincode &&
-                  updateDelivery.customerAddress &&
-                  updateDelivery.deliveryTime !== 0 &&
-                  (updateDelivery.paymentMethod === 1 ? (
-                    <button className="btn-otp" onClick={handlePlaceOrder}>
-                      PLACE ORDER <FaArrowRightLong />
-                    </button>
-                  ) : updateDelivery.paymentMethod === 2 ? (
-                    <button className="btn-otp" onClick={handlePlaceOrder}>
-                      PROCEED TO PAY <FaArrowRightLong />
-                    </button>
-                  ) : null)}
-              </div>
-
-
-            </div>}
-
-
           </div>
         </div>
+      ) : (
+        <div className='empty-cart'>
+          <img src={emptyCart} alt="Your Cart is Empty" />
+        </div>
+      )}
 
-      </div>
-      {showOffers && <ShowOffers closeOffersModal={closeOffersModal} amount={calculateNetAmount()}/>}
+      {showOffers && <ShowOffers closeOffersModal={closeOffersModal} closeOffersModalWithCoupon={closeOffersModalWithCoupon} amount={calculateNetAmount()} />}
     </div>
   )
 }

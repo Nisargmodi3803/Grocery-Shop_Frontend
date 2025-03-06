@@ -16,10 +16,9 @@ body.modal-open {
     overflow: hidden;
 }
 
-.offer-modal-container {
+.offers-modal-container {
     width: 27%;
     height: 100vh;
-    background: white;
     box-shadow: -2px 0px 10px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
@@ -53,11 +52,16 @@ body.modal-open {
 
 .offer-modal-content {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    justify-items: center;
     padding: 20px;
     font-size: 16px;
     color: #333;
     overflow-y: auto;
     max-height: calc(100vh - 50px);
+    background: #f4f7fc;
 }
 
 .offer-no-offers {
@@ -65,4 +69,63 @@ body.modal-open {
     font-weight: bold;
     color: #0a3570;
     text-align: left;
+}
+
+.offer-item {
+    border: 1px solid #133365;
+    padding-bottom: 12px;
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+    padding-left: 10px;
+    padding-right: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    background: white;
+}
+
+.offer-item-header {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    border-bottom: 1px dotted #133365;
+    padding-bottom: -5px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.offer-item-header-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.offer-item-header-title h3 {
+    font-size: 18px;
+    font-weight: bold;
+    color: #133365;
+}
+
+.offer-item-header-title span {
+    font-size: 14px;
+    font-weight: bold;
+    color: #ff5722;
+    cursor: pointer;
+}
+
+.offer-item-header-info p {
+    font-size: 14px;
+    color: #2e7d32;
+    font-weight: 500;
+    margin-top: -10px;
+}
+
+.offer-item-body span {
+    font-size: 14px;
+    color: #757575;
+    display: block;
+    text-align: left;
+    padding-top: 12px;
+    padding-left: 5px;
+    padding-right: 5px;
 }

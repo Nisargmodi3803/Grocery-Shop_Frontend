@@ -208,3 +208,9 @@
 .cancel-button:hover {
     transform: scale(1.05);
 }
+
+.profile-detail img{
+    height: 50%;
+    width: 50%;
+    object-fit: cover;
+}

@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import "./ShowOffers.css";
 import { IoClose } from "react-icons/io5"; // Close icon
 import axios from "axios";
+import { MyCart } from "./MyCart";
 
-const ShowOffers = ({ closeOffersModal, amount }) => {
+const ShowOffers = ({ closeOffersModal, amount, closeOffersModalWithCoupon }) => {
   const [offers, setOffers] = useState([]);
   const [saveAmount, setSaveAmount] = useState([]);
 
@@ -24,21 +25,8 @@ const ShowOffers = ({ closeOffersModal, amount }) => {
     }
   }
 
-  // const calculateSaveAmount = () => {
-  //   const saveAmount = offers.map((offer) => {
-  //     const minAmt = offer.couponMinimumBillAmount;
-  //     const maxDiscount = offer.couponMaxDiscount;
-
-  //     const discount = 
-  //   }
-  // }
-
   useEffect(() => {
     fetchOffers();
-
-    // if(offers.length > 0) {
-    //   calculateSaveAmount();
-    // }
   }, [amount]);
 
   useEffect(() => {
@@ -49,13 +37,17 @@ const ShowOffers = ({ closeOffersModal, amount }) => {
     };
   }, []);
 
+  const handleApplyOffer = (couponCode) => {
+    closeOffersModalWithCoupon(couponCode);
+  }
+
   return (
     <div className="offer-modal-overlay">
-      <div className="offer-modal-container">
+      <div className="offers-modal-container">
         <div className="offer-modal-header">
-          <h2>Available Offers</h2>
+          <h2>AVAILABLE OFFERS</h2>
           <div className="offer-close-btn" onClick={closeOffersModal}>
-            <IoClose size={22} />
+            <IoClose size={23} />
           </div>
         </div>
         <div className="offer-modal-content">
@@ -66,9 +58,8 @@ const ShowOffers = ({ closeOffersModal, amount }) => {
                   <div className="offer-item-header">
                     <div className="offer-item-header-title">
                       <h3>{offer.couponCode}</h3>
-                      <span>APPLY</span>
+                      <span onClick={()=>{handleApplyOffer(offer.couponCode)}}>APPLY</span>
                     </div>
-                    
                     <div className="offer-item-header-info">
                       <p>Save ₹{offer.couponMaxDiscount} on this Order!</p>
                     </div>
@@ -79,7 +70,6 @@ const ShowOffers = ({ closeOffersModal, amount }) => {
                   </div>
                 </div>
               ))}
-              <p className="offer-available">Offers are available</p>
             </div>
           ) : (
             <p className="offer-no-offers">NOT AVAILABLE</p>
