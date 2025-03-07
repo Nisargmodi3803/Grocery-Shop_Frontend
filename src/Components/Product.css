@@ -17,13 +17,13 @@
     border-bottom: 1px solid #ddd;
     margin-bottom: 15px;
     border-right: 1px solid #ddd;
-    cursor: pointer;
 }
 
 .product-navigate-section .navigate a {
     text-decoration: none;
     color: #133365;
     font-weight: 500;
+    cursor: pointer;
 }
 
 .product-navigate-section .navigate a:hover {

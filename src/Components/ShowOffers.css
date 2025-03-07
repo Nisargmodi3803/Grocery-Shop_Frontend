@@ -129,3 +129,7 @@ body.modal-open {
     padding-left: 5px;
     padding-right: 5px;
 }
+
+.offer-item-body span:last-child{
+    padding-top: 5px;
+}

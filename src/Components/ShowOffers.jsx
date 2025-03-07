@@ -58,7 +58,7 @@ const ShowOffers = ({ closeOffersModal, amount, closeOffersModalWithCoupon }) =>
                   <div className="offer-item-header">
                     <div className="offer-item-header-title">
                       <h3>{offer.couponCode}</h3>
-                      <span onClick={()=>{handleApplyOffer(offer.couponCode)}}>APPLY</span>
+                      <span onClick={() => { handleApplyOffer(offer.couponCode) }}>APPLY</span>
                     </div>
                     <div className="offer-item-header-info">
                       <p>Save ₹{offer.couponMaxDiscount} on this Order!</p>
@@ -67,6 +67,7 @@ const ShowOffers = ({ closeOffersModal, amount, closeOffersModalWithCoupon }) =>
 
                   <div className="offer-item-body">
                     <span>{offer.couponTitle}</span>
+                    <span style={{color:"#133365", fontWeight:"bold"}}>Minimum Amount : ₹{offer.couponMinimumBillAmount}</span>
                   </div>
                 </div>
               ))}

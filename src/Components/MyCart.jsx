@@ -714,6 +714,13 @@ export const MyCart = () => {
       if (response.status === 200) {
         setIsCouponApplied(true);
         setCoupon(response.data);
+
+        await Swal.fire({
+          title: "Coupon Code",
+          text: `${code} Coupon Code Applied Successfully!`,
+          icon: "success",
+          confirmButtonText: "OK",
+        });
       }
     } catch (error) {
       if (error.response.status === 404) {
@@ -760,12 +767,22 @@ export const MyCart = () => {
                     const discount = discountMap[item.product.id] || 0;
                     return (
                       <div className='cart-info-body-card'>
-                        <div className='cart-info-body-card-image'>
+                        <div className='cart-info-body-card-image'
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/ecommerce/product/${item.product.slug_title}`);
+                          }}>
                           <img src={imageMap[item.product.image_url || "default.jpg"]} alt="" />
                         </div>
 
                         <div className='cart-info-card-details'>
-                          <p>{item.product.name} | {item.product.variantName}</p>
+                          <p
+                            style={{ cursor: 'pointer' }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/ecommerce/product/${item.product.slug_title}`);
+                            }}
+                          >{item.product.name} | {item.product.variantName}</p>
                           <div className='product-offer-price3'>
                             {discount > 0 && <span className='product-regular-price3'>₹{item.product.mrp.toFixed(2)}</span>}
                             <span className='product-discount-price3'>₹{item.product.discount_amt.toFixed(2)}</span>
@@ -801,9 +818,11 @@ export const MyCart = () => {
                       />
                       <button onClick={() => applyCouponCode(couponCode)}>Apply</button>
                     </div>
-                    {isCouponApplied == false  && <span className='coupon-not-found'>PLEASE ENTER VALID COUPON CODE!</span>}
+                    {isCouponApplied == false && <span className='coupon-not-found'>PLEASE ENTER VALID COUPON CODE!</span>}
+
                     {isCouponApplied == true && updateDelivery.paymentMethod === 1 && <><span className='coupon-not-found'>COUPON NOT APPLICABLE FOR CASH ON DELIVERY!</span></>}
 
+                    {isCouponApplied == true && coupon.couponMinimumBillAmount > calculateNetAmount() && <><span className='coupon-not-found'>COUPON APPLICABLE ON A MINIMUM BILL OF ₹{coupon.couponMinimumBillAmount}!</span></>}
                     <div className='cart-info-payment-show-offer'
                       onClick={(e) => {
                         // e.stopPropagation();
@@ -837,7 +856,7 @@ export const MyCart = () => {
                         <span><HiMiniMinusSmall />{customer.customerPoint}</span>
                       </div>
 
-                      {isCouponApplied === true && updateDelivery.paymentMethod === 2 &&
+                      {isCouponApplied === true && updateDelivery.paymentMethod === 2 && coupon.couponMinimumBillAmount <= calculateNetAmount() &&
                         <div className='order-details-coupon-discount'>
                           <p>COUPON DISCOUNT</p>
                           <span>
@@ -861,12 +880,12 @@ export const MyCart = () => {
               </div>
             </div>
 
-            <div className="my-delivery-section"
-              onClick={(e) => {
-                e.stopPropagation();
-                setDeliveryAddress(!showDeliveryAddress);
-              }}>
-              <div className="my-delivery-section-header">
+            <div className="my-delivery-section">
+              <div className="my-delivery-section-header"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setDeliveryAddress(!showDeliveryAddress);
+                }}>
                 <div className={showDeliveryAddress ? "orange" : "green"}>1</div>
                 <h1>DELIVERY ADDRESS</h1>
               </div>
