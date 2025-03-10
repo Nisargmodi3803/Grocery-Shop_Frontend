@@ -320,11 +320,11 @@ export const CouponCode = () => {
                     <div className="coupon-item-header">
                       <div className="coupon-item-header-title">
                         <h3>{coupon.couponCode}</h3>
-                        <span 
-                            onClick={() => handleCopy(coupon.couponCode, coupon.couponId)}
-                            className={`coupon-copy-btn ${copiedCouponId === coupon.couponId ? "copied" : ""}`}
+                        <span
+                          onClick={() => handleCopy(coupon.couponCode, coupon.couponId)}
+                          className={`coupon-copy-btn ${copiedCouponId === coupon.couponId ? "copied" : ""}`}
                         >
-                            {copiedCouponId === coupon.couponId ? "COPIED!" : "COPY"}
+                          {copiedCouponId === coupon.couponId ? "COPIED!" : "COPY"}
                         </span>
                       </div>
 

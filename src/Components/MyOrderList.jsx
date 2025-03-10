@@ -17,6 +17,7 @@ import { MdLock } from "react-icons/md";
 import Swal from 'sweetalert2';
 import { MdCancelPresentation } from "react-icons/md";
 import { FaCheckCircle } from "react-icons/fa";
+import noOrderList from '../assets/Logo/No Wishlist.jpg'
 
 const importAll = (r) => {
   let images = {};
@@ -519,6 +520,7 @@ export const MyOrderList = () => {
                   <h1 style={{ fontSize: '1.5rem', color: 'red' }}>
                     NO ORDER YET!
                   </h1>
+                  <img src={noOrderList} alt='No Order List' />
                 </div>
               )}
             </div>
