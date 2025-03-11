@@ -54,7 +54,7 @@ export const SubCategory = () => {
 
     useEffect(() => {
         setIsAuthenticated(sessionStorage.getItem("isAuthenticated") === "true");
-    }, []);
+    });
 
     const fetchProductsBySubCategory = async () => {
         setLoading(true);
@@ -458,7 +458,7 @@ export const SubCategory = () => {
                         <span> {greater} </span>
                         <a onClick={() => {
                             navigate(`/ecommerce/shop-by-category`);
-                            window.location.reload();
+                            // window.location.reload();
                         }}
                         >Category</a>
                         <span> {greater} </span>
@@ -467,7 +467,7 @@ export const SubCategory = () => {
                         <a onClick={() => {
                             {
                                 navigate(`/ecommerce/subcategory/${subcategorySlugTitle}`);
-                                window.location.reload();
+                                // window.location.reload();
                             }
                         }}>{subcategoryName || "Loading..."}</a>
                     </span>
@@ -479,7 +479,7 @@ export const SubCategory = () => {
                                     className={`subcategory-item ${subcategory.slug_title === subcategorySlugTitle ? "active" : ""}`}
                                     onClick={() => {
                                         navigate(`/ecommerce/sub-category/${subcategorySlugTitle}`);
-                                        window.location.reload();
+                                        // window.location.reload();
                                     }}
                                 >
                                     {subcategory.name}
@@ -503,7 +503,7 @@ export const SubCategory = () => {
                     <span> {greater} </span>
                     <a onClick={() => {
                         navigate(`/ecommerce/shop-by-category`);
-                        window.location.reload();
+                        // window.location.reload();
                     }}
                     >Category</a>
                     <span> {greater} </span>
@@ -512,7 +512,7 @@ export const SubCategory = () => {
                     <a onClick={() => {
                         {
                             navigate(`/ecommerce/sub-category/${subcategorySlugTitle}`);
-                            window.location.reload();
+                            // window.location.reload();
                         }
                     }}>{subcategoryName || "Loading..."}</a>
                 </span>
@@ -526,7 +526,7 @@ export const SubCategory = () => {
                             className={`subcategory-item ${subcategory.slug_title === subcategorySlugTitle ? "active" : ""}`}
                             onClick={() => {
                                 navigate(`/ecommerce/sub-category/${subcategory.slug_title}`,);
-                                window.location.reload();
+                                // window.location.reload();
                             }}
                         >
                             {subcategory.name}

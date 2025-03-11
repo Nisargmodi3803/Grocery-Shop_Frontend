@@ -329,7 +329,7 @@ export const MyCart = () => {
               sessionStorage.removeItem("cartCount");
               window.dispatchEvent(new Event("cartUpdated"));
               navigate(`/ecommerce/view-order/${invoiceNum}`);
-              window.location.reload();
+              // window.location.reload();
             } else {
               Swal.fire({
                 title: "Payment Error",
@@ -385,7 +385,7 @@ export const MyCart = () => {
         window.dispatchEvent(new Event("cartUpdated"));
 
         navigate(`/ecommerce/view-order/${invoiceNum}`);
-        window.location.reload();
+        // window.location.reload();
       } catch (error) {
         console.error("Error during order placement process:", error);
       }
@@ -467,7 +467,7 @@ export const MyCart = () => {
             sessionStorage.setItem("cartCount", "0");
             window.dispatchEvent(new Event("cartUpdated"));
             navigate('/ecommerce/');
-            window.location.reload();
+            // window.location.reload();
           } else {
             sessionStorage.setItem("cartCount", totalCount.toString());
             window.dispatchEvent(new Event("cartUpdated"));
@@ -549,7 +549,7 @@ export const MyCart = () => {
           sessionStorage.setItem("cartCount", "0");
           window.dispatchEvent(new Event("cartUpdated"));
           navigate('/ecommerce/');
-          window.location.reload();
+          // window.location.reload();
         } else {
           sessionStorage.setItem("cartCount", cartCount.toString());
           window.dispatchEvent(new Event("cartUpdated"));

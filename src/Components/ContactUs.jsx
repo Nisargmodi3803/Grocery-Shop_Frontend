@@ -55,7 +55,7 @@ export const ContactUs = () => {
     if (authStatus) {
       fetchCustomerDetails();
     }
-  }, [isAuthenticated]);
+  });
 
   useEffect(() => {
     setLoading(true); 
@@ -193,7 +193,7 @@ export const ContactUs = () => {
 
     setTimeout(() => {
       setSuccess();
-      window.location.reload();
+      // window.location.reload();
     }, 4000);
   };
 

@@ -32,7 +32,7 @@ export const InquiryNow = ({ closeModal, flag, productId, productSlugTitle, bran
         } else {
             alert("Customer is not authenticated.");
         }
-    }, []);
+    });
 
     const getProductId = async () => {
         setLoading(true);
@@ -75,7 +75,7 @@ export const InquiryNow = ({ closeModal, flag, productId, productSlugTitle, bran
                 setSuccessMessage("✅ Inquiry submitted successfully");
                 setTimeout(() => {
                     closeModal();
-                    window.location.reload();
+                    // window.location.reload();
                 }, 3000);
             }
         } catch (error) {

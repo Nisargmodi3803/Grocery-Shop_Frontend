@@ -200,7 +200,7 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
                 setIsAuthenticated(true);
                 // console.log("Slug title : "+productSlugTitle);
                 const timer = setTimeout(() => {
-                    window.location.reload();
+                    // window.location.reload();
                     closeModal();
                 }, 3000);
             }
@@ -336,7 +336,7 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
 
                 const timer = setTimeout(() => {
                     closeModal();
-                    window.location.reload();
+                    // window.location.reload();
                 }, 3000);
             }
             else {
@@ -537,7 +537,7 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
                 setVerified(true);
                 setOtpResponse("✅ OTP is valid");
                 const timer = setTimeout(() => {
-                    window.location.reload();
+                    // window.location.reload();
                     closeModal();
                 }, 3000);
             }
@@ -584,7 +584,7 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
             if (response.status === 200) {
                 setSuccessfulForgotPassword(true);
                 const timer = setTimeout(() => {
-                    window.location.reload();
+                    // window.location.reload();
                     setIsLogin(true);
                     setForgotPassword(false);
                 }, 3000);

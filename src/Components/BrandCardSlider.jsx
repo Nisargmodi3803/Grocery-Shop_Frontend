@@ -92,7 +92,7 @@ export const BrandCardSlider = () => {
                     <h5>Shop by Brand</h5>
                     <button onClick={() => {
                         navigate("/ecommerce/shop-by-brand");
-                        window.location.reload();
+                        // window.location.reload();
                     }}>View All</button>
                 </div>
                 <div
@@ -111,7 +111,7 @@ export const BrandCardSlider = () => {
                                 key={d.id}
                                 onClick={() => {
                                     navigate(`/ecommerce/brand/${d.slug_title}`);
-                                    window.location.reload();
+                                    // window.location.reload();
                                 }}>
                                 <div className='brand-image-container'>
                                     <img src={imageSrc} alt={d.name} loading='lazy' />

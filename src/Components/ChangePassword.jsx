@@ -118,7 +118,7 @@ export const ChangePassword = () => {
         if (response.status === 200) {
           console.log('Image uploaded successfully:', response.data);
           setImage(customer.customerImage);  // Update the image if successful
-          window.location.reload();
+          // window.location.reload();
         } else {
           console.error('Error uploading image:', response);
           alert("Error uploading image. Please try again!");
@@ -203,7 +203,7 @@ export const ChangePassword = () => {
       sessionStorage.removeItem("customerData");
       await Swal.fire("Logged Out!", "You have been logged out.", "success");
       navigate("/ecommerce/");
-      window.location.reload();
+      // window.location.reload();
     }
   };
 
@@ -268,7 +268,7 @@ export const ChangePassword = () => {
         setSuccess(true);
         setMessage("Password Changed Successfully!");
         setTimeout(() => {
-          window.location.reload();
+          // window.location.reload();
         }, 3000);
       }
     } catch (error) {
@@ -334,37 +334,37 @@ export const ChangePassword = () => {
           <ul className='nav-list'>
             <li onClick={() => {
               navigate('/ecommerce/my-profile');
-              window.location.reload();
+              // window.location.reload();
             }}><IoPersonOutline /> My Profile</li>
 
             <li className='active' onClick={() => {
               navigate('/ecommerce/change-password');
-              window.location.reload();
+              // window.location.reload();
             }}><TbPasswordUser /> Change Password</li>
 
             <li onClick={() => {
               navigate('/ecommerce/my-wishlist');
-              window.location.reload();
+              // window.location.reload();
             }}><FaRegHeart /> My Wishlist</li>
 
             <li onClick={() => {
               navigate('/ecommerce/my-orders');
-              window.location.reload();
+              // window.location.reload();
             }}><CiCircleList /> Order List</li>
 
             <li onClick={() => {
               navigate('/ecommerce/refer-and-earn');
-              window.location.reload();
+              // window.location.reload();
             }}><MdCurrencyRupee /> Refer & Earn</li>
 
             <li onClick={() => {
               navigate('/ecommerce/coupon-code');
-              window.location.reload();
+              // window.location.reload();
             }}><RiCouponLine /> Coupon Code</li>
 
             <li onClick={() => {
               navigate('/ecommerce/my-ecommerce');
-              window.location.reload();
+              // window.location.reload();
             }}><BsCreditCard2Back /> My Ecommerce</li>
 
             <li onClick={handleLogout}><MdLock /> Logout</li>

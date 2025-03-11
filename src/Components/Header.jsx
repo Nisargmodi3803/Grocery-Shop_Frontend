@@ -68,7 +68,7 @@ export const Header = () => {
         if (storedCartCount) {
             setCartCount(parseInt(storedCartCount, 10));
         }
-    }, []);
+    },);
 
     useEffect(() => {
         if (isAuthenticated && customerEmail) {
@@ -103,12 +103,12 @@ export const Header = () => {
         }
 
         if (cartCount === 0) {
-            window.location.reload();
+            // window.location.reload();
             return;
         }
 
         navigate('/ecommerce/checkout');
-        window.location.reload();
+        // window.location.reload();
     };
 
     const handleLoginSignUp = () => {
@@ -138,7 +138,7 @@ export const Header = () => {
             window.dispatchEvent(new Event("cartUpdated"));
             await Swal.fire("Logged Out!", "You have been logged out.", "success");
             navigate("/ecommerce/");
-            window.location.reload();
+            // window.location.reload();
         }
     };
 
@@ -190,7 +190,9 @@ export const Header = () => {
             <header className="fixed-header">
                 <div className="navbar">
                     <div className="navbar-container">
-                        <div className="navbar-left">
+                        <div className="navbar-left"
+                            style={{ cursor: "pointer" }}
+                            onClick={() => navigate('/ecommerce/')}>
                             <img
                                 src={companyLogo}
                                 alt="Company Logo"
@@ -261,7 +263,7 @@ export const Header = () => {
                             <div className="icon-container"
                                 onClick={() => {
                                     navigate("/ecommerce/my-profile");
-                                    window.location.reload();
+                                    // window.location.reload();
                                 }}
                             >
                                 <AccountCircleIcon style={{ color: "#133365" }} />

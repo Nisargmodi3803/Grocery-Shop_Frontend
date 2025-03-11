@@ -55,7 +55,7 @@ export const Offers = () => {
 
     useEffect(() => {
         setIsAuthenticated(sessionStorage.getItem("isAuthenticated") === "true");
-    }, []);
+    });
 
     // Fetch Subcategory IDs
     const fetchSubCategoriesIds = async () => {
@@ -431,7 +431,7 @@ export const Offers = () => {
                         </a>
                         <span> {greater} </span>
                         <a onClick={() => {
-                            window.location.reload();
+                            // window.location.reload();
                         }}
                         >Offers</a>
                         <span> {greater} </span>
@@ -454,11 +454,11 @@ export const Offers = () => {
                     </a>
                     <span> {greater} </span>
                     <a onClick={() => {
-                        window.location.reload();
+                        // window.location.reload();
                     }}
                     >Offers</a>
                     <span> {greater} </span>
-                    <a onClick={() => { window.location.reload() }}>Best Of Veg. & Fruits</a>
+                    <a onClick={() => {  }}>Best Of Veg. & Fruits</a>
                 </span>
             </section>
 

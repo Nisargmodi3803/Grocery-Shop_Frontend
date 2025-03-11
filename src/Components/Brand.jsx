@@ -48,7 +48,7 @@ export const Brand = () => {
 
     useEffect(() => {
         setIsAuthenticated(sessionStorage.getItem("isAuthenticated") === "true");
-    }, []);
+    },);
 
     const fetchProductsByBrand = async () => {
         setLoading(true);
@@ -448,11 +448,11 @@ export const Brand = () => {
                         <span> {greater} </span>
                         <a onClick={() => {
                             navigate(`/ecommerce/shop-by-brand`);
-                            window.location.reload();
+                            // window.location.reload();
                         }}
                         >Brand</a>
                         <span> {greater} </span>
-                        <a onClick={() => { window.location.reload() }}>{brandName || "Loading..."}</a>
+                        <a onClick={() => {  }}>{brandName || "Loading..."}</a>
                     </span>
                 </section>
                 <section className='brand-main'>
@@ -466,7 +466,7 @@ export const Brand = () => {
                                         className={`brand-item ${brand.slug_title === brandSlugTitle ? "selected" : ""}`}
                                         onClick={() => {
                                             navigate(`/ecommerce/brand/${brand.slug_title}`);
-                                            window.location.reload();
+                                            // window.location.reload();
                                         }}
                                     >
                                         <img src={imageSrc} alt={brand.name} />
@@ -504,11 +504,11 @@ export const Brand = () => {
                     <span> {greater} </span>
                     <a onClick={() => {
                         navigate(`/ecommerce/shop-by-brand`);
-                        window.location.reload();
+                        // window.location.reload();
                     }}
                     >Brand</a>
                     <span> {greater} </span>
-                    <a onClick={() => { window.location.reload() }}>{brandName || "Loading..."}</a>
+                    <a onClick={() => {  }}>{brandName || "Loading..."}</a>
                 </span>
             </section>
 
@@ -524,7 +524,7 @@ export const Brand = () => {
                                     className={`brand-item ${brand.slug_title === brandSlugTitle ? "selected" : ""}`}
                                     onClick={() => {
                                         navigate(`/ecommerce/brand/${brand.slug_title}`);
-                                        window.location.reload();
+                                        // window.location.reload();
                                     }}
                                 >
                                     <img src={imageSrc} alt={brand.name} />

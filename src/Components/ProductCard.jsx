@@ -33,7 +33,7 @@ export const ProductCard = () => {
 
   useEffect(() => {
     setIsAuthenticated(sessionStorage.getItem("isAuthenticated") === "true");
-  }, []);
+  });
 
   useEffect(() => {
     setLoading(true);

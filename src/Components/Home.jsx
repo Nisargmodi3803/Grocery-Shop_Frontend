@@ -102,7 +102,7 @@ export const Home = () => {
 
                 if (response.data.length > 0) {
                     navigate(`/ecommerce/sub-category/${response.data[0].slug_title}`);
-                    window.location.reload();
+                    // window.location.reload();
                 } else {
                     console.log("No Subcategories Found");
                 }
@@ -171,7 +171,7 @@ export const Home = () => {
                     <h5>Shop By Category</h5>
                     <button onClick={() => {
                         navigate('/ecommerce/shop-by-category');
-                        window.location.reload();
+                        // window.location.reload();
                     }}>View All</button>
                 </div>
                 <div className='bottom-section'>

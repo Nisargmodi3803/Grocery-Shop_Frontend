@@ -9,6 +9,7 @@
     justify-content: center;
     align-items: center;
     z-index: 1000;
+    pointer-events: auto;
 }
 
 .modal-container {
@@ -372,6 +373,12 @@ form button {
 
 body.modal-open {
     overflow: hidden;
+    /* position: fixed; */
+    /* width: 100%; */
+}
+
+body.modal-open::-webkit-scrollbar {
+    display: none;
 }
 
 form button {

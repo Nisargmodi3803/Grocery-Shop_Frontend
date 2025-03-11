@@ -39,7 +39,7 @@ export default function Product() {
     useEffect(() => {
         const authStatus = sessionStorage.getItem("isAuthenticated") === "true";
         setIsAuthenticated(authStatus);
-    }, []);
+    });
 
     useEffect(() => {
         setLoading(true);
@@ -311,12 +311,10 @@ export default function Product() {
                     <span> {greater} </span>
                     <a onClick={() => {
                         navigate(`/ecommerce/shop-by-category`);
-                        window.location.reload();
                     }}>{product.cat?.name || "Category"}</a>
                     <span> {greater} </span>
                     <a onClick={() => {
                         navigate(`/ecommerce/sub-category/${product.subcat?.slug_title}`);
-                        window.location.reload();
                     }}>{product.subcat?.name || "Subcategory"}</a>
                 </span>
             </section>
@@ -386,16 +384,17 @@ export default function Product() {
                                 <div
                                     key={category.id}
                                     className={isSelected ? "selected-category-option-container" : "category-option-container"}
-                                    onChange={(e) => { navigate(`/ecommerce/product/${category.slug_title}`); window.location.reload(); }}
+                                    onChange={(e) => { navigate(`/ecommerce/product/${category.slug_title}`);  
+                                }}
                                 >
                                     <div className="radio-button-section"
-                                        onChange={(e) => { navigate(`/ecommerce/product/${category.slug_title}`); window.location.reload(); }}>
+                                        onChange={(e) => { navigate(`/ecommerce/product/${category.slug_title}`);  }}>
                                         <input
                                             type="radio"
                                             name="category-option"
                                             id={`category-${category.id}`}
                                             checked={isSelected}
-                                            onChange={(e) => { navigate(`/ecommerce/product/${category.slug_title}`); window.location.reload(); }}
+                                            onChange={(e) => { navigate(`/ecommerce/product/${category.slug_title}`);  }}
                                         />
                                         <label htmlFor={`category-${category.id}`} className="category-size">
                                             {category.variantName}

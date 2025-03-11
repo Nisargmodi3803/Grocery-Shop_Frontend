@@ -108,7 +108,7 @@ const CardSlider = () => {
                             key={d.id}
                             onClick={() => {
                                 naviagate(`/ecommerce/sub-category/${d.slug_title}`);
-                                window.location.reload();
+                                // window.location.reload();
                             }}>
                             <div className='card-image-container'>
                                 <img src={imageSrc} alt={d.name} loading='lazy' />

@@ -63,7 +63,7 @@ export default function BlogCard() {
                                     loading="lazy"
                                     onClick={() => {
                                         navigate(`/ecommerce/blog/${blog.slug_title}`);
-                                        window.location.reload();
+                                        // window.location.reload();
                                     }}
                                 />
                             </div>
@@ -72,7 +72,7 @@ export default function BlogCard() {
                                     className="blog-title"
                                     onClick={() => {
                                         navigate(`/ecommerce/blog/${blog.slug_title}`);
-                                        window.location.reload();
+                                        // window.location.reload();
                                     }}
                                 >
                                     <h3>{blog.title}</h3>
@@ -81,7 +81,7 @@ export default function BlogCard() {
                                     className="blog-date"
                                     onClick={() => {
                                         navigate(`/ecommerce/blog/${blog.slug_title}`);
-                                        window.location.reload();
+                                        // window.location.reload();
                                     }}>
                                     <span>
                                         <FaCalendarDay /> {blog.date}
@@ -94,7 +94,7 @@ export default function BlogCard() {
                                     <span
                                         onClick={() => {
                                             navigate(`/ecommerce/blog/${blog.slug_title}`);
-                                            window.location.reload();
+                                            // window.location.reload();
                                         }}
                                     >READ MORE {'>'}</span>
                                 </div>

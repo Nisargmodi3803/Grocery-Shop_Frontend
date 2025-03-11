@@ -114,7 +114,7 @@ export const BlogMain = () => {
                                 <div className={`${b.title === blog.title ? "blog-side-content-item-title-active" : "blog-side-content-item-title"}`}
                                     onClick={() => {
                                         navigate(`/ecommerce/blog/${b.slug_title}`);
-                                        window.location.reload();
+                                        // window.location.reload();
                                     }}>
                                     <h6>{b.title}</h6>
                                 </div>

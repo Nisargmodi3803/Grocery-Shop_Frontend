@@ -60,7 +60,7 @@ export const ShopByCategory = () => {
 
                 if (response.data.length > 0) {
                     navigate(`/ecommerce/sub-category/${response.data[0].slug_title}`);
-                    window.location.reload();
+                    // window.location.reload();
                 } else {
                     console.log("No Subcategories Found");
                 }

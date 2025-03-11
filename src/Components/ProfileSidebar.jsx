@@ -88,7 +88,7 @@ export const ProfileSidebar = () => {
                 if (response.status === 200) {
                     console.log('Image uploaded successfully:', response.data);
                     setImage(customer.customerImage);  // Update the image if successful
-                    window.location.reload();
+                    // window.location.reload();
                 } else {
                     console.error('Error uploading image:', response);
                     alert("Error uploading image. Please try again!");
@@ -142,7 +142,7 @@ export const ProfileSidebar = () => {
         sessionStorage.removeItem("cartCount");
         sessionStorage.removeItem("customerData");
         navigate("/ecommerce/");
-        window.location.reload();
+        // window.location.reload();
     };
 
     const closeModal = () => {
@@ -176,7 +176,7 @@ export const ProfileSidebar = () => {
                             className={`view-btn ${image === 'default.png' ? 'disabled' : ''}`}
                             onClick={() => {
                                 handleDeleteClick();
-                                window.location.reload();
+                                // window.location.reload();
                             }}
                             disabled={image === 'default.png'}
                         >

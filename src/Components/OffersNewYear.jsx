@@ -55,7 +55,7 @@ export const OffersNewYear = () => {
 
     useEffect(() => {
         setIsAuthenticated(sessionStorage.getItem("isAuthenticated") === "true");
-    }, []);
+    });
 
     const fetchSubCategoriesIds = async () => {
         setLoading(true);
@@ -405,7 +405,7 @@ export const OffersNewYear = () => {
                         </a>
                         <span> {greater} </span>
                         <a onClick={() => {
-                            window.location.reload();
+                            // window.location.reload();
                         }}
                         >Offers</a>
                         <span> {greater} </span>
@@ -428,7 +428,7 @@ export const OffersNewYear = () => {
                     </a>
                     <span> {greater} </span>
                     <a onClick={() => {
-                        window.location.reload();
+                        // window.location.reload();
                     }}
                     >Offers</a>
                     <span> {greater} </span>

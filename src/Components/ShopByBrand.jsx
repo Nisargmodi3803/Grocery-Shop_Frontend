@@ -65,7 +65,7 @@ export const ShopByBrand = () => {
                                 className='brand-card'
                                 onClick={() => {
                                     navigate(`/ecommerce/brand/${brand.slug_title}`);
-                                    window.location.reload();
+                                    // window.location.reload();
                                 }}>
                                 <img src={imageSrc} alt={brand.name} loading="lazy" />
                                 <h6>{brand.name}</h6>
