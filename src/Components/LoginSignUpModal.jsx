@@ -1124,7 +1124,7 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
                                         onChange={(e) => setOTP(e.target.value)}
                                     />
                                     {referralCodeExist === false && <span className='otp-error-message'>{registrationMessage}</span>}
-                                    {otpSent == true ? <span className="otp-success-message">✅ OTP Send Successfully!</span> : ""}
+                                    {otpSent == true ? <span className="otp-success-message">✅ OTP Send Successfully to {formData.email}!</span> : ""}
                                     {otpSent == false ? <span className="otp-error-message">❌ Email already registered. Please login or use a different email. </span> : ""}
                                     {otpSent && (
                                         <button

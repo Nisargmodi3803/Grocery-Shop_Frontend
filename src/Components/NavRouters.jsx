@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, BrowserRouter } from 'react-router-dom';
+import { Routes, Route, BrowserRouter, Navigate } from 'react-router-dom';
 import { Header } from './Header';
 import { Home } from './Home';
 import { ShopByCategory } from './ShopByCategory';
@@ -35,6 +35,7 @@ export const NavRouters = () => {
     <>
       <Header />
       <Routes>
+      <Route path="/" element={<Navigate to="/ecommerce" replace />} />
         <Route path="/ecommerce" element={<Home />} />
         <Route path="/ecommerce/shop-By-Category" element={<ShopByCategory />} />
         <Route path="/ecommerce/blog" element={<Blog />} />
