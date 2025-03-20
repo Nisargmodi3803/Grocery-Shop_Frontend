@@ -388,7 +388,7 @@ export const NewYearProductCard = () => {
         <div className='card-section-lower'>
           {productList.length > 0 &&
             productList.slice(currentIndex, currentIndex + 7).map((product) => {
-              const imageSrc = imageMap[product.image_url] || imageMap["default.jpg"];
+              const imageSrc = imageMap[product.image_url] || `http://localhost:9000/uploads/${product.image_url}` || imageMap["default.jpg"];
               const discount = discountMap[product.id] || 0;
               const rating = product.average_rating ? parseFloat(product.average_rating).toFixed(1) : 0;
 

@@ -57,7 +57,7 @@ export const ShopByBrand = () => {
             <section className='brand-container'>
                 <div className='brand-grid'>
                     {brands.map((brand) => {
-                        const imageSrc = imageMap[brand.image_url] || imageMap["default.png"];
+                        const imageSrc = imageMap[brand.image_url] || `http://localhost:9000/uploads/${brand.image_url}` || imageMap["default.png"];
 
                         return (
                             <div

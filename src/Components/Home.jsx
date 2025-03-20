@@ -176,7 +176,7 @@ export const Home = () => {
                 </div>
                 <div className='bottom-section'>
                     {categories.map((category) => {
-                        const imageSrc = imageMap[category.image_url] || imageMap["default.png"];
+                        const imageSrc = imageMap[category.image_url] || `http://localhost:9000/uploads/${category.image_url}` || imageMap["default.png"];
 
                         return (
                             <div

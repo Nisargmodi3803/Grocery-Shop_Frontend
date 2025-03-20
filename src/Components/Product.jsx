@@ -291,7 +291,7 @@ export default function Product() {
             </div>
         );
     }
-    const imageSrc = imageMap[product.image_url] || imageMap["default.jpg"];
+    const imageSrc = imageMap[product.image_url] || `http://localhost:9000/uploads/${product.image_url}` || imageMap["default.jpg"];
 
     const calculateDiscountPercentage = (mrp, discountAmt) => {
         return mrp > 0 ? Math.round(((mrp - discountAmt) * 100) / mrp) : 0;

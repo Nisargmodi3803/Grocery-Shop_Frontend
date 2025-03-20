@@ -182,8 +182,9 @@ export const Brand = () => {
     useEffect(() => {
         fetchBrandName();
         fetchBrands();
+        fetchProductsByBrand();
         setTimeout(scrollToSelectedBrand, 300);
-    }, []);
+    }, [brandSlugTitle]);
 
     useEffect(() => {
         if (sortOption) {
@@ -459,7 +460,7 @@ export const Brand = () => {
                     <div className="brand-selector-container">
                         <div className="brand-scroll" ref={brandScrollRef}>
                             {brands.map((brand) => {
-                                const imageSrc = imageMap1[brand.image_url] || imageMap["default.jpg"];
+                                const imageSrc = imageMap1[brand.image_url] || `http://localhost:9000/uploads/${brand.image_url}` || imageMap["default.jpg"] ;
                                 return (
                                     <div
                                         key={brand.id}
@@ -517,7 +518,7 @@ export const Brand = () => {
                 <div className="brand-selector-container">
                     <div className="brand-scroll" ref={brandScrollRef}>
                         {brands.map((brand) => {
-                            const imageSrc = imageMap1[brand.image_url] || imageMap["default.jpg"];
+                            const imageSrc = imageMap1[brand.image_url] || `http://localhost:9000/uploads/${brand.image_url}` || imageMap["default.jpg"];
                             return (
                                 <div
                                     key={brand.id}
@@ -549,7 +550,7 @@ export const Brand = () => {
 
                 <div className='card-section-lower1'>
                     {products.map((product) => {
-                        const imageSrc = imageMap[product.image_url] || imageMap["default.jpg"];
+                        const imageSrc = imageMap[product.image_url] || `http://localhost:9000/uploads/${product.image_url}` || imageMap["default.jpg"];
                         const discount = discountMap[product.id] || 0;
                         const rating = product.average_rating ? parseFloat(product.average_rating).toFixed(1) : 0;
                         const mrp = product.mrp ? `₹${product.mrp.toFixed(2)}` : "N/A";

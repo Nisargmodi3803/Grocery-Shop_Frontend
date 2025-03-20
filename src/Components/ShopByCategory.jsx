@@ -91,7 +91,7 @@ export const ShopByCategory = () => {
             <section className='categories-container'>
                 <div className='categories-grid'>
                     {categories.map((category) => {
-                        const imageSrc = imageMap[category.image_url] || imageMap["default.png"];
+                        const imageSrc = imageMap[category.image_url] || `http://localhost:9000/uploads/${category.image_url}`  || imageMap["default.png"];
 
                         return (
                             <div

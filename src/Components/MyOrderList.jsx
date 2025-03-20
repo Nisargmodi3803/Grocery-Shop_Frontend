@@ -471,7 +471,7 @@ export const MyOrderList = () => {
                         {orderDetails[order.invoiceNum] &&
                           orderDetails[order.invoiceNum].map((item) => {
                             const imageSrc =
-                              productImages[item.product?.image_url] || productImages["default.jpg"];
+                              productImages[item.product?.image_url] || `http://localhost:9000/uploads/${item.product.image_url}` || productImages["default.jpg"];
                             return (
                               <img key={item.productId} src={imageSrc} alt="Product" className="order-img" />
                             );

@@ -772,7 +772,7 @@ export const MyCart = () => {
                             e.stopPropagation();
                             navigate(`/ecommerce/product/${item.product.slug_title}`);
                           }}>
-                          <img src={imageMap[item.product.image_url || "default.jpg"]} alt="" />
+                          <img src={imageMap[item.product.image_url || `http://localhost:9000/uploads/${item.product.image_url}` || imageMap["default.jpg"]]} alt="" />
                         </div>
 
                         <div className='cart-info-card-details'>

@@ -53,7 +53,7 @@ export default function BlogCard() {
                 </div>
             ) : blogs.length > 0 ? (
                 blogs.map((blog) => {
-                    const imageSrc = imageMap[blog.image_url] || imageMap["default.png"];
+                    const imageSrc = imageMap[blog.image_url] || `http://localhost:9000/uploads/${blog.image_url}` || imageMap["default.png"] ;
                     return (
                         <div className="blog-card" key={blog.id}>
                             <div className="blog-image">

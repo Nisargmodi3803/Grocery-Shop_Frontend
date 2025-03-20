@@ -527,7 +527,7 @@ export const MyWishList = () => {
               {products.length > 0 ? (
                 <div className='card-section-lower2'>
                   {products.map((product) => {
-                    const imageSrc = productMap[product.image_url] || productMap["default.jpg"];
+                    const imageSrc = productMap[product.image_url] || `http://localhost:9000/uploads/${product.image_url}` || productMap["default.jpg"];
                     const discount = discountMap[product.id] || 0;
                     const rating = product.average_rating ? parseFloat(product.average_rating).toFixed(1) : 0;
                     const mrp = product.mrp ? `₹${product.mrp.toFixed(2)}` : "N/A";

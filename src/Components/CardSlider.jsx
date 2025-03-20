@@ -100,7 +100,7 @@ const CardSlider = () => {
                 }}
             >
                 {cardData.slice(currentIndex, currentIndex + 8).map((d) => {
-                    const imageSrc = imageMap[d.image_url] || imageMap["default.jpg"];
+                    const imageSrc = imageMap[d.image_url] || `http://localhost:9000/uploads/${d.image_url}` || imageMap["default.jpg"];
 
                     return (
                         <div

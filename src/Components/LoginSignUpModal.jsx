@@ -209,8 +209,14 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
             }
 
         } catch (error) {
-            if (error.response.status === 400) {
+            if (error.response.status === 403) {
                 setIsAuthenticated(false);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Blocked',
+                    text: 'Your account is blocked. Please contact support.',
+                });
+
             }
             else {
                 console.error(error);
@@ -367,8 +373,13 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
                 }
             } catch (error) {
                 if (error.response) {
-                    if (error.response.status === 404) {
+                    if (error.response.status === 403) {
                         setOtpSent(false);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Blocked',
+                            text: 'Your account is blocked. Please contact support.',
+                        });
                     } else {
                         alert(`Error: ${error.response.status}`);
                     }
@@ -458,8 +469,13 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
             }
         } catch (error) {
             if (error.response) {
-                if (error.response.status === 409) {
+                if (error.response.status === 403) {
                     setOtpSent(false);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Blocked',
+                        text: 'Your account is blocked. Please contact support.',
+                    });
                 } else {
                     alert(`Error: ${error.response.status}`);
                 }

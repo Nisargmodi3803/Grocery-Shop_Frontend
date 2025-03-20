@@ -81,7 +81,7 @@ export const BlogMain = () => {
                 <div className='blog-content-section'>
                     <div className='blog-content-image'>
                         <img
-                            src={imageMap[blog.image_url] || imageMap["default.jpg"]}
+                            src={imageMap[blog.image_url] || `http://localhost:9000/uploads/${blog.image_url}` || imageMap["default.jpg"]}
                             alt="Blog"
                         />
                     </div>

@@ -195,7 +195,7 @@ export const ViewOrder = () => {
 
                     {orderDetails[invoiceNum] &&
                         orderDetails[invoiceNum].map((product) => {
-                            const imageSrc = productImages[product.product?.image_url] || productImages["default.jpg"];
+                            const imageSrc = productImages[product.product?.image_url] || `http://localhost:9000/uploads/${product.product.image_url}` || productImages["default.jpg"];
                             return (
                                 <div className='order-details1'>
                                     <div

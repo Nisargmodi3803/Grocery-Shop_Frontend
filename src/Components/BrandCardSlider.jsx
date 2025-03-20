@@ -104,7 +104,7 @@ export const BrandCardSlider = () => {
                     }}
                 >
                     {brand.slice(currentIndex, currentIndex + 12).map((d) => {
-                        const imageSrc = imageMap[d.image_url] || imageMap["default.jpg"];
+                        const imageSrc = imageMap[d.image_url] || `http://localhost:9000/uploads/${d.image_url}` || imageMap["default.jpg"] ;
 
                         return (
                             <div className='card'

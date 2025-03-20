@@ -201,9 +201,12 @@ export const SubCategory = () => {
     };
 
     useEffect(() => {
-        fetchSubcategoryName();
-        fetchCategoryName();
-    }, []);
+        if (subcategorySlugTitle) {
+            fetchSubcategoryName();
+            fetchCategoryName();
+            fetchProductsBySubCategory();
+        }
+    }, [subcategorySlugTitle]);
 
     useEffect(() => {
         if (sortOption) {
@@ -467,7 +470,6 @@ export const SubCategory = () => {
                         <a onClick={() => {
                             {
                                 navigate(`/ecommerce/subcategory/${subcategorySlugTitle}`);
-                                // window.location.reload();
                             }
                         }}>{subcategoryName || "Loading..."}</a>
                     </span>
@@ -526,7 +528,6 @@ export const SubCategory = () => {
                             className={`subcategory-item ${subcategory.slug_title === subcategorySlugTitle ? "active" : ""}`}
                             onClick={() => {
                                 navigate(`/ecommerce/sub-category/${subcategory.slug_title}`,);
-                                // window.location.reload();
                             }}
                         >
                             {subcategory.name}
@@ -549,7 +550,7 @@ export const SubCategory = () => {
 
                 <div className='card-section-lower1'>
                     {products.map((product) => {
-                        const imageSrc = imageMap[product.image_url] || imageMap["default.jpg"];
+                        const imageSrc = imageMap[product.image_url] || `http://localhost:9000/uploads/${product.image_url}` || imageMap["default.jpg"];
                         const discount = discountMap[product.id] || 0;
                         const rating = product.average_rating ? parseFloat(product.average_rating).toFixed(1) : 0;
                         const mrp = product.mrp ? `₹${product.mrp.toFixed(2)}` : "N/A";
