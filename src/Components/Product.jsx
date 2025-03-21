@@ -36,6 +36,9 @@ export default function Product() {
         return storedCart ? JSON.parse(storedCart) : {};
     });
 
+    const [isRatingThere, setIsRatingThere] = useState(false);
+    const [reviews, setReviews] = useState([]);
+
     useEffect(() => {
         const authStatus = sessionStorage.getItem("isAuthenticated") === "true";
         setIsAuthenticated(authStatus);
@@ -57,6 +60,32 @@ export default function Product() {
     };
 
     const imageMap = importAll(require.context("../assets/Product", false, /\.(png|jpeg|svg|jpg|JPEG)$/));
+
+    const fetchRatingAndReviews = async (slugTitle) => {
+        if (!product) return;
+
+        if (product.no_of_rating === 0) {
+            setIsRatingThere(false);
+            return;
+        }
+
+        setIsRatingThere(true);
+
+        try {
+            const response = await axios.get(`http://localhost:9000/product-reviews/${slugTitle}`)
+            if (response.status === 200) {
+                setReviews(response.data);
+            }
+        } catch (error) {
+            if (error.response && error.response.status === 404) {
+                setIsRatingThere(false);
+            } else {
+                console.error("Error fetching rating and reviews:", error);
+                setIsRatingThere(false);
+            }
+        }
+    };
+
     useEffect(() => {
         const fetchProduct = async () => {
             setLoading(true);
@@ -79,6 +108,7 @@ export default function Product() {
             }
         };
         fetchProduct();
+        fetchRatingAndReviews(productSlugTitle);
     }, [productSlugTitle]);
 
 
@@ -176,101 +206,101 @@ export default function Product() {
 
     const toggleCartState = async (productId) => {
         if (!isAuthenticated) {
-          setShowLoginModal(true);
-          return;
-        }
-      
-        try {
-          const response = await axios.post(
-            `http://localhost:9000/add-cart?customerEmail=${sessionStorage.getItem("customerEmail")}&productId=${productId}`
-          );
-      
-          if (response.status === 200) {
-            console.log("Product added to cart successfully");
-          }
-        } catch (error) {
-          if (error.response?.status === 404) {
-            console.log("Customer or Product not found");
-          } else {
-            console.error("Error adding product to cart:", error);
-            alert("Something went wrong in adding product to cart. Please try again!");
-          }
-        }
-      
-        setCartState((prev) => {
-          const isCurrentlyInCart = prev[productId]?.cartBtnClicked || false;
-          let newCartState = { ...prev };
-      
-          if (!isCurrentlyInCart) {
-            // ✅ If product is newly added, set quantity to 1
-            newCartState[productId] = {
-              cartBtnClicked: true,
-              cartCount: 1,
-            };
-          } else {
-            // ✅ If product is removed, delete from cart
-            delete newCartState[productId];
-          }
-      
-          // ✅ Count only unique products
-          const uniqueItemCount = Object.keys(newCartState).length;
-      
-          // ✅ Update sessionStorage
-          sessionStorage.setItem("cartState", JSON.stringify(newCartState));
-          sessionStorage.setItem("cartCount", uniqueItemCount.toString());
-      
-          window.dispatchEvent(new Event("cartUpdated")); // 🔥 Notify other components
-      
-          return newCartState;
-        });
-      };
-      
-    
-    
-      const updateCartCount = async (productId, increment) => {
-        try {
-          const customerEmail = sessionStorage.getItem("customerEmail");
-          const apiUrl =
-            increment === 1
-              ? `http://localhost:9000/cart-increment?customerEmail=${customerEmail}&productId=${productId}`
-              : `http://localhost:9000/cart-decrement?customerEmail=${customerEmail}&productId=${productId}`;
-      
-          const response = await axios.patch(apiUrl);
-          if (response.status !== 200) {
-            console.log("Customer or Product not found");
+            setShowLoginModal(true);
             return;
-          }
-      
-          setCartState((prev) => {
-            let newCartState = { ...prev };
-            const prevCount = prev[productId]?.cartCount || 0;
-            const newCount = Math.max(prevCount + increment, 0); // Ensure no negative quantity
-      
-            if (newCount === 0) {
-              delete newCartState[productId]; // ✅ Remove item when quantity reaches 0
-            } else {
-              newCartState[productId] = {
-                cartBtnClicked: true,
-                cartCount: newCount,
-              };
+        }
+
+        try {
+            const response = await axios.post(
+                `http://localhost:9000/add-cart?customerEmail=${sessionStorage.getItem("customerEmail")}&productId=${productId}`
+            );
+
+            if (response.status === 200) {
+                console.log("Product added to cart successfully");
             }
-      
+        } catch (error) {
+            if (error.response?.status === 404) {
+                console.log("Customer or Product not found");
+            } else {
+                console.error("Error adding product to cart:", error);
+                alert("Something went wrong in adding product to cart. Please try again!");
+            }
+        }
+
+        setCartState((prev) => {
+            const isCurrentlyInCart = prev[productId]?.cartBtnClicked || false;
+            let newCartState = { ...prev };
+
+            if (!isCurrentlyInCart) {
+                // ✅ If product is newly added, set quantity to 1
+                newCartState[productId] = {
+                    cartBtnClicked: true,
+                    cartCount: 1,
+                };
+            } else {
+                // ✅ If product is removed, delete from cart
+                delete newCartState[productId];
+            }
+
             // ✅ Count only unique products
             const uniqueItemCount = Object.keys(newCartState).length;
-      
+
             // ✅ Update sessionStorage
             sessionStorage.setItem("cartState", JSON.stringify(newCartState));
             sessionStorage.setItem("cartCount", uniqueItemCount.toString());
-      
+
             window.dispatchEvent(new Event("cartUpdated")); // 🔥 Notify other components
-      
+
             return newCartState;
-          });
+        });
+    };
+
+
+
+    const updateCartCount = async (productId, increment) => {
+        try {
+            const customerEmail = sessionStorage.getItem("customerEmail");
+            const apiUrl =
+                increment === 1
+                    ? `http://localhost:9000/cart-increment?customerEmail=${customerEmail}&productId=${productId}`
+                    : `http://localhost:9000/cart-decrement?customerEmail=${customerEmail}&productId=${productId}`;
+
+            const response = await axios.patch(apiUrl);
+            if (response.status !== 200) {
+                console.log("Customer or Product not found");
+                return;
+            }
+
+            setCartState((prev) => {
+                let newCartState = { ...prev };
+                const prevCount = prev[productId]?.cartCount || 0;
+                const newCount = Math.max(prevCount + increment, 0); // Ensure no negative quantity
+
+                if (newCount === 0) {
+                    delete newCartState[productId]; // ✅ Remove item when quantity reaches 0
+                } else {
+                    newCartState[productId] = {
+                        cartBtnClicked: true,
+                        cartCount: newCount,
+                    };
+                }
+
+                // ✅ Count only unique products
+                const uniqueItemCount = Object.keys(newCartState).length;
+
+                // ✅ Update sessionStorage
+                sessionStorage.setItem("cartState", JSON.stringify(newCartState));
+                sessionStorage.setItem("cartCount", uniqueItemCount.toString());
+
+                window.dispatchEvent(new Event("cartUpdated")); // 🔥 Notify other components
+
+                return newCartState;
+            });
         } catch (error) {
-          console.error("Error updating product in cart:", error);
-          alert("Something went wrong. Please try again!");
+            console.error("Error updating product in cart:", error);
+            alert("Something went wrong. Please try again!");
         }
-      };
+    };
 
 
     if (!product) {
@@ -300,6 +330,47 @@ export default function Product() {
 
     const rating = product.average_rating ? parseFloat(product.average_rating).toFixed(1) : 0;
     const noOfRatings = product.no_of_rating || 0;
+
+    const formatDateTime = (dateTimeString) => {
+        if (!dateTimeString) return "Invalid Date";
+
+        const dateTimeParts = dateTimeString.split(" ");
+        if (dateTimeParts.length !== 2) return "Invalid Date";
+
+        const [datePart, timePart] = dateTimeParts;
+        const dateParts = datePart.split("-");
+        if (dateParts.length !== 3) return "Invalid Date";
+
+        // Convert to "dd-mm-yyyy" for compatibility
+        const formattedDateString = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+
+        const date = new Date(`${dateParts[0]}-${dateParts[1]}-${dateParts[2]}T${timePart}`);
+        if (isNaN(date.getTime())) return "Invalid Date";
+
+        const getOrdinalSuffix = (day) => {
+            if (day > 3 && day < 21) return "th";
+            switch (day % 10) {
+                case 1: return "st";
+                case 2: return "nd";
+                case 3: return "rd";
+                default: return "th";
+            }
+        };
+
+        const day = date.getDate();
+        const month = date.toLocaleString("en-US", { month: "short" });
+        const year = date.getFullYear();
+
+        const [hours, minutes, seconds] = timePart.split(":").map(Number);
+        if (isNaN(hours) || isNaN(minutes)) return "Invalid Time";
+
+        const ampm = hours >= 12 ? "PM" : "AM";
+        const formattedHours = hours % 12 || 12;
+
+        return `${day}${getOrdinalSuffix(day)} ${month} ${year}, ${formattedHours}:${minutes.toString().padStart(2, "0")} ${ampm}`;
+    };
+
+
 
     return (
         <div className='product-page'>
@@ -384,17 +455,18 @@ export default function Product() {
                                 <div
                                     key={category.id}
                                     className={isSelected ? "selected-category-option-container" : "category-option-container"}
-                                    onChange={(e) => { navigate(`/ecommerce/product/${category.slug_title}`);  
-                                }}
+                                    onChange={(e) => {
+                                        navigate(`/ecommerce/product/${category.slug_title}`);
+                                    }}
                                 >
                                     <div className="radio-button-section"
-                                        onChange={(e) => { navigate(`/ecommerce/product/${category.slug_title}`);  }}>
+                                        onChange={(e) => { navigate(`/ecommerce/product/${category.slug_title}`); }}>
                                         <input
                                             type="radio"
                                             name="category-option"
                                             id={`category-${category.id}`}
                                             checked={isSelected}
-                                            onChange={(e) => { navigate(`/ecommerce/product/${category.slug_title}`);  }}
+                                            onChange={(e) => { navigate(`/ecommerce/product/${category.slug_title}`); }}
                                         />
                                         <label htmlFor={`category-${category.id}`} className="category-size">
                                             {category.variantName}
@@ -459,10 +531,41 @@ export default function Product() {
                     </div>
                 </div>
             </section>
+
             <section className='product-overview-section'>
                 <h1>Quick Overview</h1>
                 <p dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.long_description) }}></p>
             </section>
+
+            {
+                rating > 0 && (
+                    <section className='product-overview-section'>
+                        <h1 className="rating-review-title">Rating & Review</h1>
+                        <div className="rating-summary">
+                            <div className="rating-badge">
+                                {rating} <MdOutlineStarPurple500 color='gold' size={20} />
+                            </div>
+                            <p className="total-rating-text">{noOfRatings} Ratings</p>
+                        </div>
+                        <div className="review-list-scroll">
+                            {reviews.map((review, index) => (
+                                <div key={index} className="review-card">
+                                    <div className="review-header">
+                                        <div className="product-content-rating-avg">
+                                            <span className='product-content-rating'>
+                                                {review.rating ? parseFloat(review.rating).toFixed(1) : 0} <MdOutlineStarPurple500 color='gold' size={15} />
+                                            </span>
+                                        </div>
+                                        <span className="review-date">{formatDateTime(review.cDate)}</span>
+                                    </div>
+                                    <p className="review-message">{review.review}</p>
+                                </div>
+                            ))}
+                        </div>
+
+                    </section>
+                )
+            }
             {showLoginModal && <LoginSignUpModal closeModal={() => setShowLoginModal(false)} productSlugTitle={inquiryProductSlugTitle} />}
             {showModal && <InquiryNow closeModal={closeModal} productId={inquiryProductId} flag={2} />}
         </div>

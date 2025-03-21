@@ -6,6 +6,8 @@ import axios from 'axios'
 import { FaPhoneAlt } from "react-icons/fa";
 import { HiMiniMinusSmall } from "react-icons/hi2";
 import { useNavigate } from 'react-router-dom'
+import companyLogo from '../assets/Logo/060622034612bits.png';
+import { ProductReview } from './ProductReview'
 
 const importAll = (r) => {
     let images = {};
@@ -15,6 +17,7 @@ const importAll = (r) => {
     return images;
 };
 
+const Company = importAll(require.context("../assets/Logo", false, /\.(png|jpeg|svg|jpg|JPEG)$/));
 const productImages = importAll(require.context("../assets/Product", false, /\.(png|jpeg|svg|jpg|JPEG)$/));
 
 
@@ -25,6 +28,9 @@ export const ViewOrder = () => {
     const { setLoading } = useLoading();
     const [customer, setCustomer] = useState({});
     const navigate = useNavigate();
+    const [showModal, setShowModal] = useState(false);
+    const [reviewProductId, setReviewProductId] = useState(null);
+    const [reviewInvoiceId, setReviewInvoiceId] = useState(null);
 
     const fetchCustomerDetails = async () => {
         setLoading(true);
@@ -45,6 +51,12 @@ export const ViewOrder = () => {
             setLoading(false);
         }
     }
+
+    useEffect(() => {
+        if (!sessionStorage.getItem("isAuthenticated")) {
+            navigate("/ecommerce/");
+        }
+    }, []);
 
     const fetchOrderList = async () => {
         setLoading(true);
@@ -146,7 +158,7 @@ export const ViewOrder = () => {
 
     const calculateTotalMrp = () => {
         if (!orderDetails[invoiceNum] || !Array.isArray(orderDetails[invoiceNum])) return 0;
-        
+
         return orderDetails[invoiceNum].reduce((acc, item) => acc + item.mrp * item.quantity, 0);
     };
 
@@ -182,6 +194,104 @@ export const ViewOrder = () => {
         return calulateCouponDiscountAmt() + deliveryCharge();
     };
 
+    const handleInvoicePrint = () => {
+        const logoUrl = "https://bitsinfotech.in/ecommerce/fmcg_upload/logo/060622034612bits.png";
+
+        // Preload the image
+        const img = new Image();
+        img.src = logoUrl;
+        img.onload = () => {
+            let printContent = `
+              <div style="font-family: Arial, sans-serif; padding: 20px;">
+                  <div style="text-align: center; margin-bottom: 10px;">
+                      <img src="${logoUrl}" alt="Company Logo" style="width: 120px; height: auto; margin-bottom: 10px;"/>
+                      <h2 style="margin: 0;">Bits Infotech</h2>
+                      <p style="margin-top: 5px;">INVOICE - BI-${orderList.invoiceNum}</p>
+                  </div>
+                  <hr />
+                  <p><strong>Name:</strong> ${orderList.invoiceName}</p>
+                  <p><strong>Mobile:</strong> ${orderList.invoiceMobile}</p>
+                  <p><strong>Date:</strong> ${orderList.invoiceDate}</p>
+                  <hr />
+                  <table border="1" cellspacing="0" cellpadding="8" style="width: 100%; border-collapse: collapse; text-align: center; margin-top: 20px;">
+                      <thead>
+                          <tr>
+                              <th>#</th>
+                              <th>Item Description</th>
+                              <th>Quantity</th>
+                              <th>MRP</th>
+                              <th>Discount</th>
+                              <th>Product Price</th>
+                              <th>Net Amount</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+            `;
+
+            orderDetails[invoiceNum].forEach((item, index) => {
+                printContent += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${item.productName}</td>
+                    <td>${item.quantity}</td>
+                    <td>₹${item.mrp}</td>
+                    <td>₹${item.mrp - item.totalAmount}</td>
+                    <td>₹${item.totalAmount}</td>
+                    <td>₹${item.quantity * item.totalAmount}</td>
+                </tr>
+              `;
+            });
+
+            printContent += `
+                      </tbody>
+                  </table>
+                  <div style="margin-top: 20px; text-align: right;">
+                      <p><strong>Sub Total:</strong> ₹${calulateCouponDiscountAmt()}</p>
+                      <p><strong>Delivery Charges:</strong> ₹${deliveryCharge()}</p>
+                      <h3><strong>Total Amount:</strong> ₹${calculateTotalPayable()}</h3>
+                  </div>
+                  <p style="text-align: center; margin-top: 30px; font-weight: bold;">THANK YOU!</p>
+              </div>
+            `;
+
+            const newWin = window.open('', '', 'width=900,height=700');
+            newWin.document.write(`
+                <html>
+                    <head>
+                        <title>Invoice Print</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; margin: 20px; }
+                            table { width: 100%; border-collapse: collapse; }
+                            th, td { border: 1px solid #000; padding: 8px; text-align: center; }
+                            th { background-color: #f0f0f0; }
+                        </style>
+                    </head>
+                    <body>
+                        ${printContent}
+                    </body>
+                </html>
+            `);
+            newWin.document.close();
+
+            setTimeout(() => {
+                newWin.focus();
+                newWin.print();
+                newWin.close();
+            }, 100); // Give some time for image to load
+        };
+    };
+
+    const handleReviewClick = (productId,invoiceId) => {
+        setReviewProductId(productId);
+        setReviewInvoiceId(invoiceId);
+        setShowModal(true); // Open Modal
+
+    };
+
+    const closeModal = () => {
+        setShowModal(false);
+        setReviewProductId(null);
+    };
 
     return (
         <div className='view-order'>
@@ -229,6 +339,13 @@ export const ViewOrder = () => {
                                                 Quantity : {product.quantity}
                                             </span>
                                         </div>
+
+                                        {orderList.invoiceStatus == 4 ? (
+                                            <div className='review-button-section'>
+                                                <div className='review-button'
+                                                onClick={() => handleReviewClick(product.product?.id,product.invoice.invoiceId)}>Add Review</div>
+                                            </div>
+                                        ) : ""}
                                     </div>
                                 </div>
                             )
@@ -316,9 +433,17 @@ export const ViewOrder = () => {
                             <p>TOTAL BILL AMONUNT</p>
                             <span>₹{calculateTotalPayable()}</span>
                         </div>
+                        {
+                            orderList.invoiceStatus == 4 ? (
+                                <div className='print-invoice-section'>
+                                    <div className='review-button' onClick={handleInvoicePrint}>Print Invoice</div>
+                                </div>
+                            ) : ""
+                        }
                     </div>
                 </div>
             </div>
+            {showModal && <ProductReview closeModal={closeModal} productId={reviewProductId} invoiceId={reviewInvoiceId}/>}
         </div >
 
     )

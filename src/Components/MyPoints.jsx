@@ -36,6 +36,53 @@ export const MyPoints = () => {
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
   const { setLoading } = useLoading();
+  const [points, setPoints] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ordersPerPage = 10;
+  const totalPages = Math.ceil(points.length / ordersPerPage);
+  const startIndex = (currentPage - 1) * ordersPerPage;
+  const endIndex = startIndex + ordersPerPage;
+  const paginatedPoints = points.slice(startIndex, endIndex);
+  const maxPageNumbersToShow = 4;
+  const startPage = Math.max(1, currentPage - Math.floor(maxPageNumbersToShow / 2));
+  const endPage = Math.min(totalPages, startPage + maxPageNumbersToShow - 1);
+  const [showResult, setShowResult] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [Count, setCount] = useState(0);
+
+  const handlePageClick = (page) => {
+    setCurrentPage(page);
+  };
+
+  const fetchPoints = async () => {
+    try {
+      const response = await axios.get(`http://localhost:9000/points/${sessionStorage.getItem("customerEmail")}`);
+      if (response.status === 200) {
+        setPoints(response.data);
+      }
+    } catch (error) {
+      if (error.response?.status === 404) {
+        console.log("No Points Found");
+      } else {
+        console.error(error);
+        alert("Something went wrong. Please try again!");
+      }
+    }
+  };
+
+
+  const formatDateOnly = (dateTimeString) => {
+    if (!dateTimeString) return "Invalid Date";
+    const date = new Date(dateTimeString);
+
+    if (isNaN(date.getTime())) return "Invalid Date";
+
+    const day = date.getDate();
+    const month = date.toLocaleString("en-US", { month: "long" }); // Full month name
+    const year = date.getFullYear();
+
+    return `${day} ${month} ${year}`;
+  };
 
   const fetchCustomerDetails = async () => {
     setLoading(true);
@@ -59,6 +106,7 @@ export const MyPoints = () => {
 
   useEffect(() => {
     fetchCustomerDetails();
+    fetchPoints();
   }, []);
 
   useEffect(() => {
@@ -291,9 +339,63 @@ export const MyPoints = () => {
           </div>
           <div className='my-profile-section-body'>
             <div className='profile-detail'>
+              <table className="brand-table">
+                <thead>
+                  <tr>
+                    <th>Sr. No.</th>
+                    <th>Date</th>
+                    <th>Points</th>
+                    <th className="description">Remark</th>
+                    <th>In/Out</th>
+                    <th>Available Points</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {paginatedPoints.map((points, index) => {
+                    return (
+                      <tr key={points.id} >
+                        <td>{startIndex + index + 1}</td>
+                        <td>
+                          {formatDateOnly(points.c_date)}
+                        </td>
+                        <td>{points.customerPoint}</td>
+                        <td className="description">{points.customerPointDetail}</td>
+                        <td>{points.customerPointInOut === 1 ? "In" : "Out"}</td>
+                        <td>{points.customerAvailablePoint}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
 
+              </table>
             </div>
           </div>
+
+
+          {paginatedPoints.length > 0 && (
+
+            <div className="pagination">
+              <span>Showing {startIndex + 1} to {Math.min(endIndex, points.length)} of {points.length} entries</span>
+
+              <button onClick={() => handlePageClick(currentPage - 1)} disabled={currentPage === 1}>
+                &lt;
+              </button>
+
+              {Array.from({ length: endPage - startPage + 1 }, (_, index) => (
+                <button
+                  key={startPage + index}
+                  className={currentPage === startPage + index ? "active" : ""}
+                  onClick={() => handlePageClick(startPage + index)}
+                >
+                  {startPage + index}
+                </button>
+              ))}
+
+              <button onClick={() => handlePageClick(currentPage + 1)} disabled={currentPage === totalPages}>
+                &gt;
+              </button>
+            </div>
+          )}
         </div>
         <input
           id="file-input"

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
 import "./InquiryNow.css";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useLoading } from "../Context/LoadingContext";
@@ -124,7 +124,7 @@ export const InquiryNow = ({ closeModal, flag, productId, productSlugTitle, bran
         <div className="inquiry-modal-overlay">
             <div className="inquiry-modal-content">
                 <div className="inquiry-modal-header">
-                    <h2>Product Inquiry</h2>
+                    <h2>PRODUCT INQUIRY</h2>
                     <button className="close-button" onClick={closeModal}>×</button>
                 </div>
                 <form onSubmit={handleSubmit}>

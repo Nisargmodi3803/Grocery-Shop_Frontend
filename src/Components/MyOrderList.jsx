@@ -41,7 +41,8 @@ export const MyOrderList = () => {
   const { setLoading } = useLoading();
   const [orderList, setOrderList] = useState([]);
   const [orderDetails, setOrderDetails] = useState([]);
-
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showResult, setShowResult] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
   const ordersPerPage = 5;
@@ -74,7 +75,7 @@ export const MyOrderList = () => {
         console.log("Customer not found");
       } else {
         console.error("Error fetching customer details:", error);
-        alert("Something went wrong in fetching Customer Details. Please try again!");
+        // alert("Something went wrong in fetching Customer Details. Please try again!");
       }
     } finally {
       // setLoading(false);
@@ -341,6 +342,41 @@ export const MyOrderList = () => {
     }
   }
 
+  const fetchResults = async (keyword) => {
+    try {
+      const response = await axios.get(`http://localhost:9000/search-invoice?keyword=${encodeURIComponent(keyword)}`);
+      if (response?.status === 200) {
+        if (response.data.length === 0) {
+          return;
+        }
+        // showResult(true);
+        setOrderList(response.data.invoice);
+        console.log(response.data?.invoice);
+      }
+    } catch (error) {
+      if (error.response?.status === 404) {
+        setOrderList([]);
+      } else {
+        console.error("Error fetching search results:", error);
+        alert("Error fetching search results. Please try again later.");
+        setOrderList([]);
+      }
+    }
+  }
+
+  const handleSearchChange = async (e) => {
+    const keyword = e.target.value;
+    setSearchTerm(keyword);
+
+    if (keyword.trim() === "") {
+      setSearchTerm("");
+      fetchOrderList();
+      return;
+    }
+
+    fetchResults(keyword);
+  }
+
   return (
     <div className='my-wishlist'>
       <div className='profile-section'>
@@ -434,6 +470,12 @@ export const MyOrderList = () => {
               <option>Sort by: All Orders</option>
             </select>
           </div> */}
+          { /*<div className="search-order">
+            <input type="text"
+              placeholder='Search'
+              onChange={handleSearchChange}
+            />
+          </div>*/}
           <div className='my-profile-section-body'>
             <div className="order-container">
               {paginatedOrders.length > 0 ? (
@@ -482,31 +524,30 @@ export const MyOrderList = () => {
                         <div className="order-status">
                           <h3>
                             Order{" "}
-                            {order.invoiceStatus == 4 ? (
-                              <>
-                                <b>delivered</b> <FaCheckCircle className="status-icon delivered" />
-                              </>
-                            ) : (
-                              <>
-                                <div className="order-status">
-                                  <h3 className={
-                                    order.invoiceStatus == 1 ? "Pending" :
-                                      order.invoiceStatus == 2 ? "Confirm" :
-                                        order.invoiceStatus == 3 ? "Dispatched" :
-                                          order.invoiceStatus == 4 ? "Delivered" :
-                                            order.invoiceStatus == 5 ? "Rejected" :
-                                              order.invoiceStatus == 6 ? "Cancelled" : ""
-                                  }>
-                                    {order.invoiceStatus == 1 ? "Pending" :
-                                      order.invoiceStatus == 2 ? "Confirmed" :
-                                        order.invoiceStatus == 3 ? "Dispatched" :
-                                          order.invoiceStatus == 4 ? "Delivered" :
-                                            order.invoiceStatus == 5 ? "Rejected" :
-                                              order.invoiceStatus == 6 ? "Cancelled" : ""}
-                                  </h3>
-                                </div>
-                              </>
-                            )}
+                            <>
+                              <div className="order-status">
+                                <h3 className={
+                                  order.invoiceStatus == 1 ? "Pending" :
+                                    order.invoiceStatus == 2 ? "Confirm" :
+                                      order.invoiceStatus == 3 ? "Dispatched" :
+                                        order.invoiceStatus == 4 ? "Delivered" :
+                                          order.invoiceStatus == 5 ? "Rejected" :
+                                            order.invoiceStatus == 6 ? "Cancelled" : ""
+                                }>
+                                  {order.invoiceStatus == 1 && "Pending"}
+                                  {order.invoiceStatus == 2 && "Confirmed"}
+                                  {order.invoiceStatus == 3 && "Dispatched"}
+                                  {order.invoiceStatus == 4 && (
+                                    <>
+                                      Delivered <FaCheckCircle className="status-icon delivered" />
+                                    </>
+                                  )}
+                                  {order.invoiceStatus == 5 && "Rejected"}
+                                  {order.invoiceStatus == 6 && "Cancelled"}
+                                </h3>
+                              </div>
+
+                            </>
                           </h3>
                         </div>
 

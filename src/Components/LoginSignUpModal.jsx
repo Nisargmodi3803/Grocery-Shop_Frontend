@@ -202,7 +202,7 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
                 const timer = setTimeout(() => {
                     // window.location.reload();
                     closeModal();
-                }, 3000);
+                }, 2000);
             }
             else {
                 setIsAuthenticated(false);
@@ -215,8 +215,9 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
                     icon: 'error',
                     title: 'Blocked',
                     text: 'Your account is blocked. Please contact support.',
+                }).then(() => {
+                    navigate("/ecommerce/");
                 });
-
             }
             else {
                 console.error(error);
@@ -343,7 +344,7 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
                 const timer = setTimeout(() => {
                     closeModal();
                     // window.location.reload();
-                }, 3000);
+                }, 2000);
             }
             else {
                 setIsAuthenticated(false);
@@ -379,6 +380,8 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
                             icon: 'error',
                             title: 'Blocked',
                             text: 'Your account is blocked. Please contact support.',
+                        }).then(() => {
+                            navigate("/ecommerce/");
                         });
                     } else {
                         alert(`Error: ${error.response.status}`);
@@ -475,6 +478,8 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
                         icon: 'error',
                         title: 'Blocked',
                         text: 'Your account is blocked. Please contact support.',
+                    }).then(() => {
+                        navigate("/ecommerce/");
                     });
                 } else {
                     alert(`Error: ${error.response.status}`);
@@ -555,7 +560,7 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
                 const timer = setTimeout(() => {
                     // window.location.reload();
                     closeModal();
-                }, 3000);
+                }, 2000);
             }
 
         } catch (error) {
@@ -603,7 +608,7 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
                     // window.location.reload();
                     setIsLogin(true);
                     setForgotPassword(false);
-                }, 3000);
+                }, 2000);
             }
         } catch (error) {
             if (error.response) {

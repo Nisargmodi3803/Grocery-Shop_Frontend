@@ -230,7 +230,7 @@
     height: 50px;
 }
 
-.product-content-inquiry-now{
+.product-content-inquiry-now {
     background-color: #08b4ce;
     color: #fff;
     border: none;
@@ -269,7 +269,7 @@
 }
 
 .product-content-add-to-cart:hover,
-.product-content-inquiry-now:hover{
+.product-content-inquiry-now:hover {
     transform: scale(1.05);
 }
 
@@ -322,6 +322,7 @@
     color: #133365;
     margin-bottom: 10px;
     text-transform: capitalize;
+    display: flex;
 }
 
 .product-overview-section p {
@@ -357,7 +358,7 @@
     border: 2px solid #28a745;
 }
 
-.category-price{
+.category-price {
     display: flex;
     flex-direction: row;
     cursor: pointer;
@@ -392,7 +393,8 @@
     text-align: center;
     word-wrap: break-word;
     max-width: 100%;
-    padding: 5px 0; ;
+    padding: 5px 0;
+    ;
 }
 
 .discount-section-main {
@@ -409,15 +411,15 @@
 }
 
 .selected-category-option-container .discount-section-main {
-    display: block; 
+    display: block;
     color: #28a745;
 }
 
-.radio-button-section{
-    display:flex;
+.radio-button-section {
+    display: flex;
 }
 
-.radio-button-section input[type="radio"]{
+.radio-button-section input[type="radio"] {
     cursor: pointer;
     accent-color: #28a745;
     size: 10px;
@@ -429,4 +431,100 @@
 .selected-category-option-container {
     border-color: #28a745;
     box-shadow: 0 4px 8px rgba(40, 167, 69, 0.2);
+}
+
+
+
+.rating-review-container {
+    margin: 30px 0;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.rating-review-title {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #002d6b;
+}
+
+.rating-summary {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.rating-badge {
+    background-color: #002d6b;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 50px;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.total-rating-text {
+    color: #555;
+    font-size: 18px;
+}
+
+.review-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    border-top: 2px solid #ddd;
+    padding-top: 20px;
+}
+
+.review-list-scroll {
+    width: 100%;
+    max-height: 400px;   /* adjust height as per your UI */
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    border-top: 2px solid #ddd;
+    padding-top: 20px;
+    padding-right: 10px;
+}
+
+.review-card {
+    border-bottom: 1px solid #eaeaea;
+    padding-bottom: 10px;
+}
+
+.review-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 5px;
+}
+
+.review-rating-badge {
+    background-color: #002d6b;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 50px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+}
+
+.review-date {
+    font-size: 13px;
+    color: #777;
+}
+
+.review-message {
+    margin-left: 34px;
+    font-size: 15px;
+    color: #333;
 }

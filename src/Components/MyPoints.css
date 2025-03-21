@@ -8,3 +8,27 @@
     flex-wrap: wrap;
     text-decoration: none;
 }
+
+.brand-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.brand-table th, 
+.brand-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+    white-space: normal !important;  /* allows text to wrap */
+    word-break: break-word;          /* breaks long words if needed */
+    max-width: 150px;               /* adjust based on how wide you want */
+}
+
+.brand-table th {
+    background-color: #f7f7f7;
+    font-weight: bold;
+}
+
+.brand-table tr:nth-child(even) {
+    background-color: #fafafa;
+}

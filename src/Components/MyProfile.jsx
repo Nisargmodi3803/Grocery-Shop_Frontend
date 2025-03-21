@@ -310,6 +310,7 @@ export const MyProfile = () => {
             return "Invalid Date"; // Handle unexpected errors
         }
     }
+
     return (
         <div className='my-profile'>
             <div className='profile-section'>
@@ -541,7 +542,6 @@ export const MyProfile = () => {
                         )}
                     </div>
                 </div>
-
 
                 <input
                     id="file-input"

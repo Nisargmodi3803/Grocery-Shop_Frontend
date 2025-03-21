@@ -42,16 +42,37 @@ export const Header = () => {
     const fetchCustomerDetails = async () => {
         if (isAuthenticated && customerEmail) {
             try {
-                setLoading(true);
-                const response = await axios.get(`http://localhost:9000/customer-email/${customerEmail}`);
-                if (response.status === 200) {
-                    setCustomerDetails(response.data);
+                const response = await axios.get(`http://localhost:9000/check-block-customer/${customerEmail}`);
+
+                if (response.data == false) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Blocked',
+                        text: 'Your account is blocked. Please contact support.',
+                    });
+                    sessionStorage.clear();
+                    setIsAuthenticated(false);
+                    setCustomerEmail("");
+                    setCartCount(0);
+                    window.dispatchEvent(new Event("cartUpdated"));
+                    navigate("/ecommerce/");
+                } else {
+                    try {
+                        setLoading(true);
+                        const response = await axios.get(`http://localhost:9000/customer-email/${customerEmail}`);
+                        if (response.status === 200) {
+                            setCustomerDetails(response.data);
+                        }
+                    } catch (error) {
+                        console.error("Error fetching customer details:", error);
+                    } finally {
+                        setLoading(false);
+                    }
                 }
             } catch (error) {
-                console.error("Error fetching customer details:", error);
-            } finally {
-                setLoading(false);
+                console.log(error);
             }
+
         }
     };
 
@@ -68,7 +89,46 @@ export const Header = () => {
         if (storedCartCount) {
             setCartCount(parseInt(storedCartCount, 10));
         }
-    },);
+    });
+
+    useEffect(() => {
+        const fetchAuthAndCheckBlock = async () => {
+            const storedAuth = sessionStorage.getItem("isAuthenticated");
+            const storedCustomerEmail = sessionStorage.getItem("customerEmail");
+            const storedCartCount = sessionStorage.getItem("cartCount");
+
+            if (storedAuth === "true" && storedCustomerEmail) {
+                try {
+                    const response = await axios.get(`http://localhost:9000/check-block-customer/${storedCustomerEmail}`);
+                    if (response.data == false) {
+                        await Swal.fire({
+                            icon: 'error',
+                            title: 'Blocked',
+                            text: 'Your account is blocked. Please contact support.',
+                        });
+                        sessionStorage.clear();
+                        setIsAuthenticated(false);
+                        setCustomerEmail("");
+                        setCartCount(0);
+                        window.dispatchEvent(new Event("cartUpdated"));
+                        navigate("/ecommerce/");
+                    } else {
+                        setIsAuthenticated(true);
+                        setCustomerEmail(storedCustomerEmail);
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+
+            if (storedCartCount) {
+                setCartCount(parseInt(storedCartCount, 10));
+            }
+        };
+
+        fetchAuthAndCheckBlock();
+    }, [navigate]);
+
 
     useEffect(() => {
         if (isAuthenticated && customerEmail) {

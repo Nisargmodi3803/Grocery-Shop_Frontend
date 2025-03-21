@@ -246,3 +246,31 @@
         width: 100%;
     }
 }
+
+.review-button-section{
+    display: flex;
+    justify-content: flex-end;
+}
+
+.review-button{
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background-color: #133365;
+    color: #fff;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+    margin-bottom: 15px;
+}
+
+.review-button:hover{
+    background-color: #0d2a4d;
+    transform: scale(1.01);
+}
+
+.print-invoice-section{
+    display: flex;
+}
