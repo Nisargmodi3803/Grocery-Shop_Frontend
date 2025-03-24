@@ -1,0 +1,78 @@
+"filename", "language", "JavaScript JSX", "CSS", "JavaScript", "comment", "blank", "total"
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\AboutUs.css", "CSS", 0, 29, 0, 0, 4, 33
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\AboutUs.jsx", "JavaScript JSX", 49, 0, 0, 0, 4, 53
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\Blog.css", "CSS", 0, 4, 0, 0, 0, 4
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\Blog.jsx", "JavaScript JSX", 15, 0, 0, 0, 3, 18
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\BlogCard.css", "CSS", 0, 73, 0, 1, 9, 83
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\BlogCard.jsx", "JavaScript JSX", 103, 0, 0, 4, 7, 114
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\BlogMain.css", "CSS", 0, 129, 0, 3, 22, 154
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\BlogMain.jsx", "JavaScript JSX", 119, 0, 0, 4, 11, 134
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\Brand.css", "CSS", 0, 309, 0, 4, 47, 360
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\Brand.jsx", "JavaScript JSX", 542, 0, 0, 16, 78, 636
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\BrandCardSlider.css", "CSS", 0, 64, 0, 6, 9, 79
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\BrandCardSlider.jsx", "JavaScript JSX", 111, 0, 0, 2, 14, 127
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\BrandSelector.css", "CSS", 0, 22, 0, 0, 5, 27
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\BrandSelector.jsx", "JavaScript JSX", 41, 0, 0, 1, 7, 49
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\CardSlider.css", "CSS", 0, 140, 0, 12, 22, 174
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\CardSlider.jsx", "JavaScript JSX", 117, 0, 0, 1, 16, 134
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\ChangePassword.css", "CSS", 0, 55, 0, 0, 8, 63
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\ChangePassword.jsx", "JavaScript JSX", 395, 0, 0, 15, 48, 458
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\ContactUs.css", "CSS", 0, 136, 0, 0, 28, 164
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\ContactUs.jsx", "JavaScript JSX", 306, 0, 0, 1, 33, 340
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\CouponCode.css", "CSS", 0, 103, 0, 4, 16, 123
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\CouponCode.jsx", "JavaScript JSX", 313, 0, 0, 14, 41, 368
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\Footer.css", "CSS", 0, 223, 0, 1, 42, 266
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\Footer.jsx", "JavaScript JSX", 124, 0, 0, 10, 8, 142
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\Header.css", "CSS", 0, 226, 0, 30, 32, 288
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\Header.jsx", "JavaScript JSX", 321, 0, 0, 4, 39, 364
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\Home.css", "CSS", 0, 251, 0, 3, 46, 300
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\Home.jsx", "JavaScript JSX", 184, 0, 0, 3, 23, 210
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\ImageModal.css", "CSS", 0, 36, 0, 1, 5, 42
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\ImageModal.jsx", "JavaScript JSX", 13, 0, 0, 1, 2, 16
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\InquiryNow.css", "CSS", 0, 139, 0, 2, 20, 161
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\InquiryNow.jsx", "JavaScript JSX", 159, 0, 0, 1, 14, 174
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\LoginSignUpModal.css", "CSS", 0, 333, 0, 13, 56, 402
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\LoginSignUpModal.jsx", "JavaScript JSX", 1076, 0, 0, 26, 98, 1200
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\MyCart.css", "CSS", 0, 468, 0, 3, 80, 551
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\MyCart.jsx", "JavaScript JSX", 907, 0, 0, 23, 137, 1067
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\MyOrderList.css", "CSS", 0, 197, 0, 0, 35, 232
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\MyOrderList.jsx", "JavaScript JSX", 517, 0, 0, 51, 60, 628
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\MyPoints.css", "CSS", 0, 30, 0, 0, 4, 34
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\MyPoints.jsx", "JavaScript JSX", 351, 0, 0, 14, 48, 413
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\MyProfile.css", "CSS", 0, 304, 0, 8, 55, 367
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\MyProfile.jsx", "JavaScript JSX", 481, 0, 0, 23, 54, 558
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\MyWishList.jsx", "JavaScript JSX", 534, 0, 0, 24, 74, 632
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\MyWishlist.css", "CSS", 0, 214, 0, 4, 30, 248
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\NavRouters.jsx", "JavaScript JSX", 67, 0, 0, 0, 3, 70
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\NewYearProductCard.jsx", "JavaScript JSX", 389, 0, 0, 14, 73, 476
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\Offers.jsx", "JavaScript JSX", 476, 0, 0, 15, 71, 562
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\OffersNewYear.jsx", "JavaScript JSX", 457, 0, 0, 11, 68, 536
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\PrivacyPolicy.css", "CSS", 0, 9, 0, 0, 1, 10
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\PrivacyPolicy.jsx", "JavaScript JSX", 36, 0, 0, 0, 10, 46
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\Product.css", "CSS", 0, 460, 0, 5, 65, 530
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\Product.jsx", "JavaScript JSX", 487, 0, 0, 9, 81, 577
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\ProductCard.css", "CSS", 0, 249, 0, 7, 35, 291
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\ProductCard.jsx", "JavaScript JSX", 389, 0, 0, 14, 73, 476
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\ProductReview.css", "CSS", 0, 116, 0, 0, 19, 135
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\ProductReview.jsx", "JavaScript JSX", 136, 0, 0, 0, 13, 149
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\ProfileSidebar.jsx", "JavaScript JSX", 219, 0, 0, 9, 20, 248
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\ReferAndEarn.css", "CSS", 0, 74, 0, 0, 8, 82
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\ReferAndEarn.jsx", "JavaScript JSX", 296, 0, 0, 14, 40, 350
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\SearchResult.jsx", "JavaScript JSX", 342, 0, 0, 9, 60, 411
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\ShippingReturnPolicy.css", "CSS", 0, 30, 0, 0, 4, 34
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\ShippingReturnPolicy.jsx", "JavaScript JSX", 34, 0, 0, 0, 5, 39
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\ShopByBrand.css", "CSS", 0, 65, 0, 2, 12, 79
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\ShopByBrand.jsx", "JavaScript JSX", 70, 0, 0, 1, 9, 80
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\ShopByCategory.css", "CSS", 0, 119, 0, 1, 22, 142
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\ShopByCategory.jsx", "JavaScript JSX", 96, 0, 0, 1, 14, 111
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\ShowOffers.css", "CSS", 0, 121, 0, 0, 15, 136
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\ShowOffers.jsx", "JavaScript JSX", 74, 0, 0, 0, 12, 86
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\Slides.js", "JavaScript", 0, 0, 24, 0, 2, 26
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\SubCategory.css", "CSS", 0, 37, 0, 0, 5, 42
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\SubCategory.jsx", "JavaScript JSX", 549, 0, 0, 16, 69, 634
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\TermsConditions.css", "CSS", 0, 7, 0, 0, 1, 8
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\TermsConditions.jsx", "JavaScript JSX", 23, 0, 0, 0, 4, 27
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\ViewOrder.css", "CSS", 0, 230, 0, 4, 42, 276
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\ViewOrder.jsx", "JavaScript JSX", 389, 0, 0, 3, 58, 450
+"d:\Sem-8\Grocery_Shop_Fronted\src\Components\demo.jsx", "JavaScript JSX", 6, 0, 0, 0, 2, 8
+"Total", "-", 11313, 5002, 24, 468, 2310, 19117

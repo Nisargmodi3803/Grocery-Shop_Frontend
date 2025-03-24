@@ -218,6 +218,8 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
                 }).then(() => {
                     navigate("/ecommerce/");
                 });
+            }else if(error.response.status === 400){
+                setIsAuthenticated(false);
             }
             else {
                 console.error(error);

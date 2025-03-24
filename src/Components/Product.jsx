@@ -64,24 +64,22 @@ export default function Product() {
     const fetchRatingAndReviews = async (slugTitle) => {
         if (!product) return;
 
-        if (product.no_of_rating === 0) {
-            setIsRatingThere(false);
-            return;
-        }
+        if (rating > 0) {
 
-        setIsRatingThere(true);
+            setIsRatingThere(true);
 
-        try {
-            const response = await axios.get(`http://localhost:9000/product-reviews/${slugTitle}`)
-            if (response.status === 200) {
-                setReviews(response.data);
-            }
-        } catch (error) {
-            if (error.response && error.response.status === 404) {
-                setIsRatingThere(false);
-            } else {
-                console.error("Error fetching rating and reviews:", error);
-                setIsRatingThere(false);
+            try {
+                const response = await axios.get(`http://localhost:9000/product-reviews/${slugTitle}`)
+                if (response.status === 200) {
+                    setReviews(response.data);
+                }
+            } catch (error) {
+                if (error.response && error.response.status === 404) {
+                    setIsRatingThere(false);
+                } else {
+                    console.error("Error fetching rating and reviews:", error);
+                    setIsRatingThere(false);
+                }
             }
         }
     };
@@ -108,8 +106,12 @@ export default function Product() {
             }
         };
         fetchProduct();
-        fetchRatingAndReviews(productSlugTitle);
+        // fetchRatingAndReviews(productSlugTitle);
     }, [productSlugTitle]);
+
+    useEffect(() => {
+        fetchRatingAndReviews(productSlugTitle);
+    });
 
 
     // Fetch Related Variants

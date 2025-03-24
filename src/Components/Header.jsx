@@ -127,7 +127,7 @@ export const Header = () => {
         };
 
         fetchAuthAndCheckBlock();
-    }, [navigate]);
+    });
 
 
     useEffect(() => {
