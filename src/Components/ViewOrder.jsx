@@ -281,7 +281,7 @@ export const ViewOrder = () => {
         };
     };
 
-    const handleReviewClick = (productId,invoiceId) => {
+    const handleReviewClick = (productId, invoiceId) => {
         setReviewProductId(productId);
         setReviewInvoiceId(invoiceId);
         setShowModal(true); // Open Modal
@@ -343,7 +343,7 @@ export const ViewOrder = () => {
                                         {orderList.invoiceStatus == 4 ? (
                                             <div className='review-button-section'>
                                                 <div className='review-button'
-                                                onClick={() => handleReviewClick(product.product?.id,product.invoice.invoiceId)}>Add Review</div>
+                                                    onClick={() => handleReviewClick(product.product?.id, product.invoice.invoiceId)}>Add Review</div>
                                             </div>
                                         ) : ""}
                                     </div>
@@ -362,6 +362,20 @@ export const ViewOrder = () => {
                         <p className="order-date">
                             Placed at {formatDateTime(orderList.invoiceDate, orderList.invoiceTime)}
                         </p>
+                        {
+                            orderList.invoiceDeliveryDate && orderList.invoiceStatus === 3 &&(
+                                <p className="order-date" style={{ color: "blue" }}>
+                                    Expected Delivery Date {orderList.invoiceDeliveryDate}
+                                </p>
+                            )
+                        }
+                        {
+                            orderList.invoiceDeliveryDate && orderList.invoiceStatus === 4 &&(
+                                <p className="order-date" style={{ color: "green" }}>
+                                    Order Delivered on {orderList.invoiceDeliveryDate}
+                                </p>
+                            )
+                        }
                         <div className="order-details-status">
                             <span className={
                                 orderList.invoiceStatus == 1 ? "Pending" :
@@ -443,7 +457,7 @@ export const ViewOrder = () => {
                     </div>
                 </div>
             </div>
-            {showModal && <ProductReview closeModal={closeModal} productId={reviewProductId} invoiceId={reviewInvoiceId}/>}
+            {showModal && <ProductReview closeModal={closeModal} productId={reviewProductId} invoiceId={reviewInvoiceId} />}
         </div >
 
     )
