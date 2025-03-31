@@ -321,13 +321,13 @@ export const SearchResult = () => {
     return (
         <div className='subcategory'>
             <section className='brand-main'>
-                <div className='brand-header' style={{marginTop:"10px",marginBottom:"0px"}}>
-                    <h1 class="brand-name" style={{textTransform:"none"}}>Search Result for "{searchQuery}"</h1>
+                <div className='brand-header' style={{ marginTop: "10px", marginBottom: "0px" }}>
+                    <h1 class="brand-name" style={{ textTransform: "none" }}>Search Result for "{searchQuery}"</h1>
                 </div>
 
                 <div className='card-section-lower1'>
                     {products.map((product) => {
-                        const imageSrc = imageMap[product.image_url] ||`http://localhost:9000/uploads/${product.image_url}` || imageMap["default.jpg"];
+                        const imageSrc = imageMap[product.image_url] || `http://localhost:9000/uploads/${product.image_url}` || imageMap["default.jpg"];
                         const discount = discountMap[product.id] || 0;
                         const rating = product.average_rating ? parseFloat(product.average_rating).toFixed(1) : 0;
                         const mrp = product.mrp ? `₹${product.mrp.toFixed(2)}` : "N/A";
@@ -350,7 +350,7 @@ export const SearchResult = () => {
                                         </div>
                                     </div>
                                     <div className='product-body1'>
-                                        <h5 className='product-text1'>{product.name}</h5>
+                                        <h5 className='product-text'>{product.name} - {product.variantName}</h5>
                                     </div>
                                     <div className='product-rating-main1'>
                                         {rating > 0 ? (

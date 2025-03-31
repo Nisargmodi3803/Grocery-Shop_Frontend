@@ -55,7 +55,7 @@ export const ContactUs = () => {
     if (authStatus) {
       fetchCustomerDetails();
     }
-  });
+  },[]);
 
   useEffect(() => {
     setLoading(true); 

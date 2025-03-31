@@ -546,13 +546,27 @@ export const MyOrderList = () => {
                                   {order.invoiceStatus == 6 && "Cancelled"}
                                 </h3>
                               </div>
-
                             </>
                           </h3>
                         </div>
-
                         <h3 className="order-amount">₹{order.invoiceTotalAmount}</h3>
                       </div>
+                      {/* <div >
+                        {
+                          order.invoiceDeliveryDate && order.invoiceStatus === 3 && (
+                            <p className="order-date" style={{ color: "blue" }}>
+                              Expected Delivery Date {order.invoiceDeliveryDate}
+                            </p>
+                          )
+                        }
+                        {
+                          order.invoiceDeliveryDate && order.invoiceStatus === 4 && (
+                            <p className="order-date" style={{ color: "green" }}>
+                              Order Delivered on {order.invoiceDeliveryDate}
+                            </p>
+                          )
+                        }
+                      </div> */}
                     </div>
                   </div>
                 ))

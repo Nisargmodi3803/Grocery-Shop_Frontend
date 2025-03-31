@@ -380,7 +380,7 @@ export const NewYearProductCard = () => {
       <section className='card-container'>
         <div className='card-section-header'>
           <h5>New Year</h5>
-          <button onClick={()=>navigate("/ecommerce/offers/new-year")}>View All</button>
+          <button onClick={() => navigate("/ecommerce/offers/new-year")}>View All</button>
         </div>
         <div className="product-slider-arrow">
           <BsArrowLeftCircleFill className="arrow2 arrow-left" onClick={handlePrev} />
@@ -411,7 +411,7 @@ export const NewYearProductCard = () => {
                     </div>
                   </div>
                   <div className='product-body'>
-                    <h5 className='product-text'>{product.name}</h5>
+                    <h5 className='product-text'>{product.name} - {product.variantName}</h5>
                   </div>
                   <div className='product-rating-main'>
                     {rating > 0 ? (

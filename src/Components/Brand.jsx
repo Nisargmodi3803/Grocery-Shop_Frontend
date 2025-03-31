@@ -453,14 +453,14 @@ export const Brand = () => {
                         }}
                         >Brand</a>
                         <span> {greater} </span>
-                        <a onClick={() => {  }}>{brandName || "Loading..."}</a>
+                        <a onClick={() => { }}>{brandName || "Loading..."}</a>
                     </span>
                 </section>
                 <section className='brand-main'>
                     <div className="brand-selector-container">
                         <div className="brand-scroll" ref={brandScrollRef}>
                             {brands.map((brand) => {
-                                const imageSrc = imageMap1[brand.image_url] || `http://localhost:9000/uploads/${brand.image_url}` || imageMap["default.jpg"] ;
+                                const imageSrc = imageMap1[brand.image_url] || `http://localhost:9000/uploads/${brand.image_url}` || imageMap["default.jpg"];
                                 return (
                                     <div
                                         key={brand.id}
@@ -509,7 +509,7 @@ export const Brand = () => {
                     }}
                     >Brand</a>
                     <span> {greater} </span>
-                    <a onClick={() => {  }}>{brandName || "Loading..."}</a>
+                    <a onClick={() => { }}>{brandName || "Loading..."}</a>
                 </span>
             </section>
 
@@ -573,7 +573,7 @@ export const Brand = () => {
                                         </div>
                                     </div>
                                     <div className='product-body1'>
-                                        <h5 className='product-text1'>{product.name}</h5>
+                                        <h5 className='product-text'>{product.name} - {product.variantName}</h5>
                                     </div>
                                     <div className='product-rating-main1'>
                                         {rating > 0 ? (

@@ -50,6 +50,7 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
     const [registrationMessage, setRegistrationMessage] = useState("");
     const [referralCodeExist, setReferralCodeExist] = useState();
     const [customerPointConfirmation, setCustomerPointConfirmation] = useState(false);
+    const [mobileNumberError, setMobileNumberError] = useState('');
 
     // useEffect(() => {
     //     setLoading(true);
@@ -202,7 +203,8 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
                 const timer = setTimeout(() => {
                     // window.location.reload();
                     closeModal();
-                }, 2000);
+                }, 800);
+                // closeModal();
             }
             else {
                 setIsAuthenticated(false);
@@ -308,7 +310,7 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
                         }
                     } catch (error) {
                         if (error.response.status === 404) {
-                            console.log("Customer not found fuck");
+                            console.log("Customer not found");
                         } else {
                             console.error(error);
                             alert('something went wrong in customer points!!!');
@@ -346,15 +348,20 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
                 const timer = setTimeout(() => {
                     closeModal();
                     // window.location.reload();
-                }, 2000);
+                }, 800);
+                // closeModal();
             }
             else {
                 setIsAuthenticated(false);
                 setRegistrationMessage("❌ Registration Failed!");
             }
         } catch (error) {
+            if(error.response.status === 409){
+                setRegistrationMessage("❌ Registration Failed! Email or Mobile number Already Exists");
+            }else{
             console.error(error);
             alert('Registration Failed');
+            }
         } finally {
             setLoading(false);
         }
@@ -562,7 +569,8 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
                 const timer = setTimeout(() => {
                     // window.location.reload();
                     closeModal();
-                }, 2000);
+                }, 800);
+                // closeModal();
             }
 
         } catch (error) {
@@ -610,7 +618,8 @@ export const LoginSignUpModal = ({ closeModal, productSlugTitle, brandSlugTitle,
                     // window.location.reload();
                     setIsLogin(true);
                     setForgotPassword(false);
-                }, 2000);
+                    closeModal();
+                }, 800);
             }
         } catch (error) {
             if (error.response) {

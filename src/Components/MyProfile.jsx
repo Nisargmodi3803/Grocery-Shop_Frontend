@@ -142,7 +142,7 @@ export const MyProfile = () => {
 
     useEffect(() => {
         fetchCustomerDetails();
-    }, []);
+    }, [image]);
 
     const handleSaveProfileClick = async () => {
         try {

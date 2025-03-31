@@ -458,7 +458,7 @@ export const Offers = () => {
                     }}
                     >Offers</a>
                     <span> {greater} </span>
-                    <a onClick={() => {  }}>Best Of Veg. & Fruits</a>
+                    <a onClick={() => { }}>Best Of Veg. & Fruits</a>
                 </span>
             </section>
 
@@ -501,7 +501,7 @@ export const Offers = () => {
                                         </div>
                                     </div>
                                     <div className='product-body1'>
-                                        <h5 className='product-text1'>{product.name}</h5>
+                                        <h5 className='product-text'>{product.name} - {product.variantName}</h5>
                                     </div>
                                     <div className='product-rating-main1'>
                                         {rating > 0 ? (
