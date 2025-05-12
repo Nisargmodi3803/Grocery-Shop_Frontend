@@ -142,7 +142,7 @@ export const MyProfile = () => {
 
     useEffect(() => {
         fetchCustomerDetails();
-    }, [image]);
+    }, [editMode["name"], editMode["mobile"], editMode["gender"], editMode["dob"], editMode["address"],image]); // Fetch customer details when edit mode changes
 
     const handleSaveProfileClick = async () => {
         try {

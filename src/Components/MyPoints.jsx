@@ -287,7 +287,7 @@ export const MyPoints = () => {
                 </div>
               )}
             </div>
-            <h3><b>Hello</b> {customer.customerName}</h3>
+            <h3>Hello {customer.customerName}</h3>
             <p>{customer.customerMobile}</p>
             <p className='ecommerce-points'>
               Ecommerce Points: <span>{customer.customerPoints ? customer.customerPoints.toFixed(2) : '0.00'}</span>

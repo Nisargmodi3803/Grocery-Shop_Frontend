@@ -210,6 +210,7 @@ export const MyWishList = () => {
     } catch (error) {
       if (error.response.status === 404) {
         console.log("Customer not found");
+        setProducts([]);
       } else {
         console.error("Error fetching wish list:", error);
       }
@@ -369,6 +370,7 @@ export const MyWishList = () => {
 
       if (response.status === 200) {
         console.log(`Product disliked successfully`);
+        fetchWishListProducts(); // Refresh the wishlist after disliking a product
         // window.location.reload();
       }
     } catch (error) {
@@ -471,7 +473,7 @@ export const MyWishList = () => {
                 </div>
               )}
             </div>
-            <h3><b>Hello</b> {customer.customerName}</h3>
+            <h3>Hello {customer.customerName}</h3>
             <p>{customer.customerMobile}</p>
             <p className='ecommerce-points'>
               Ecommerce Points: <span>{customer.customerPoints ? customer.customerPoints.toFixed(2) : '0.00'}</span>

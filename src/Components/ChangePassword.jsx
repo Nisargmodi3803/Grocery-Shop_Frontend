@@ -43,6 +43,8 @@ export const ChangePassword = () => {
   const navigate = useNavigate();
   const { setLoading } = useLoading();
   const [showPassword, setShowPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [changePassword, setChangePassword] = useState({
     oldPassword: "",
     newPassword: "",
@@ -104,7 +106,6 @@ export const ChangePassword = () => {
       formData.append('file', selectedFile);  // <-- Key should be "file" (matches backend)
 
       try {
-        console.log("API CALL")
         const response = await axios.patch(
           `http://localhost:9000/change-profile-image/${sessionStorage.getItem("customerEmail")}`,
           formData,
@@ -268,8 +269,10 @@ export const ChangePassword = () => {
         setSuccess(true);
         setMessage("Password Changed Successfully!");
         setTimeout(() => {
-          // window.location.reload();
-        }, 3000);
+          setSuccess();
+          setMessage("");
+          window.location.reload();
+        }, 1000);
       }
     } catch (error) {
       if (error.response.status === 401) {
@@ -325,7 +328,7 @@ export const ChangePassword = () => {
                 </div>
               )}
             </div>
-            <h3><b>Hello</b> {customer.customerName}</h3>
+            <h3>Hello {customer.customerName}</h3>
             <p>{customer.customerMobile}</p>
             <p className='ecommerce-points'>
               Ecommerce Points: <span>{customer.customerPoints ? customer.customerPoints.toFixed(2) : '0.00'}</span>
@@ -389,7 +392,7 @@ export const ChangePassword = () => {
                   name='oldPassword'
                   onChange={(e) => handleInputChange(e)}
                 />
-                <button type="button" className="toggle-btn" onClick={togglePasswordVisibility}>
+                <button type="button" className="toggle-btn" onClick={() => setShowPassword(!showPassword)}>
                   {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </button>
               </div>
@@ -398,14 +401,14 @@ export const ChangePassword = () => {
               <h3><TbPasswordMobilePhone /> NEW PASSWORD</h3>
               <div className='password-container'>
                 <input
-                  type={showPassword ? 'text' : 'password'}
+                  type={showNewPassword ? 'text' : 'password'}
                   placeholder='ENTER YOUR NEW PASSWORD'
                   className='input-field'
                   name='newPassword'
                   onChange={(e) => handleInputChange(e)}
                 />
-                <button type="button" className="toggle-btn" onClick={togglePasswordVisibility}>
-                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                <button type="button" className="toggle-btn" onClick={() => setShowNewPassword(!showNewPassword)}>
+                  {showNewPassword ? <FaEyeSlash /> : <FaEye />}
                 </button>
               </div>
               {errors.password && <span className='error'>{errors.password}</span>}
@@ -414,14 +417,14 @@ export const ChangePassword = () => {
               <h3><GiConfirmed /> CONFIRM PASSWORD</h3>
               <div className='password-container'>
                 <input
-                  type={showPassword ? 'text' : 'password'}
+                  type={showConfirmPassword ? 'text' : 'password'}
                   placeholder='CONFIRM PASSWORD'
                   className='input-field'
                   name='confirmPassword'
                   onChange={(e) => handleInputChange(e)}
                 />
-                <button type="button" className="toggle-btn" onClick={togglePasswordVisibility}>
-                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                <button type="button" className="toggle-btn" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+                  {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
                 </button>
               </div>
               {errors.confirmPassword && <span className='error'>{errors.confirmPassword}</span>}
